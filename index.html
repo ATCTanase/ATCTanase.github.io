@@ -23,9 +23,6 @@ input, textarea {
 </style>
 </head>
 <body>
-<canvas id="unity-canvas" width="750" height="1333" tabindex="-1"></canvas>
-<input id="testInput" placeholder="入力" style="top:80%; left:10%; width:80%;">
-
 <script>
 // ホーム画面起動判定
 function isStandalone() {
@@ -74,31 +71,24 @@ function resizeCanvas() {
     screen.orientation.lock("landscape").catch(err=>console.warn(err));
   }
 }
-
-// キーボード上に入力欄を移動
-  function setupKeyboardInput() {
-  const canvas = document.getElementById("unity-canvas");
+// キーボード表示時に入力欄を上に移動
+function setupKeyboardInput() {
   const inputs = document.querySelectorAll("input, textarea");
 
-  inputs.forEach(input => {
-    input.addEventListener("focus", () => {
-      setTimeout(() => {
+  inputs.forEach(input=>{
+    input.addEventListener("focus", ()=>{
+      setTimeout(()=>{
         const viewport = window.visualViewport || window;
         const keyboardHeight = window.innerHeight - viewport.height;
-
-        // Canvas が rotate されている場合は transform に足す
-        input.style.position = "absolute";
-        input.style.transition = "transform 0.3s";
-
-        input.style.transform = `translateY(-${keyboardHeight + 20}px)`; // 20px margin
-      }, 300); // iOS Safari キーボード表示遅延対応
+        input.style.transform = `translate(-50%, -50%) translateY(-${keyboardHeight + 20}px)`;
+      },300);
     });
-
-    input.addEventListener("blur", () => {
-      input.style.transform = `translateY(0)`; // 元に戻す
+    input.addEventListener("blur", ()=>{
+      input.style.transform = `translate(-50%, -50%)`;
     });
   });
 }
+
 
 // 初回ロード
 window.addEventListener("load", ()=>{
@@ -209,6 +199,7 @@ window.addEventListener("resize", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
