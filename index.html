@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
       <meta name="apple-mobile-web-app-orientation" content="landscape">
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-      <style>
+<style>
 html, body {
   margin: 0;
   padding: 0;
@@ -52,7 +52,7 @@ function resizeCanvas() {
 
     canvas.style.width = canvasWidth + "px";
     canvas.style.height = canvasHeight + "px";
-    canvas.style.transform = `translate(-50%, -50%) rotate(90deg)`;
+    canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
   } else {
     // 横画面
     if (screenWidth / screenHeight > gameRatio) {
@@ -65,7 +65,7 @@ function resizeCanvas() {
 
     canvas.style.width = canvasWidth + "px";
     canvas.style.height = canvasHeight + "px";
-    canvas.style.transform = `translate(-50%, -50%)`;
+    canvas.style.transform = "translate(-50%, -50%)";
   }
 
   canvas.style.top = "50%";
@@ -170,6 +170,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
