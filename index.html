@@ -11,22 +11,20 @@
       <meta name="apple-mobile-web-app-orientation" content="landscape">
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
       <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: black;
-  }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: black;
+}
 
-  #unity-canvas {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform-origin: center center;
-    background: black;
-  }
+#unity-canvas {
+  position: absolute;
+  background: black;
+  transform-origin: center center;
+}
   </style>
       <script>
         let initialHeight = window.innerHeight;
@@ -49,31 +47,31 @@ function resizeCanvas() {
 
   if (h > w) {
     // 縦画面 → 横画面固定
-    canvas.style.width = `${h}px`;  // 回転後の幅 = 画面高さ
-    canvas.style.height = `${w}px`; // 回転後の高さ = 画面幅
-    canvas.style.position = "absolute";
+    const scale = h / w; // 画面比に合わせる
+    canvas.style.width = h + "px";   // 横幅 = 画面高さ
+    canvas.style.height = w + "px";  // 高さ = 画面幅
+
     canvas.style.top = "50%";
     canvas.style.left = "50%";
-    canvas.style.transform = "rotate(90deg) translate(-50%, -50%)";
-    canvas.style.transformOrigin = "center center";
+    canvas.style.transform = `translate(-50%, -50%) rotate(90deg)`;
   } else {
     // 横画面
+    let width, height;
     if (w / h > gameRatio) {
-      canvas.style.width = `${h * gameRatio}px`;
-      canvas.style.height = `${h}px`;
+      width = h * gameRatio;
+      height = h;
     } else {
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${w / gameRatio}px`;
+      width = w;
+      height = w / gameRatio;
     }
-    canvas.style.position = "absolute";
+
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
     canvas.style.top = "50%";
     canvas.style.left = "50%";
     canvas.style.transform = "translate(-50%, -50%)";
-    canvas.style.transformOrigin = "center center";
   }
 }
-
-
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
 
@@ -173,6 +171,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
