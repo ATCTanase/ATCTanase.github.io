@@ -31,45 +31,50 @@ html, body {
 <script>
 function resizeCanvas() {
 const canvas = document.getElementById("unity-canvas");
-
-// 回転後のサイズを計算
-let canvasWidth, canvasHeight;
+const screenWidth = window.innerWidth;
+const screenHeight = window.innerHeight;
 const gameRatio = 16/9;
-if (screenHeight > screenWidth) {
+
+let canvasWidth, canvasHeight;
+
+if(screenHeight > screenWidth){
+    // 縦画面 → 横画面固定
     const rotatedWidth = screenHeight;
     const rotatedHeight = screenWidth;
-    if (rotatedWidth / rotatedHeight > gameRatio) {
+
+    if(rotatedWidth / rotatedHeight > gameRatio){
         canvasHeight = rotatedHeight;
         canvasWidth = canvasHeight * gameRatio;
     } else {
         canvasWidth = rotatedWidth;
         canvasHeight = canvasWidth / gameRatio;
     }
+
+    canvas.style.width = canvasWidth + "px";
+    canvas.style.height = canvasHeight + "px";
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
 } else {
-    if (screenWidth / screenHeight > gameRatio) {
+    // 横画面
+    if(screenWidth / screenHeight > gameRatio){
         canvasHeight = screenHeight;
         canvasWidth = canvasHeight * gameRatio;
     } else {
         canvasWidth = screenWidth;
         canvasHeight = canvasWidth / gameRatio;
     }
+
+    canvas.style.width = canvasWidth + "px";
+    canvas.style.height = canvasHeight + "px";
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    canvas.style.transform = "translate(-50%, -50%)";
 }
 
-// CSSサイズ
-canvas.style.width = canvasWidth + "px";
-canvas.style.height = canvasHeight + "px";
-
-// 内部描画解像度も合わせる
-canvas.width = canvasWidth;
-canvas.height = canvasHeight;
-
-// 回転と中央配置
 canvas.style.top = "50%";
 canvas.style.left = "50%";
 canvas.style.transformOrigin = "center center";
-canvas.style.transform = screenHeight > screenWidth ?
-    "translate(-50%, -50%) rotate(90deg)" :
-    "translate(-50%, -50%)";
 }
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
@@ -169,6 +174,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
