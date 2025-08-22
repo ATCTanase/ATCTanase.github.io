@@ -37,17 +37,28 @@ function resizeCanvas() {
 
   if (screenHeight > screenWidth) {
     // 縦画面 → 横画面固定
-    canvasWidth = screenWidth;
-    canvasHeight = canvasWidth / gameRatio;
+    const rotatedWidth = screenHeight;   // 回転後の横幅
+    const rotatedHeight = screenWidth;   // 回転後の高さ
 
-    if (canvasHeight > screenHeight) {
-      canvasHeight = screenHeight;
+    if (rotatedWidth / rotatedHeight > gameRatio) {
+      canvasHeight = rotatedHeight;
       canvasWidth = canvasHeight * gameRatio;
+    } else {
+      canvasWidth = rotatedWidth;
+      canvasHeight = canvasWidth / gameRatio;
     }
 
+    // 内部解像度と CSS サイズを一致
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
     canvas.style.width = canvasWidth + "px";
     canvas.style.height = canvasHeight + "px";
-    canvas.style.transform = `translate(-50%, -50%) rotate(90deg)`;
+
+    // 回転と中央配置
+    canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
+    canvas.style.transformOrigin = "center center";
+    canvas.style.top = "50%";
+    canvas.style.left = "50%";
   } else {
     // 横画面
     if (screenWidth / screenHeight > gameRatio) {
@@ -58,13 +69,24 @@ function resizeCanvas() {
       canvasHeight = canvasWidth / gameRatio;
     }
 
+    // 内部解像度と CSS サイズを一致
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
     canvas.style.width = canvasWidth + "px";
     canvas.style.height = canvasHeight + "px";
-    canvas.style.transform = `translate(-50%, -50%)`;
-  }
 
-  canvas.style.top = "50%";
-  canvas.style.left = "50%";
+    // 中央配置
+    canvas.style.transform = "translate(-50%, -50%)";
+    canvas.style.transformOrigin = "center center";
+    canvas.style.top = "50%";
+    canvas.style.left = "50%";
+  }
+}
+
+// 初回ロード＆リサイズ時に呼び出す
+window.addEventListener("load", resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
+
 }
 
 window.addEventListener("resize", resizeCanvas);
@@ -165,16 +187,3 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
