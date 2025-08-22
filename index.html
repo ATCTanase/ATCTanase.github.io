@@ -86,11 +86,6 @@ function resizeCanvas() {
 // 初回ロード＆リサイズ時に呼び出す
 window.addEventListener("load", resizeCanvas);
 window.addEventListener("resize", resizeCanvas);
-
-}
-
-window.addEventListener("resize", resizeCanvas);
-window.addEventListener("load", resizeCanvas);
     </script>
   </head>
   <body>
@@ -109,6 +104,13 @@ window.addEventListener("load", resizeCanvas);
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("ServiceWorker.js");
         }
+        
+  // 横画面ロック（対応ブラウザのみ）
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock("landscape").catch((err) => {
+      console.warn("Orientation lock failed:", err);
+    });
+  }
       });
 
       var container = document.querySelector("#unity-container");
@@ -187,3 +189,4 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
