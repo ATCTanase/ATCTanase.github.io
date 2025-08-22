@@ -11,81 +11,87 @@
       <meta name="apple-mobile-web-app-orientation" content="landscape">
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
       <style>
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: black;
-}
-
-#unity-canvas {
-  position: absolute;
-  background: black;
-  transform-origin: center center;
-}
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: black;
+    }
+    #unity-canvas {
+      position: absolute;
+      background: black;
+      transform-origin: center center;
+      display: block;
+    }
   </style>
       <script>
-function resizeCanvas() {
-  const canvas = document.getElementById("unity-canvas");
-  const screenWidth = window.innerWidth;
-  const screenHeight = window.innerHeight;
-  const gameRatio = 16 / 9;
+ const canvas = document.getElementById("unity-canvas");
+    const gameRatio = 16 / 9; // Unity 横画面比率
 
-  let canvasWidth, canvasHeight;
+    function resizeCanvas() {
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
 
-  if (screenHeight > screenWidth) {
-    // 縦画面 → 横画面固定
-    const rotatedWidth = screenHeight;   // 回転後の横幅
-    const rotatedHeight = screenWidth;   // 回転後の高さ
+      let canvasWidth, canvasHeight;
 
-    if (rotatedWidth / rotatedHeight > gameRatio) {
-      canvasHeight = rotatedHeight;
-      canvasWidth = canvasHeight * gameRatio;
-    } else {
-      canvasWidth = rotatedWidth;
-      canvasHeight = canvasWidth / gameRatio;
+      if (screenHeight > screenWidth) {
+        // 縦画面 → 横画面固定表示
+        const rotatedWidth = screenHeight;
+        const rotatedHeight = screenWidth;
+
+        if (rotatedWidth / rotatedHeight > gameRatio) {
+          canvasHeight = rotatedHeight;
+          canvasWidth = canvasHeight * gameRatio;
+        } else {
+          canvasWidth = rotatedWidth;
+          canvasHeight = canvasWidth / gameRatio;
+        }
+
+        // 内部解像度と CSS を一致
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        canvas.style.width = canvasWidth + "px";
+        canvas.style.height = canvasHeight + "px";
+
+        // 回転と中央配置
+        canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
+      } else {
+        // 横画面
+        if (screenWidth / screenHeight > gameRatio) {
+          canvasHeight = screenHeight;
+          canvasWidth = canvasHeight * gameRatio;
+        } else {
+          canvasWidth = screenWidth;
+          canvasHeight = canvasWidth / gameRatio;
+        }
+
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        canvas.style.width = canvasWidth + "px";
+        canvas.style.height = canvasHeight + "px";
+
+        canvas.style.transform = "translate(-50%, -50%)";
+      }
+
+      canvas.style.top = "50%";
+      canvas.style.left = "50%";
+      canvas.style.transformOrigin = "center center";
     }
 
-    // 内部解像度と CSS サイズを一致
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    canvas.style.width = canvasWidth + "px";
-    canvas.style.height = canvasHeight + "px";
+    window.addEventListener("load", () => {
+      resizeCanvas();
 
-    // 回転と中央配置
-    canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
-    canvas.style.transformOrigin = "center center";
-    canvas.style.top = "50%";
-    canvas.style.left = "50%";
-  } else {
-    // 横画面
-    if (screenWidth / screenHeight > gameRatio) {
-      canvasHeight = screenHeight;
-      canvasWidth = canvasHeight * gameRatio;
-    } else {
-      canvasWidth = screenWidth;
-      canvasHeight = canvasWidth / gameRatio;
-    }
+      // Android Chrome など対応ブラウザで横画面ロック
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock("landscape").catch(err => {
+          console.warn("Orientation lock failed:", err);
+        });
+      }
+    });
 
-    // 内部解像度と CSS サイズを一致
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    canvas.style.width = canvasWidth + "px";
-    canvas.style.height = canvasHeight + "px";
-
-    // 中央配置
-    canvas.style.transform = "translate(-50%, -50%)";
-    canvas.style.transformOrigin = "center center";
-    canvas.style.top = "50%";
-    canvas.style.left = "50%";
-  }
-}
-
-// 初回ロード＆リサイズ時に呼び出す
-window.addEventListener("load", resizeCanvas);
-window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", resizeCanvas);
     </script>
   </head>
   <body>
@@ -104,13 +110,6 @@ window.addEventListener("resize", resizeCanvas);
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("ServiceWorker.js");
         }
-        
-  // 横画面ロック（対応ブラウザのみ）
-  if (screen.orientation && screen.orientation.lock) {
-    screen.orientation.lock("landscape").catch((err) => {
-      console.warn("Orientation lock failed:", err);
-    });
-  }
       });
 
       var container = document.querySelector("#unity-container");
@@ -189,4 +188,5 @@ window.addEventListener("resize", resizeCanvas);
     </script>
   </body>
 </html>
+
 
