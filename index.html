@@ -27,24 +27,22 @@ html, body {
   display: block;
 }
 </style>
-
-<canvas id="unity-canvas" width="750" height="1333" tabindex="-1"></canvas>
-
 <script>
-function resizeCanvas() {
-  const canvas = document.getElementById("unity-canvas");
+function resizeUnityCanvas() {
+  const container = document.getElementById("unity-container");
+  const canvas = container.querySelector("canvas");
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
-  const gameRatio = 16 / 9; // Unity 横画面比率
+  const gameRatio = 16/9;
 
   let canvasWidth, canvasHeight;
 
-  if (screenHeight > screenWidth) {
+  if(screenHeight > screenWidth){
     // 縦画面 → 横画面固定
-    const rotatedWidth = screenHeight;   // 回転後の横幅
-    const rotatedHeight = screenWidth;   // 回転後の高さ
+    const rotatedWidth = screenHeight;
+    const rotatedHeight = screenWidth;
 
-    if (rotatedWidth / rotatedHeight > gameRatio) {
+    if(rotatedWidth / rotatedHeight > gameRatio){
       canvasHeight = rotatedHeight;
       canvasWidth = canvasHeight * gameRatio;
     } else {
@@ -52,19 +50,15 @@ function resizeCanvas() {
       canvasHeight = canvasWidth / gameRatio;
     }
 
-    // CSSサイズ
     canvas.style.width = canvasWidth + "px";
     canvas.style.height = canvasHeight + "px";
-
-    // 内部解像度も更新
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
-    // 回転と中央配置
     canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
   } else {
     // 横画面
-    if (screenWidth / screenHeight > gameRatio) {
+    if(screenWidth / screenHeight > gameRatio){
       canvasHeight = screenHeight;
       canvasWidth = canvasHeight * gameRatio;
     } else {
@@ -72,29 +66,22 @@ function resizeCanvas() {
       canvasHeight = canvasWidth / gameRatio;
     }
 
-    // CSSサイズ
     canvas.style.width = canvasWidth + "px";
     canvas.style.height = canvasHeight + "px";
-
-    // 内部解像度
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
-    // 中央配置
     canvas.style.transform = "translate(-50%, -50%)";
   }
 
-  // 常に中央に配置
   canvas.style.top = "50%";
   canvas.style.left = "50%";
   canvas.style.transformOrigin = "center center";
 }
 
-// 初回ロード＆リサイズ時に調整
-window.addEventListener("load", resizeCanvas);
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("load", resizeUnityCanvas);
+window.addEventListener("resize", resizeUnityCanvas);
 </script>
-
   </head>
   <body>
     <div id="unity-container">
@@ -190,6 +177,7 @@ window.addEventListener("resize", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
