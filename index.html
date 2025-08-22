@@ -30,48 +30,47 @@ html, body {
 
 <script>
 function resizeCanvas() {
-  const canvas = document.getElementById("unity-canvas");
-  const screenWidth = window.innerWidth;
-  const screenHeight = window.innerHeight;
-  const gameRatio = 16 / 9; // Unity 横画面比率
+const canvas = document.getElementById("unity-canvas");
 
-  let canvasWidth, canvasHeight;
-
-  if (screenHeight > screenWidth) {
-    // 縦画面 → 横画面固定
+// 回転後のサイズを計算
+let canvasWidth, canvasHeight;
+const gameRatio = 16/9;
+if (screenHeight > screenWidth) {
     const rotatedWidth = screenHeight;
     const rotatedHeight = screenWidth;
-
     if (rotatedWidth / rotatedHeight > gameRatio) {
-      canvasHeight = rotatedHeight;
-      canvasWidth = canvasHeight * gameRatio;
+        canvasHeight = rotatedHeight;
+        canvasWidth = canvasHeight * gameRatio;
     } else {
-      canvasWidth = rotatedWidth;
-      canvasHeight = canvasWidth / gameRatio;
+        canvasWidth = rotatedWidth;
+        canvasHeight = canvasWidth / gameRatio;
     }
-
-    canvas.style.width = canvasWidth + "px";
-    canvas.style.height = canvasHeight + "px";
-    canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
-  } else {
-    // 横画面
+} else {
     if (screenWidth / screenHeight > gameRatio) {
-      canvasHeight = screenHeight;
-      canvasWidth = canvasHeight * gameRatio;
+        canvasHeight = screenHeight;
+        canvasWidth = canvasHeight * gameRatio;
     } else {
-      canvasWidth = screenWidth;
-      canvasHeight = canvasWidth / gameRatio;
+        canvasWidth = screenWidth;
+        canvasHeight = canvasWidth / gameRatio;
     }
-
-    canvas.style.width = canvasWidth + "px";
-    canvas.style.height = canvasHeight + "px";
-    canvas.style.transform = "translate(-50%, -50%)";
-  }
-
-  canvas.style.top = "50%";
-  canvas.style.left = "50%";
 }
 
+// CSSサイズ
+canvas.style.width = canvasWidth + "px";
+canvas.style.height = canvasHeight + "px";
+
+// 内部描画解像度も合わせる
+canvas.width = canvasWidth;
+canvas.height = canvasHeight;
+
+// 回転と中央配置
+canvas.style.top = "50%";
+canvas.style.left = "50%";
+canvas.style.transformOrigin = "center center";
+canvas.style.transform = screenHeight > screenWidth ?
+    "translate(-50%, -50%) rotate(90deg)" :
+    "translate(-50%, -50%)";
+}
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
 </script>
@@ -170,6 +169,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
