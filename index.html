@@ -78,19 +78,26 @@
         const rotatedWidth = screenHeight;
         const rotatedHeight = screenWidth;
 
-        if(rotatedWidth / rotatedHeight > gameRatio){
-          canvasHeight = rotatedHeight;
-          canvasWidth = canvasHeight * gameRatio;
-        } else {
-          canvasWidth = rotatedWidth;
-          canvasHeight = canvasWidth / gameRatio;
-        }
+// 回転後に画面に収める
+if(rotatedWidth / rotatedHeight > gameRatio){
+    canvasHeight = rotatedHeight;
+    canvasWidth = canvasHeight * gameRatio;
+} else {
+    canvasWidth = rotatedWidth;
+    canvasHeight = canvasWidth / gameRatio;
+}
 
-        canvas.style.width = canvasWidth + "px";
-        canvas.style.height = canvasHeight + "px";
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
-        canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
+// 内部解像度とCSSサイズを一致
+canvas.width = canvasWidth;
+canvas.height = canvasHeight;
+canvas.style.width = canvasWidth + "px";
+canvas.style.height = canvasHeight + "px";
+
+// 中央配置・回転
+canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
+canvas.style.transformOrigin = "center center";
+canvas.style.top = "50%";
+canvas.style.left = "50%";
       } else {
         // 横画面
         if(screenWidth / screenHeight > gameRatio){
@@ -153,3 +160,4 @@
   </script>
 </body>
 </html>
+
