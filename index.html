@@ -31,38 +31,46 @@ function resizeCanvas() {
   const canvas = document.getElementById("unity-canvas");
   const w = window.innerWidth;
   const h = window.innerHeight;
-  const gameRatio = 16 / 9;
+  const gameRatio = 16 / 9; // Unity の横画面比率
+
+  let canvasWidth, canvasHeight;
 
   if (h > w) {
     // 縦画面 → 横画面固定
-    const scale = h / w; // 画面比に合わせる
-    canvas.style.width = h + "px";   // 横幅 = 画面高さ
-    canvas.style.height = w + "px";  // 高さ = 画面幅
+    // 画面に収まるサイズを計算
+    if (h / w > gameRatio) {
+      canvasWidth = w * gameRatio;
+      canvasHeight = w;
+    } else {
+      canvasWidth = h;
+      canvasHeight = h / gameRatio;
+    }
 
+    canvas.style.width = canvasWidth + "px";
+    canvas.style.height = canvasHeight + "px";
     canvas.style.top = "50%";
     canvas.style.left = "50%";
     canvas.style.transform = `translate(-50%, -50%) rotate(90deg)`;
   } else {
     // 横画面
-    let width, height;
     if (w / h > gameRatio) {
-      width = h * gameRatio;
-      height = h;
+      canvasWidth = h * gameRatio;
+      canvasHeight = h;
     } else {
-      width = w;
-      height = w / gameRatio;
+      canvasWidth = w;
+      canvasHeight = w / gameRatio;
     }
 
-    canvas.style.width = width + "px";
-    canvas.style.height = height + "px";
+    canvas.style.width = canvasWidth + "px";
+    canvas.style.height = canvasHeight + "px";
     canvas.style.top = "50%";
     canvas.style.left = "50%";
-    canvas.style.transform = "translate(-50%, -50%)";
+    canvas.style.transform = `translate(-50%, -50%)`;
   }
 }
+
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
-
     </script>
   </head>
   <body>
@@ -159,6 +167,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
