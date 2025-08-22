@@ -76,23 +76,26 @@ function resizeCanvas() {
 }
 
 // キーボード上に入力欄を移動
-function setupKeyboardInput() {
+  function setupKeyboardInput() {
+  const canvas = document.getElementById("unity-canvas");
   const inputs = document.querySelectorAll("input, textarea");
-  inputs.forEach(input=>{
-    input.addEventListener("focus", ()=>{
-      setTimeout(()=>{
+
+  inputs.forEach(input => {
+    input.addEventListener("focus", () => {
+      setTimeout(() => {
         const viewport = window.visualViewport || window;
         const keyboardHeight = window.innerHeight - viewport.height;
-        const rect = input.getBoundingClientRect();
-        const offset = keyboardHeight + 10;
-        window.scrollTo({
-          top: rect.top + window.scrollY - offset,
-          behavior: "smooth"
-        });
-      },300);
+
+        // Canvas が rotate されている場合は transform に足す
+        input.style.position = "absolute";
+        input.style.transition = "transform 0.3s";
+
+        input.style.transform = `translateY(-${keyboardHeight + 20}px)`; // 20px margin
+      }, 300); // iOS Safari キーボード表示遅延対応
     });
-    input.addEventListener("blur", ()=>{
-      window.scrollTo({top:0, behavior:"smooth"});
+
+    input.addEventListener("blur", () => {
+      input.style.transform = `translateY(0)`; // 元に戻す
     });
   });
 }
@@ -206,6 +209,7 @@ window.addEventListener("resize", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
