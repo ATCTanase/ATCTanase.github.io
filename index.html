@@ -45,15 +45,15 @@ function resizeCanvas() {
   const canvas = document.getElementById("unity-canvas");
   const w = window.innerWidth;
   const h = window.innerHeight;
-  const gameRatio = 16 / 9; // Unity のゲーム比率に合わせる (例: 16:9)
+  const gameRatio = 16 / 9;
 
   if (w < h) {
-    // 📱 縦持ちでも横画面に固定
+    // 縦持ちでも横画面表示
     canvas.style.width = `${h}px`;
     canvas.style.height = `${w}px`;
-    canvas.style.transform = `rotate(90deg) translate(0, -50%) translate(50%, 0)`;
+    canvas.style.transform = `rotate(90deg) translate(-50%, -50%)`;
   } else {
-    // 💻 横持ちのとき
+    // 横持ち
     if (w / h > gameRatio) {
       canvas.style.width = `${h * gameRatio}px`;
       canvas.style.height = `${h}px`;
@@ -63,8 +63,10 @@ function resizeCanvas() {
     }
     canvas.style.transform = "translate(-50%, -50%)";
   }
+  canvas.style.position = "absolute";
+  canvas.style.top = "50%";
+  canvas.style.left = "50%";
 }
-
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
 
@@ -164,6 +166,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
