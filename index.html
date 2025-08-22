@@ -27,18 +27,6 @@ html, body {
 }
   </style>
       <script>
-        let initialHeight = window.innerHeight;
-        window.addEventListener('resize', () => {
-          const unityCanvas = document.getElementById('unity-canvas'); // Unity Canvas ID
-          const currentHeight = window.innerHeight;
-        if (currentHeight < initialHeight) {
-          unityCanvas.style.position = 'absolute';
-          unityCanvas.style.top = '0px';
-        } else {
-          unityCanvas.style.position = 'relative';
-          unityCanvas.style.top = '0px';
-        }
-      });
 function resizeCanvas() {
   const canvas = document.getElementById("unity-canvas");
   const w = window.innerWidth;
@@ -171,6 +159,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
