@@ -23,27 +23,7 @@
           unityCanvas.style.top = '0px';
         }
       });
-function resizeCanvas() {
-  const canvas = document.getElementById("unity-canvas");
-  const w = window.innerWidth;
-  const h = window.innerHeight;
 
-  if (w < h) {
-    // 縦持ち → キャンバスを90度回転 & 中央に配置
-    canvas.style.width = `${h}px`;
-    canvas.style.height = `${w}px`;
-    canvas.style.transform = `rotate(90deg) translate(0, -100%)`;
-    canvas.style.transformOrigin = "top left";
-  } else {
-    // 横持ち → 通常表示
-    canvas.style.width = `${w}px`;
-    canvas.style.height = `${h}px`;
-    canvas.style.transform = `none`;
-  }
-}
-
-window.addEventListener("resize", resizeCanvas);
-window.addEventListener("load", resizeCanvas);
     </script>
   </head>
   <body>
@@ -140,4 +120,5 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
