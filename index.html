@@ -23,16 +23,24 @@
 }
   </style>
 <script>
-function checkOrientation() {
+function adjustCanvasRotation() {
+  var canvas = document.getElementById("unity-canvas");
   if (window.innerHeight > window.innerWidth) {
-    document.getElementById("rotateOverlay").style.display = "block";
+    // 縦持ち → 横向きに回転
+    canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
+    canvas.style.width = window.innerHeight + "px";
+    canvas.style.height = window.innerWidth + "px";
   } else {
-    document.getElementById("rotateOverlay").style.display = "none";
+    // 横持ち → 通常表示
+    canvas.style.transform = "translate(-50%, -50%) rotate(0deg)";
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
   }
 }
-window.addEventListener("resize", checkOrientation);
-window.addEventListener("orientationchange", checkOrientation);
-checkOrientation();
+
+window.addEventListener("resize", adjustCanvasRotation);
+window.addEventListener("orientationchange", adjustCanvasRotation);
+adjustCanvasRotation();
 </script>
   </head>
   <body>
@@ -129,5 +137,6 @@ checkOrientation();
     </script>
   </body>
 </html>
+
 
 
