@@ -23,7 +23,30 @@
           unityCanvas.style.top = '0px';
         }
       });
+function resizeCanvas() {
+  const canvas = document.getElementById("unity-canvas");
+  const gameRatio = 16 / 9; // ゲームのアスペクト比（例: 16:9）
 
+  let w = window.innerWidth;
+  let h = window.innerHeight;
+
+  if (w / h > gameRatio) {
+    // 横に広すぎる → 高さ基準に
+    canvas.style.width = `${h * gameRatio}px`;
+    canvas.style.height = `${h}px`;
+  } else {
+    // 縦に長すぎる → 幅基準に
+    canvas.style.width = `${w}px`;
+    canvas.style.height = `${w / gameRatio}px`;
+  }
+  canvas.style.position = "absolute";
+  canvas.style.top = "50%";
+  canvas.style.left = "50%";
+  canvas.style.transform = "translate(-50%, -50%)";
+}
+
+window.addEventListener("resize", resizeCanvas);
+window.addEventListener("load", resizeCanvas);
     </script>
   </head>
   <body>
@@ -120,5 +143,6 @@
     </script>
   </body>
 </html>
+
 
 
