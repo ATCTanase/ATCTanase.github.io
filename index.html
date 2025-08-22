@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="manifest" href="manifest.webmanifest">
     <meta name="apple-mobile-web-app-capable" content="yes">
-      <meta name="apple-mobile-web-app-orientation" content="landscape">
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-orientation" content="landscape">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
       <style>
 html, body {
   margin: 0;
@@ -26,9 +26,9 @@ html, body {
   transform-origin: center center;
 }
   </style>
-      <script>
+<script>
 function resizeCanvas() {
-  const canvas = document.getElementById("unity-canvas");
+    const canvas = document.getElementById("unity-canvas");
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
   const gameRatio = 16 / 9;
@@ -43,7 +43,7 @@ function resizeCanvas() {
     if (canvasHeight > screenHeight) {
       canvasHeight = screenHeight;
       canvasWidth = canvasHeight * gameRatio;
-    }
+        }
 
     canvas.style.width = canvasWidth + "px";
     canvas.style.height = canvasHeight + "px";
@@ -61,15 +61,15 @@ function resizeCanvas() {
     canvas.style.width = canvasWidth + "px";
     canvas.style.height = canvasHeight + "px";
     canvas.style.transform = `translate(-50%, -50%)`;
-  }
+        }
 
   canvas.style.top = "50%";
   canvas.style.left = "50%";
-}
+    }
 
-window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
-    </script>
+</script>
   </head>
   <body>
     <div id="unity-container">
@@ -120,12 +120,12 @@ window.addEventListener("load", resizeCanvas);
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/2e7a7585d31d2355062dc8b2c9eee5de.loader.js";
+      var loaderUrl = buildUrl + "/c07a2c75be8044c1e1477b870a809abd.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/556c29c816e3bca6efa88b04c6555107.data.unityweb",
+        dataUrl: buildUrl + "/19a866494d49eaa731f995727df74eb8.data.unityweb",
         frameworkUrl: buildUrl + "/af645531fdb524daee5d0b26e663c345.framework.js.unityweb",
-        codeUrl: buildUrl + "/b3cc8a9d006e801e593859c02a396c29.wasm.unityweb",
+        codeUrl: buildUrl + "/c9b5ccb2041dfe419d767c1716c57c9c.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -165,16 +165,3 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
