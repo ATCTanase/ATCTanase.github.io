@@ -48,10 +48,15 @@ function resizeCanvas() {
   const gameRatio = 16 / 9;
 
   if (w < h) {
-    // 縦持ちでも横画面表示
-    canvas.style.width = `${h}px`;
-    canvas.style.height = `${w}px`;
+    // 縦持ち → 横画面固定
+    canvas.style.width = `${h}px`;   // 横幅 = 画面の高さ
+    canvas.style.height = `${w}px`;  // 高さ = 画面の幅
+    canvas.style.position = "absolute";
+    canvas.style.top = "50%";
+    canvas.style.left = "50%";
+    // 回転して中央に配置
     canvas.style.transform = `rotate(90deg) translate(-50%, -50%)`;
+    canvas.style.transformOrigin = "center center";
   } else {
     // 横持ち
     if (w / h > gameRatio) {
@@ -61,12 +66,14 @@ function resizeCanvas() {
       canvas.style.width = `${w}px`;
       canvas.style.height = `${w / gameRatio}px`;
     }
+    canvas.style.position = "absolute";
+    canvas.style.top = "50%";
+    canvas.style.left = "50%";
     canvas.style.transform = "translate(-50%, -50%)";
+    canvas.style.transformOrigin = "center center";
   }
-  canvas.style.position = "absolute";
-  canvas.style.top = "50%";
-  canvas.style.left = "50%";
 }
+
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
 
@@ -166,6 +173,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
