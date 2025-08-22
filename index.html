@@ -25,7 +25,8 @@ html, body {
   background: black;
   transform-origin: center center;
 }
-  </style><script>
+  </style>
+    <script>
 function resizeCanvas() {
   const canvas = document.getElementById("unity-canvas");
   const screenWidth = window.innerWidth;
@@ -36,14 +37,14 @@ function resizeCanvas() {
 
   if (screenHeight > screenWidth) {
     // 縦画面 → 横画面固定
-    const rotatedScreenWidth = screenHeight;
-    const rotatedScreenHeight = screenWidth;
+    const rotatedWidth = screenHeight;
+    const rotatedHeight = screenWidth;
 
-    if (rotatedScreenWidth / rotatedScreenHeight > gameRatio) {
-      canvasHeight = rotatedScreenHeight;
+    if (rotatedWidth / rotatedHeight > gameRatio) {
+      canvasHeight = rotatedHeight;
       canvasWidth = canvasHeight * gameRatio;
     } else {
-      canvasWidth = rotatedScreenWidth;
+      canvasWidth = rotatedWidth;
       canvasHeight = canvasWidth / gameRatio;
     }
 
@@ -73,6 +74,7 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
 </script>
+
   </head>
   <body>
     <div id="unity-container">
@@ -168,6 +170,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
