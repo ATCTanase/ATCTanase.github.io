@@ -69,8 +69,6 @@
       const canvas = container.querySelector("canvas");
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
-let maxCanvasHeight = screenWidth; // 回転後の高さ
-let maxCanvasWidth = screenHeight; // 回転後の幅
       const gameRatio = 16 / 9;
 
       let canvasWidth, canvasHeight;
@@ -80,25 +78,19 @@ let maxCanvasWidth = screenHeight; // 回転後の幅
         const rotatedWidth = screenHeight;
         const rotatedHeight = screenWidth;
 
-if(maxCanvasWidth / maxCanvasHeight > gameRatio){
-    canvasHeight = maxCanvasHeight;
-    canvasWidth = canvasHeight * gameRatio;
-} else {
-    canvasWidth = maxCanvasWidth;
-    canvasHeight = canvasWidth / gameRatio;
-}
+        if(rotatedWidth / rotatedHeight > gameRatio){
+          canvasHeight = rotatedHeight;
+          canvasWidth = canvasHeight * gameRatio;
+        } else {
+          canvasWidth = rotatedWidth;
+          canvasHeight = canvasWidth / gameRatio;
+        }
 
-// 内部解像度とCSSサイズを一致
-canvas.width = canvasWidth;
-canvas.height = canvasHeight;
-canvas.style.width = canvasWidth + "px";
-canvas.style.height = canvasHeight + "px";
-
-// 中央配置・回転
-canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
-canvas.style.transformOrigin = "center center";
-canvas.style.top = "50%";
-canvas.style.left = "50%";
+        canvas.style.width = canvasWidth + "px";
+        canvas.style.height = canvasHeight + "px";
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
       } else {
         // 横画面
         if(screenWidth / screenHeight > gameRatio){
@@ -161,5 +153,3 @@ canvas.style.left = "50%";
   </script>
 </body>
 </html>
-
-
