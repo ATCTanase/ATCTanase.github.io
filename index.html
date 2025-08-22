@@ -10,6 +10,24 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
       <meta name="apple-mobile-web-app-orientation" content="landscape">
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+      <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: black; /* 余白は黒に */
+    }
+
+    /* Unity Canvas を中央固定＆背景黒 */
+    #unity-canvas {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: center center;
+      background: black;
+    }
+  </style>
       <script>
         let initialHeight = window.innerHeight;
         window.addEventListener('resize', () => {
@@ -25,40 +43,26 @@
       });
 function resizeCanvas() {
   const canvas = document.getElementById("unity-canvas");
-  const gameRatio = 16 / 9; // ゲームのアスペクト比（Unity 側の解像度に合わせる）
-
-  let w = window.innerWidth;
-  let h = window.innerHeight;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const gameRatio = 16 / 9; // Unity のゲーム比率に合わせる (例: 16:9)
 
   if (w < h) {
-    // 縦持ち → 横向きに回転
+    // 📱 縦持ちでも横画面に固定
     canvas.style.width = `${h}px`;
     canvas.style.height = `${w}px`;
-    canvas.style.transform = `rotate(90deg) translate(0, -100%)`;
-    canvas.style.transformOrigin = "top left";
+    canvas.style.transform = `rotate(90deg) translate(0, -50%) translate(50%, 0)`;
   } else {
-    // 横持ち → 通常
+    // 💻 横持ちのとき
     if (w / h > gameRatio) {
-      // 横に広すぎる → 高さ基準
       canvas.style.width = `${h * gameRatio}px`;
       canvas.style.height = `${h}px`;
     } else {
-      // 縦に長すぎる → 幅基準
       canvas.style.width = `${w}px`;
       canvas.style.height = `${w / gameRatio}px`;
     }
-    canvas.style.transform = "none";
-    canvas.style.transformOrigin = "center center";
+    canvas.style.transform = "translate(-50%, -50%)";
   }
-
-  // 常に中央配置
-  canvas.style.position = "absolute";
-  canvas.style.top = "50%";
-  canvas.style.left = "50%";
-  canvas.style.margin = "0";
-  canvas.style.padding = "0";
-  canvas.style.background = "black";
-  canvas.style.transform += " translate(-50%, -50%)";
 }
 
 window.addEventListener("resize", resizeCanvas);
@@ -160,6 +164,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
