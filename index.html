@@ -26,7 +26,7 @@ html, body {
   transform-origin: center center;
 }
   </style>
-   <script>
+<script>
 function resizeCanvas() {
   const canvas = document.getElementById("unity-canvas");
   const screenWidth = window.innerWidth;
@@ -50,7 +50,7 @@ function resizeCanvas() {
 
     canvas.style.width = canvasWidth + "px";
     canvas.style.height = canvasHeight + "px";
-    canvas.style.transform = `translate(-50%, -50%) rotate(90deg)`;
+    canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
   } else {
     // 横画面
     if (screenWidth / screenHeight > gameRatio) {
@@ -63,7 +63,7 @@ function resizeCanvas() {
 
     canvas.style.width = canvasWidth + "px";
     canvas.style.height = canvasHeight + "px";
-    canvas.style.transform = `translate(-50%, -50%)`;
+    canvas.style.transform = "translate(-50%, -50%)";
   }
 
   canvas.style.top = "50%";
@@ -169,6 +169,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
