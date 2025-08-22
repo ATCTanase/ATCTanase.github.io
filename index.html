@@ -25,28 +25,45 @@
       });
 function resizeCanvas() {
   const canvas = document.getElementById("unity-canvas");
-  const gameRatio = 16 / 9; // ゲームのアスペクト比（例: 16:9）
+  const gameRatio = 16 / 9; // ゲームのアスペクト比（Unity 側の解像度に合わせる）
 
   let w = window.innerWidth;
   let h = window.innerHeight;
 
-  if (w / h > gameRatio) {
-    // 横に広すぎる → 高さ基準に
-    canvas.style.width = `${h * gameRatio}px`;
-    canvas.style.height = `${h}px`;
+  if (w < h) {
+    // 縦持ち → 横向きに回転
+    canvas.style.width = `${h}px`;
+    canvas.style.height = `${w}px`;
+    canvas.style.transform = `rotate(90deg) translate(0, -100%)`;
+    canvas.style.transformOrigin = "top left";
   } else {
-    // 縦に長すぎる → 幅基準に
-    canvas.style.width = `${w}px`;
-    canvas.style.height = `${w / gameRatio}px`;
+    // 横持ち → 通常
+    if (w / h > gameRatio) {
+      // 横に広すぎる → 高さ基準
+      canvas.style.width = `${h * gameRatio}px`;
+      canvas.style.height = `${h}px`;
+    } else {
+      // 縦に長すぎる → 幅基準
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${w / gameRatio}px`;
+    }
+    canvas.style.transform = "none";
+    canvas.style.transformOrigin = "center center";
   }
+
+  // 常に中央配置
   canvas.style.position = "absolute";
   canvas.style.top = "50%";
   canvas.style.left = "50%";
-  canvas.style.transform = "translate(-50%, -50%)";
+  canvas.style.margin = "0";
+  canvas.style.padding = "0";
+  canvas.style.background = "black";
+  canvas.style.transform += " translate(-50%, -50%)";
 }
 
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
+
     </script>
   </head>
   <body>
@@ -143,6 +160,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
