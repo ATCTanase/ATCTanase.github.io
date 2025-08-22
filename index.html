@@ -25,26 +25,25 @@ html, body {
   background: black;
   transform-origin: center center;
 }
-  </style>
-      <script>
+  </style><script>
 function resizeCanvas() {
   const canvas = document.getElementById("unity-canvas");
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
-  const gameRatio = 16 / 9; // Unity横画面比率
+  const gameRatio = 16 / 9;
 
   let canvasWidth, canvasHeight;
 
   if (screenHeight > screenWidth) {
     // 縦画面 → 横画面固定
-    const rotatedWidth = screenHeight;
-    const rotatedHeight = screenWidth;
+    const rotatedScreenWidth = screenHeight;
+    const rotatedScreenHeight = screenWidth;
 
-    if (rotatedWidth / rotatedHeight > gameRatio) {
-      canvasHeight = rotatedHeight;
+    if (rotatedScreenWidth / rotatedScreenHeight > gameRatio) {
+      canvasHeight = rotatedScreenHeight;
       canvasWidth = canvasHeight * gameRatio;
     } else {
-      canvasWidth = rotatedWidth;
+      canvasWidth = rotatedScreenWidth;
       canvasHeight = canvasWidth / gameRatio;
     }
 
@@ -68,11 +67,12 @@ function resizeCanvas() {
 
   canvas.style.top = "50%";
   canvas.style.left = "50%";
+  canvas.style.transformOrigin = "center center";
 }
 
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
-    </script>
+</script>
   </head>
   <body>
     <div id="unity-container">
@@ -168,6 +168,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
