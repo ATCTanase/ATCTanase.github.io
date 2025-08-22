@@ -49,12 +49,13 @@ function resizeCanvas() {
 
   if (h > w) {
     // 縦画面 → 横画面固定
-    const rotatedWidth = h;  // 回転後の幅 = 画面高さ
-    const rotatedHeight = w; // 回転後の高さ = 画面幅
-
-    canvas.style.width = `${rotatedWidth}px`;
-    canvas.style.height = `${rotatedHeight}px`;
-    canvas.style.transform = `rotate(90deg) translate(-50%, -50%)`;
+    canvas.style.width = `${h}px`;  // 回転後の幅 = 画面高さ
+    canvas.style.height = `${w}px`; // 回転後の高さ = 画面幅
+    canvas.style.position = "absolute";
+    canvas.style.top = "50%";
+    canvas.style.left = "50%";
+    canvas.style.transform = "rotate(90deg) translate(-50%, -50%)";
+    canvas.style.transformOrigin = "center center";
   } else {
     // 横画面
     if (w / h > gameRatio) {
@@ -64,13 +65,12 @@ function resizeCanvas() {
       canvas.style.width = `${w}px`;
       canvas.style.height = `${w / gameRatio}px`;
     }
+    canvas.style.position = "absolute";
+    canvas.style.top = "50%";
+    canvas.style.left = "50%";
     canvas.style.transform = "translate(-50%, -50%)";
+    canvas.style.transformOrigin = "center center";
   }
-
-  canvas.style.position = "absolute";
-  canvas.style.top = "50%";
-  canvas.style.left = "50%";
-  canvas.style.transformOrigin = "center center";
 }
 
 
@@ -173,6 +173,7 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
 
 
 
