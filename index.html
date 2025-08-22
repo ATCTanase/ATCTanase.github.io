@@ -11,87 +11,64 @@
       <meta name="apple-mobile-web-app-orientation" content="landscape">
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
       <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: black;
-    }
-    #unity-canvas {
-      position: absolute;
-      background: black;
-      transform-origin: center center;
-      display: block;
-    }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: black;
+}
+
+#unity-canvas {
+  position: absolute;
+  background: black;
+  transform-origin: center center;
+}
   </style>
       <script>
- const canvas = document.getElementById("unity-canvas");
-    const gameRatio = 16 / 9; // Unity 横画面比率
+function resizeCanvas() {
+  const canvas = document.getElementById("unity-canvas");
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  const gameRatio = 16 / 9;
 
-    function resizeCanvas() {
-      const screenWidth = window.innerWidth;
-      const screenHeight = window.innerHeight;
+  let canvasWidth, canvasHeight;
 
-      let canvasWidth, canvasHeight;
+  if (screenHeight > screenWidth) {
+    // 縦画面 → 横画面固定
+    canvasWidth = screenWidth;
+    canvasHeight = canvasWidth / gameRatio;
 
-      if (screenHeight > screenWidth) {
-        // 縦画面 → 横画面固定表示
-        const rotatedWidth = screenHeight;
-        const rotatedHeight = screenWidth;
-
-        if (rotatedWidth / rotatedHeight > gameRatio) {
-          canvasHeight = rotatedHeight;
-          canvasWidth = canvasHeight * gameRatio;
-        } else {
-          canvasWidth = rotatedWidth;
-          canvasHeight = canvasWidth / gameRatio;
-        }
-
-        // 内部解像度と CSS を一致
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
-        canvas.style.width = canvasWidth + "px";
-        canvas.style.height = canvasHeight + "px";
-
-        // 回転と中央配置
-        canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
-      } else {
-        // 横画面
-        if (screenWidth / screenHeight > gameRatio) {
-          canvasHeight = screenHeight;
-          canvasWidth = canvasHeight * gameRatio;
-        } else {
-          canvasWidth = screenWidth;
-          canvasHeight = canvasWidth / gameRatio;
-        }
-
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
-        canvas.style.width = canvasWidth + "px";
-        canvas.style.height = canvasHeight + "px";
-
-        canvas.style.transform = "translate(-50%, -50%)";
-      }
-
-      canvas.style.top = "50%";
-      canvas.style.left = "50%";
-      canvas.style.transformOrigin = "center center";
+    if (canvasHeight > screenHeight) {
+      canvasHeight = screenHeight;
+      canvasWidth = canvasHeight * gameRatio;
     }
 
-    window.addEventListener("load", () => {
-      resizeCanvas();
+    canvas.style.width = canvasWidth + "px";
+    canvas.style.height = canvasHeight + "px";
+    canvas.style.transform = `translate(-50%, -50%) rotate(90deg)`;
+  } else {
+    // 横画面
+    if (screenWidth / screenHeight > gameRatio) {
+      canvasHeight = screenHeight;
+      canvasWidth = canvasHeight * gameRatio;
+    } else {
+      canvasWidth = screenWidth;
+      canvasHeight = canvasWidth / gameRatio;
+    }
 
-      // Android Chrome など対応ブラウザで横画面ロック
-      if (screen.orientation && screen.orientation.lock) {
-        screen.orientation.lock("landscape").catch(err => {
-          console.warn("Orientation lock failed:", err);
-        });
-      }
-    });
+    canvas.style.width = canvasWidth + "px";
+    canvas.style.height = canvasHeight + "px";
+    canvas.style.transform = `translate(-50%, -50%)`;
+  }
 
-    window.addEventListener("resize", resizeCanvas);
+  canvas.style.top = "50%";
+  canvas.style.left = "50%";
+}
+
+window.addEventListener("resize", resizeCanvas);
+window.addEventListener("load", resizeCanvas);
     </script>
   </head>
   <body>
@@ -188,5 +165,16 @@
     </script>
   </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
 
 
