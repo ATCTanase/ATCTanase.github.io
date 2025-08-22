@@ -10,54 +10,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-orientation" content="landscape">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-      <style>
-#unity-canvas {
-  position: absolute;
-  background: black;
-  transform-origin: center center; /* 回転の中心を Canvas 中心に */
-}
-  </style>
-<script>
-function adjustCanvasAspect() {
-    var canvas = document.getElementById("unity-canvas");
-    var targetAspect = 16 / 9;
-
-    var w = window.innerWidth;
-    var h = window.innerHeight;
-
-    var width, height;
-
-    if (h > w) {
-        // 縦画面 → 横向きに表示する場合
-        if (h / w > targetAspect) {
-            height = w;
-            width = w * targetAspect;
-        } else {
-            width = h;
-            height = h / targetAspect;
-        }
-        canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
-    } else {
-        // 横画面
-        if (w / h > targetAspect) {
-            height = h;
-            width = h * targetAspect;
-        } else {
-            width = w;
-            height = w / targetAspect;
-        }
-        canvas.style.transform = "translate(-50%, -50%) rotate(0deg)";
-    }
-
-    canvas.style.width = width + "px";
-    canvas.style.height = height + "px";
-    canvas.style.top = "50%";
-    canvas.style.left = "50%";
-}
-window.addEventListener("resize", adjustCanvasAspect);
-window.addEventListener("orientationchange", adjustCanvasAspect);
-adjustCanvasAspect();
-</script>
   </head>
   <body>
     <div id="unity-container">
@@ -153,6 +105,7 @@ adjustCanvasAspect();
     </script>
   </body>
 </html>
+
 
 
 
