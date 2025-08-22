@@ -14,28 +14,28 @@
 #unity-canvas {
   position: absolute;
   background: black;
-  transform-origin: center center;
-  width: 100vw;          /* 横幅いっぱい */
-  height: calc(100vw * 9 / 16); /* 16:9 に合わせて高さ */
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  transform-origin: center center; /* 回転の中心を Canvas 中心に */
 }
   </style>
 <script>
 function adjustCanvasRotation() {
   var canvas = document.getElementById("unity-canvas");
+
   if (window.innerHeight > window.innerWidth) {
     // 縦持ち → 横向きに回転
     canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
-    canvas.style.width = window.innerHeight + "px";
-    canvas.style.height = window.innerWidth + "px";
+    canvas.style.width = window.innerHeight + "px";   // 縦幅を横幅に
+    canvas.style.height = window.innerWidth + "px";   // 横幅を縦幅に
   } else {
-    // 横持ち → 通常表示
+    // 横持ち → 元に戻す
     canvas.style.transform = "translate(-50%, -50%) rotate(0deg)";
     canvas.style.width = window.innerWidth + "px";
     canvas.style.height = window.innerHeight + "px";
   }
+
+  // 中央揃え
+  canvas.style.top = "50%";
+  canvas.style.left = "50%";
 }
 
 window.addEventListener("resize", adjustCanvasRotation);
@@ -137,6 +137,7 @@ adjustCanvasRotation();
     </script>
   </body>
 </html>
+
 
 
 
