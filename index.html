@@ -18,62 +18,45 @@
 }
   </style>
 <script>
-function adjustCanvasRotation() {
+function adjustCanvasAspect() {
     var canvas = document.getElementById("unity-canvas");
+    var targetAspect = 16 / 9;
 
-    // 縦画面判定
-    if (window.innerHeight > window.innerWidth) {
-        var targetAspect = 16 / 9;
+    var w = window.innerWidth;
+    var h = window.innerHeight;
 
-        // 回転後の利用可能幅・高さ
-        var availableWidth = window.innerHeight;  // 回転後は縦幅が横幅に
-        var availableHeight = window.innerWidth;  // 回転後は横幅が縦幅に
+    var width, height;
 
-        // アスペクト比を維持
-        var width, height;
-        if (availableWidth / availableHeight > targetAspect) {
-            height = availableHeight;
-            width = height * targetAspect;
+    if (h > w) {
+        // 縦画面 → 横向きに表示する場合
+        if (h / w > targetAspect) {
+            height = w;
+            width = w * targetAspect;
         } else {
-            width = availableWidth;
-            height = width / targetAspect;
+            width = h;
+            height = h / targetAspect;
         }
-
-        // 90度回転 + 中央寄せ
-        canvas.style.transform = `translate(-50%, -50%) rotate(90deg)`;
-        canvas.style.width = width + "px";
-        canvas.style.height = height + "px";
-        canvas.style.top = "50%";
-        canvas.style.left = "50%";
+        canvas.style.transform = "translate(-50%, -50%) rotate(90deg)";
     } else {
-        // 横画面 → 通常
-        canvas.style.transform = `translate(-50%, -50%) rotate(0deg)`;
-
-        // 横画面でも16:9維持
-        var targetAspect = 16 / 9;
-        var availableWidth = window.innerWidth;
-        var availableHeight = window.innerHeight;
-
-        var width, height;
-        if (availableWidth / availableHeight > targetAspect) {
-            height = availableHeight;
-            width = height * targetAspect;
+        // 横画面
+        if (w / h > targetAspect) {
+            height = h;
+            width = h * targetAspect;
         } else {
-            width = availableWidth;
-            height = width / targetAspect;
+            width = w;
+            height = w / targetAspect;
         }
-
-        canvas.style.width = width + "px";
-        canvas.style.height = height + "px";
-        canvas.style.top = "50%";
-        canvas.style.left = "50%";
+        canvas.style.transform = "translate(-50%, -50%) rotate(0deg)";
     }
+
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+    canvas.style.top = "50%";
+    canvas.style.left = "50%";
 }
-
-window.addEventListener("resize", adjustCanvasRotation);
-window.addEventListener("orientationchange", adjustCanvasRotation);
-adjustCanvasRotation();
-
+window.addEventListener("resize", adjustCanvasAspect);
+window.addEventListener("orientationchange", adjustCanvasAspect);
+adjustCanvasAspect();
 </script>
   </head>
   <body>
@@ -170,6 +153,7 @@ adjustCanvasRotation();
     </script>
   </body>
 </html>
+
 
 
 
