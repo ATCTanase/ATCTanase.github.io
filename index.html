@@ -27,48 +27,16 @@ html, body {
 }
   </style>
 <script>
-function resizeCanvas() {
-    const canvas = document.getElementById("unity-canvas");
-  const screenWidth = window.innerWidth;
-  const screenHeight = window.innerHeight;
-  const gameRatio = 16 / 9;
-
-  let canvasWidth, canvasHeight;
-
-  if (screenHeight > screenWidth) {
-    // 縦画面 → 横画面固定
-    canvasWidth = screenWidth;
-    canvasHeight = canvasWidth / gameRatio;
-
-    if (canvasHeight > screenHeight) {
-      canvasHeight = screenHeight;
-      canvasWidth = canvasHeight * gameRatio;
-        }
-
-    canvas.style.width = canvasWidth + "px";
-    canvas.style.height = canvasHeight + "px";
-    canvas.style.transform = `translate(-50%, -50%) rotate(90deg)`;
+function checkOrientation() {
+  if (window.innerHeight > window.innerWidth) {
+    document.getElementById("rotateOverlay").style.display = "block";
   } else {
-    // 横画面
-    if (screenWidth / screenHeight > gameRatio) {
-      canvasHeight = screenHeight;
-      canvasWidth = canvasHeight * gameRatio;
-    } else {
-      canvasWidth = screenWidth;
-      canvasHeight = canvasWidth / gameRatio;
-    }
-
-    canvas.style.width = canvasWidth + "px";
-    canvas.style.height = canvasHeight + "px";
-    canvas.style.transform = `translate(-50%, -50%)`;
-        }
-
-  canvas.style.top = "50%";
-  canvas.style.left = "50%";
-    }
-
-    window.addEventListener("resize", resizeCanvas);
-window.addEventListener("load", resizeCanvas);
+    document.getElementById("rotateOverlay").style.display = "none";
+  }
+}
+window.addEventListener("resize", checkOrientation);
+window.addEventListener("orientationchange", checkOrientation);
+checkOrientation();
 </script>
   </head>
   <body>
@@ -165,3 +133,4 @@ window.addEventListener("load", resizeCanvas);
     </script>
   </body>
 </html>
+
