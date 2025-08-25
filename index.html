@@ -19,6 +19,8 @@
     padding: 0;
     height: 100%;
     background-color: #000000; /* 黒 */
+    overscroll-behavior: none;   /* iOS Safari のスクロール抑制 */
+    touch-action: none;           /* タッチによるスクロールを抑制 */
   }
   #unityContainer {
     width: 100%;
@@ -120,3 +122,4 @@
     </script>
   </body>
 </html>
+
