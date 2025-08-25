@@ -28,6 +28,19 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
+      
+      function MoveInputAboveKeyboard(inputY, inputHeight) {
+        setTimeout(() => {
+          // キーボード表示後のブラウザの高さ
+          const viewportHeight = window.innerHeight;
+          // 入力欄の下辺がキーボード直上に来るように計算
+          const targetY = inputY - (viewportHeight - inputHeight) + 10; // 余白10px
+          window.scrollTo({
+            top: targetY,
+            behavior: "smooth"
+          });
+        }, 300); // キーボード展開のタイミングを待つ
+      }
 
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -60,12 +73,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/f7295d02fb6152f4f943f239ce3fe7d3.loader.js";
+      var loaderUrl = buildUrl + "/d56e029e35f6bea57e12b7247c1b848c.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/6a5acb3f45cf8bbc3dfd3fc6eaff9551.data.unityweb",
-        frameworkUrl: buildUrl + "/192d0680638e6ad4aa04d4f3125c98f1.framework.js.unityweb",
-        codeUrl: buildUrl + "/c37b7cf6adf9c2ce7982373b19129d5d.wasm.unityweb",
+        dataUrl: buildUrl + "/6e47ab0cb956e3b3921a7017c35e0671.data.unityweb",
+        frameworkUrl: buildUrl + "/00eb758da43525344fa52a3f5dc85a39.framework.js.unityweb",
+        codeUrl: buildUrl + "/2ec7cd7f77977bb91453d6ae1ce62836.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -105,12 +118,3 @@
     </script>
   </body>
 </html>
-
-
-
-
-
-
-
-
-
