@@ -19,8 +19,6 @@
     padding: 0;
     height: 100%;
     background-color: #000000; /* 黒 */
-    overscroll-behavior: none;   /* iOS Safari のスクロール抑制 */
-    touch-action: none;           /* タッチによるスクロールを抑制 */
   }
   #unityContainer {
     width: 100%;
@@ -45,16 +43,6 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
-      window.visualViewport.addEventListener('resize', () => {
-    const vh = window.visualViewport.height;
-    const delta = window.innerHeight - vh;
-    console.log("Keyboard height change:", delta);
-});
-      const observer = new MutationObserver(() => {
-    console.log("Body size changed:", document.body.offsetHeight);
-});
-
-observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
 
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -87,12 +75,12 @@ observer.observe(document.body, { attributes: true, attributeFilter: ['style'] }
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/8ad13e0163c5c67372960578347fec38.loader.js";
+      var loaderUrl = buildUrl + "/02b9a83095273ddec4cdd19cfc190f04.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/a681b0a2ecbda3d8bce7423d9567d615.data.unityweb",
-        frameworkUrl: buildUrl + "/192d0680638e6ad4aa04d4f3125c98f1.framework.js.unityweb",
-        codeUrl: buildUrl + "/fc5b2502d91d888713e815c646b64ac2.wasm.unityweb",
+        dataUrl: buildUrl + "/c86503393724e4fc4e5c29c16e54a9f4.data.unityweb",
+        frameworkUrl: buildUrl + "/2dfdd4051d6c89fd4852cd2dc58ae8eb.framework.js.unityweb",
+        codeUrl: buildUrl + "/103060fe6865c188031b1ec29fac20c9.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -132,5 +120,3 @@ observer.observe(document.body, { attributes: true, attributeFilter: ['style'] }
     </script>
   </body>
 </html>
-
-
