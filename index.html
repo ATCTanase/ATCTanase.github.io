@@ -43,28 +43,7 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
-      function checkOrientation() {
-    if (window.innerHeight > window.innerWidth) {
-        // 縦画面ならアラート表示
-        alert("画面縦向きのロックをオフにして\n横画面でプレイしてください");
-
-        // OK を押した直後にまだ縦なら再度チェック
-        if (window.innerHeight > window.innerWidth) {
-            setTimeout(checkOrientation, 100); // 少し待ってから再チェック
-        }
-    }
-}
-
-// ページロード時にチェック開始
-window.addEventListener("load", () => {
-    checkOrientation();
-});
-
-// 向きが変わったら再チェック
-window.addEventListener("orientationchange", () => {
-    setTimeout(checkOrientation, 200); // 回転の反映を待って再チェック
-});
-
+      
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -96,12 +75,12 @@ window.addEventListener("orientationchange", () => {
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/8609756ac25a0f3ee1bb0fa861617450.loader.js";
+      var loaderUrl = buildUrl + "/0b6900be805a4378a843d06db846c53a.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/614a974e8774e7fec1a53cf083a38b7d.data.unityweb",
-        frameworkUrl: buildUrl + "/64ebafd2a7553a6f889e7d7028e37a83.framework.js.unityweb",
-        codeUrl: buildUrl + "/bf351ae2f4fd964560a22f5933ee1ca9.wasm.unityweb",
+        dataUrl: buildUrl + "/3b996b61cb27bde92c2eba355c06bd86.data.unityweb",
+        frameworkUrl: buildUrl + "/7cf9c364cdd22d4c3c4771d57653e1ba.framework.js.unityweb",
+        codeUrl: buildUrl + "/738a7ced5f7c23437f9a7725fc6144dd.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -141,5 +120,3 @@ window.addEventListener("orientationchange", () => {
     </script>
   </body>
 </html>
-
-
