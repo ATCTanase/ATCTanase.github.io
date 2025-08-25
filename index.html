@@ -28,19 +28,6 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
-      
-      function MoveInputAboveKeyboard(inputY, inputHeight) {
-        setTimeout(() => {
-          // キーボード表示後のブラウザの高さ
-          const viewportHeight = window.innerHeight;
-          // 入力欄の下辺がキーボード直上に来るように計算
-          const targetY = inputY - (viewportHeight - inputHeight) + 10; // 余白10px
-          window.scrollTo({
-            top: targetY,
-            behavior: "smooth"
-          });
-        }, 300); // キーボード展開のタイミングを待つ
-      }
 
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -118,3 +105,4 @@
     </script>
   </body>
 </html>
+
