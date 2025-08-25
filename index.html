@@ -45,6 +45,16 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
+      window.visualViewport.addEventListener('resize', () => {
+    const vh = window.visualViewport.height;
+    const delta = window.innerHeight - vh;
+    console.log("Keyboard height change:", delta);
+});
+      const observer = new MutationObserver(() => {
+    console.log("Body size changed:", document.body.offsetHeight);
+});
+
+observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
 
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -122,4 +132,5 @@
     </script>
   </body>
 </html>
+
 
