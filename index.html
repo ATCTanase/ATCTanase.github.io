@@ -46,7 +46,7 @@
       function checkOrientation() {
     if (window.innerHeight > window.innerWidth) {
         // 縦画面ならアラート表示
-        alert("横画面でプレイしてください");
+        alert("画面縦向きのロックをオフにして\n横画面でプレイしてください");
 
         // OK を押した直後にまだ縦なら再度チェック
         if (window.innerHeight > window.innerWidth) {
@@ -141,4 +141,5 @@ window.addEventListener("orientationchange", () => {
     </script>
   </body>
 </html>
+
 
