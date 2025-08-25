@@ -43,6 +43,27 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
+      function checkOrientation() {
+    if (window.innerHeight > window.innerWidth) {
+        // 縦画面ならアラート表示
+        alert("横画面でプレイしてください");
+
+        // OK を押した直後にまだ縦なら再度チェック
+        if (window.innerHeight > window.innerWidth) {
+            setTimeout(checkOrientation, 100); // 少し待ってから再チェック
+        }
+    }
+}
+
+// ページロード時にチェック開始
+window.addEventListener("load", () => {
+    checkOrientation();
+});
+
+// 向きが変わったら再チェック
+window.addEventListener("orientationchange", () => {
+    setTimeout(checkOrientation, 200); // 回転の反映を待って再チェック
+});
 
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -120,3 +141,4 @@
     </script>
   </body>
 </html>
+
