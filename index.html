@@ -51,8 +51,21 @@
         console.log("input moved", rect.top, rect.left);
       });
       
-      input.addEventListener("focus", () => console.log("focus"));
-      input.addEventListener("blur", () => console.log("blur"));
+function waitForInput(selector, callback) {
+    const interval = setInterval(() => {
+        const input = document.querySelector(selector);
+        if (input) {
+            clearInterval(interval);
+            callback(input);
+        }
+    }, 100);
+}
+
+// 使い方
+waitForInput("input", (input) => {
+    input.addEventListener("focus", () => console.log("focus"));
+    input.addEventListener("blur", () => console.log("blur"));
+});
       observer.observe(input, { attributes: true, attributeFilter: ["style"] });
       
       var container = document.querySelector("#unity-container");
@@ -131,6 +144,7 @@
     </script>
   </body>
 </html>
+
 
 
 
