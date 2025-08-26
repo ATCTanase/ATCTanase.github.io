@@ -52,7 +52,7 @@
 
       function safeSendMessage(percent) {
           if (typeof SendMessage === "function") {
-              SendMessage("UiRoot", "OnKeyboardScrollPercent", percent.toString());
+              SendMessage("UIRoot", "OnKeyboardScrollPercent", percent.toString());
           } else {
               pendingKeyboardEvents.push(percent);
               console.warn("SendMessage not ready yet, queued", percent);
@@ -175,6 +175,7 @@
     </script>
   </body>
 </html>
+
 
 
 
