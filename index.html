@@ -61,7 +61,7 @@
 
       // Unityロード完了後にキューをフラッシュ
       function flushPendingEvents() {
-          pendingKeyboardEvents.forEach(p => SendMessage("UiRoot", "OnKeyboardScrollPercent", p.toString()));
+          pendingKeyboardEvents.forEach(p => SendMessage("UIRoot", "OnKeyboardScrollPercent", p.toString()));
           pendingKeyboardEvents = [];
       }
 
@@ -175,5 +175,6 @@
     </script>
   </body>
 </html>
+
 
 
