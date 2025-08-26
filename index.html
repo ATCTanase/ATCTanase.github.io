@@ -172,7 +172,7 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
+        }).then((instance) => {
             unityInstance = instance;
             loadingBar.style.display = "none";
             flushPendingEvents();
@@ -185,6 +185,7 @@
     </script>
   </body>
 </html>
+
 
 
 
