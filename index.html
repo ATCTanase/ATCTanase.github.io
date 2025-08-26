@@ -43,7 +43,7 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
-          // Unity インスタンス
+    // Unity インスタンス
     let unityInstance = null;
     let pendingKeyboardEvents = [];
 
@@ -105,7 +105,7 @@
             input.addEventListener("blur", () => console.log("Input blurred:", input));
         });
     }
-      
+
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -137,12 +137,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/73c22daf930c8818a0a24c3d08e0b1ec.loader.js";
+      var loaderUrl = buildUrl + "/af4edf0a689b108f821f2225242f9882.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/890807531af8f90348b30988fcad862d.data.unityweb",
+        dataUrl: buildUrl + "/77764531b30c6e86bd2390f72443d29b.data.unityweb",
         frameworkUrl: buildUrl + "/192d0680638e6ad4aa04d4f3125c98f1.framework.js.unityweb",
-        codeUrl: buildUrl + "/12b6d5ca53c3f7fed5b02a65e89cd0ca.wasm.unityweb",
+        codeUrl: buildUrl + "/950f61659da47ed1b11a6de9d37988f0.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -185,9 +185,3 @@
     </script>
   </body>
 </html>
-
-
-
-
-
-
