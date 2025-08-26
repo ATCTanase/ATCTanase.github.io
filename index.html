@@ -40,7 +40,7 @@
     <script>
       const initialHeight = window.innerHeight;
       console.log("Initial window.innerHeight:", initialHeight);
-          
+
       function attachKeyboardListener(input) {
           if (!input || input._keyboardAttached) return;
           input._keyboardAttached = true;
@@ -58,7 +58,7 @@
                   console.log("Keyboard Percent:", keyboardPercent);
               
                   if (typeof SendMessage === "function") {
-                      SendMessage("UiRoot", "OnKeyboardScrollPercent", keyboardPercent.toString());
+                      SendMessage("UIRoot", "OnKeyboardScrollPercent", keyboardPercent.toString());
                   }
               });
           }
@@ -68,10 +68,10 @@
               setTimeout(() => input.focus({ preventScroll: true }), 0);
           });
       }
-      
+
       // すでに存在する input にも attach
       document.querySelectorAll("input").forEach(input => attachKeyboardListener(input));
-      
+
       // 動的生成される input にも対応
       const observer = new MutationObserver(mutations => {
           for (const mutation of mutations) {
@@ -81,7 +81,7 @@
               });
           }
       });
-      
+
       observer.observe(document.body, { childList: true, subtree: true });
 
 
@@ -122,12 +122,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/6004bea546ade4195b439e2e0beca3dd.loader.js";
+      var loaderUrl = buildUrl + "/73c22daf930c8818a0a24c3d08e0b1ec.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/e051cff29ab7eace0e593c1a87d5565a.data.unityweb",
+        dataUrl: buildUrl + "/890807531af8f90348b30988fcad862d.data.unityweb",
         frameworkUrl: buildUrl + "/192d0680638e6ad4aa04d4f3125c98f1.framework.js.unityweb",
-        codeUrl: buildUrl + "/b58418e832bc55d1f3349f14f0a10abe.wasm.unityweb",
+        codeUrl: buildUrl + "/12b6d5ca53c3f7fed5b02a65e89cd0ca.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
