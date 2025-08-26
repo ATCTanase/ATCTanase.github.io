@@ -44,40 +44,12 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
-document.addEventListener("DOMContentLoaded", () => {
-    // TMP_InputField の <input> が生成されるタイミングを監視
-    const observer = new MutationObserver((mutations, obs) => {
-        const input = document.querySelector("input");
-        if (input) {
-            console.log("input created");
-
-            // フォーカス時に自動スクロールを打ち消す
-            input.addEventListener("focus", () => {
-                setTimeout(() => {
-                    // 現状のスクロール位置を維持
-                    const x = window.scrollX;
-                    const y = window.scrollY;
-                    window.scrollTo(x, y);
-                    console.log("auto-scroll prevented");
-                }, 50); // キーボード表示後に少し遅延させる
-            });
-
-            // blur も必要に応じて補正
-            input.addEventListener("blur", () => {
-                setTimeout(() => {
-                    const x = window.scrollX;
-                    const y = window.scrollY;
-                    window.scrollTo(x, y);
-                    console.log("blur scroll maintained");
-                }, 50);
-            });
-
-            obs.disconnect();
-        }
-    });
-
-    // body 配下の DOM 追加を監視
-    observer.observe(document.body, { childList: true, subtree: true });
+input.addEventListener("focus", () => {
+    setTimeout(() => {
+        // 強制的に任意位置にスクロール
+        window.scrollTo({ top: 0, behavior: 'auto' }); 
+        console.log("scroll corrected");
+    }, 50);
 });
 
       var container = document.querySelector("#unity-container");
@@ -156,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
     </script>
   </body>
 </html>
+
 
 
 
