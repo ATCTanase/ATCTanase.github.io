@@ -44,7 +44,14 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
-      window.onscroll = (e) => console.log("scroll triggered", window.scrollY);
+      const input = document.querySelector("input"); // 対象の TMP_InputField
+const observer = new MutationObserver(() => {
+    const rect = input.getBoundingClientRect();
+    console.log("input moved", rect.top, rect.left);
+});
+      input.addEventListener("focus", () => console.log("focus"));
+input.addEventListener("blur", () => console.log("blur"));
+observer.observe(input, { attributes: true, attributeFilter: ["style"] });
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -121,4 +128,5 @@
     </script>
   </body>
 </html>
+
 
