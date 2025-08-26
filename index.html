@@ -62,19 +62,43 @@ function waitForInput(selector, callback) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    // TMP_InputField の <input> が生成されたタイミングを監視
     const observer = new MutationObserver((mutations, obs) => {
         const input = document.querySelector("input");
         if (input) {
             console.log("input created");
-            input.addEventListener("focus", () => console.log("focus"));
-            input.addEventListener("blur", () => console.log("blur"));
+
+            input.addEventListener("focus", () => {
+                console.log("focus");
+
+                // 少し遅延して自動スクロールを補正
+                setTimeout(() => {
+                    // iOS / Android 両対応
+                    // 任意の位置にスクロール
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                    // Unity 側に通知（C# で Canvas を上げる処理など）
+                    if (typeof unityInstance !== "undefined") {
+                        unityInstance.SendMessage("WebGLInputManager", "OnInputFocus");
+                    }
+                }, 50);
+            });
+
+            input.addEventListener("blur", () => {
+                console.log("blur");
+                // フォーカス解除時はスクロールを戻す
+                setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+                if (typeof unityInstance !== "undefined") {
+                    unityInstance.SendMessage("WebGLInputManager", "OnInputBlur");
+                }
+            });
+
             obs.disconnect();
         }
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
 });
-      
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -151,6 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     </script>
   </body>
 </html>
+
 
 
 
