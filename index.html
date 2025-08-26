@@ -7,10 +7,9 @@
     <link rel="icon" href="TemplateData/favicons/favicon.png">
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="manifest" href="manifest.webmanifest">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-orientation" content="landscape">
-    <meta name="mobile-web-app-orientation" content="landscape">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-orientation" content="landscape">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   </head>
@@ -39,50 +38,58 @@
       <div id="unity-warning"> </div>
     </div>
     <script>
+      const initialHeight = window.innerHeight;
+      console.log("Initial window.innerHeight:", initialHeight);
+          
+      function attachKeyboardListener(input) {
+          if (!input || input._keyboardAttached) return;
+          input._keyboardAttached = true;
+      
+          // キーボードの占有率を検知
+          if (window.visualViewport) {
+              window.visualViewport.addEventListener("resize", () => {
+                  const vh = window.visualViewport.height;
+                  const keyboardHeight = initialHeight - vh;
+                  const keyboardPercent = keyboardHeight / initialHeight;
+              
+                  console.log("Input:", input.id || input.name);
+                  console.log("Original Height:", initialHeight);
+                  console.log("Current visualViewport.height:", vh);
+                  console.log("Keyboard Percent:", keyboardPercent);
+              
+                  if (typeof SendMessage === "function") {
+                      SendMessage("UiRoot", "OnKeyboardScrollPercent", keyboardPercent.toString());
+                  }
+              });
+          }
+        
+          // フォーカス時に preventScroll で自動スクロール抑制
+          input.addEventListener("focus", () => {
+              setTimeout(() => input.focus({ preventScroll: true }), 0);
+          });
+      }
+      
+      // すでに存在する input にも attach
+      document.querySelectorAll("input").forEach(input => attachKeyboardListener(input));
+      
+      // 動的生成される input にも対応
+      const observer = new MutationObserver(mutations => {
+          for (const mutation of mutations) {
+              mutation.addedNodes.forEach(node => {
+                  if (node.tagName === "INPUT") attachKeyboardListener(node);
+                  node.querySelectorAll?.("input")?.forEach(child => attachKeyboardListener(child));
+              });
+          }
+      });
+      
+      observer.observe(document.body, { childList: true, subtree: true });
+
+
       window.addEventListener("load", function () {
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
-(function() {
-  const initialHeight = window.innerHeight; // ページロード時の高さ
-  console.log("Initial window.innerHeight:", initialHeight);
-
-  function attachKeyboardListener(input) {
-    if (!input || input._keyboardAttached) return;
-    input._keyboardAttached = true;
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", () => {
-        const vh = window.visualViewport.height;
-        const keyboardHeight = initialHeight - vh;
-
-        console.log("Original View Height:", initialHeight);
-        console.log("Current visualViewport.height:", vh);
-        console.log("Keyboard caused offset:", keyboardHeight);
-
-        if (typeof SendMessage === "function") {
-          SendMessage("UiRoot", "OnKeyboardScroll", keyboardHeight.toString());
-        }
-      });
-    }
-
-    input.addEventListener("focus", () => {
-      setTimeout(() => input.focus({ preventScroll: true }), 0);
-    });
-  }
-
-  const observer = new MutationObserver(mutations => {
-    for (const mutation of mutations) {
-      mutation.addedNodes.forEach(node => {
-        if (node.tagName === "INPUT") attachKeyboardListener(node);
-        node.querySelectorAll?.("input")?.forEach(child => attachKeyboardListener(child));
-      });
-    }
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
-})();
 
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -115,12 +122,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/ec750c6850942083c5ea484efcdcbcfd.loader.js";
+      var loaderUrl = buildUrl + "/6004bea546ade4195b439e2e0beca3dd.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/ab85d8f1ea29bf531c2d2205a0a2d9e3.data.unityweb",
-        frameworkUrl: buildUrl + "/210385932e7965ec3ca32bb38fb8c0e4.framework.js.unityweb",
-        codeUrl: buildUrl + "/789a055f5663b501822989cf0e0cf8bc.wasm.unityweb",
+        dataUrl: buildUrl + "/e051cff29ab7eace0e593c1a87d5565a.data.unityweb",
+        frameworkUrl: buildUrl + "/192d0680638e6ad4aa04d4f3125c98f1.framework.js.unityweb",
+        codeUrl: buildUrl + "/b58418e832bc55d1f3349f14f0a10abe.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -160,20 +167,3 @@
     </script>
   </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
