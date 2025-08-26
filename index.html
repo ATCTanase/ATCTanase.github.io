@@ -1,55 +1,148 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Input Test</title>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>DWAI</title>
+    <link rel="icon" href="TemplateData/favicons/favicon.png">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-orientation" content="landscape">
+    <meta name="mobile-web-app-orientation" content="landscape">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  </head>
   <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: sans-serif;
-      background: #f0f0f0;
-    }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #000000; /* 黒 */
+  }
+  #unityContainer {
+    width: 100%;
+    height: 100%;
+    background-color: #000000; /* 黒 */
+  }
+</style>
+  <body>
+    <div id="unity-container">
+      <canvas id="unity-canvas" width=1280 height=800 tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-warning"> </div>
+    </div>
+    <script>
+      window.addEventListener("load", function () {
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.register("ServiceWorker.js");
+        }
+      });
+(function() {
+  // ページ全体のスクロール禁止
+  document.body.style.overflow = "hidden";
+  document.documentElement.style.overflow = "hidden";
 
-    .container {
-      height: 200vh; /* 縦長にしてスクロールできるようにする */
-      padding-top: 50vh; /* 真ん中に配置 */
-      box-sizing: border-box;
-    }
+  // フォーカス時の自動スクロール防止
+  const stopScroll = (e) => {
+    window.scrollTo(0, 0);
+    e.preventDefault();
+  };
 
-    input {
-      font-size: 20px;
-      padding: 10px;
-      width: 80%;
-      max-width: 300px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <p>下の入力欄をタップしてキーボードを表示してください。</p>
-    <input id="testInput" type="text" placeholder="ここに入力" />
-  </div>
+  window.addEventListener("scroll", stopScroll, { passive: false });
+})();
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var warningBanner = document.querySelector("#unity-warning");
 
-  <script>
-    // scrollIntoView 無効化
-    HTMLElement.prototype.scrollIntoView = function() {
-      console.log("scrollIntoView suppressed:", this);
-    };
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
 
-    // 強制スクロール抑制
-    window.addEventListener("scroll", () => {
-      console.log("scroll event → 戻す");
-      window.scrollTo(0, 0);
-    }, { passive: false });
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/ec750c6850942083c5ea484efcdcbcfd.loader.js";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/ab85d8f1ea29bf531c2d2205a0a2d9e3.data.unityweb",
+        frameworkUrl: buildUrl + "/210385932e7965ec3ca32bb38fb8c0e4.framework.js.unityweb",
+        codeUrl: buildUrl + "/789a055f5663b501822989cf0e0cf8bc.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "workhappiness",
+        productName: "DWAI",
+        productVersion: "1.0",
+        showBanner: unityShowBanner,
+      };
 
-    // preventScroll を試す
-    const input = document.getElementById("testInput");
-    input.addEventListener("focus", () => {
-      console.log("focus called with preventScroll");
-      setTimeout(() => input.focus({ preventScroll: true }), 0);
-    });
-  </script>
-</body>
+      // By default Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+      }
+
+      loadingBar.style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          progressBarFull.style.width = 100 * progress + "%";
+        }).then((unityInstance) => {
+          loadingBar.style.display = "none";
+        }).catch((message) => {
+          alert(message);
+        });
+      };
+      document.body.appendChild(script);
+    </script>
+  </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
