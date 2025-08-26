@@ -44,22 +44,6 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
-      
-      const input = document.querySelector("input"); // 対象の TMP_InputField
-      const observer = new MutationObserver(() => {
-        const rect = input.getBoundingClientRect();
-        console.log("input moved", rect.top, rect.left);
-      });
-      
-function waitForInput(selector, callback) {
-    const interval = setInterval(() => {
-        const input = document.querySelector(selector);
-        if (input) {
-            clearInterval(interval);
-            callback(input);
-        }
-    }, 100);
-}
 document.addEventListener("DOMContentLoaded", () => {
     // TMP_InputField の <input> が生成されるタイミングを監視
     const observer = new MutationObserver((mutations, obs) => {
@@ -172,6 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
     </script>
   </body>
 </html>
+
 
 
 
