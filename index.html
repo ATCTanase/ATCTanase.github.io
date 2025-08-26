@@ -44,14 +44,34 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
-input.addEventListener("focus", () => {
-    setTimeout(() => {
-        // 強制的に任意位置にスクロール
-        window.scrollTo({ top: 0, behavior: 'auto' }); 
-        console.log("scroll corrected");
-    }, 50);
-});
+(function() {
+  let lastScrollTop = 0;
 
+  // スクロールを常に元に戻す
+  window.addEventListener("scroll", function(e) {
+    window.scrollTo(0, lastScrollTop);
+  });
+
+  // フォーカス時の強制スクロール防止
+  document.addEventListener("focusin", function(e) {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+      // 現在位置を保存
+      lastScrollTop = window.scrollY;
+      setTimeout(() => {
+        window.scrollTo(0, lastScrollTop);
+      }, 0);
+    }
+  });
+
+  document.addEventListener("focusout", function(e) {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+      // フォーカス解除時も戻す
+      setTimeout(() => {
+        window.scrollTo(0, lastScrollTop);
+      }, 0);
+    }
+  });
+})();
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -128,6 +148,7 @@ input.addEventListener("focus", () => {
     </script>
   </body>
 </html>
+
 
 
 
