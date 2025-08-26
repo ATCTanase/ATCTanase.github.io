@@ -45,32 +45,43 @@
         }
       });
 (function() {
-  const input = document.getElementById("testInput");
   const initialHeight = window.innerHeight;
 
-  // scrollIntoView を無効化（iOS Safari 対策）
-  HTMLElement.prototype.scrollIntoView = function() {
-    console.log("scrollIntoView suppressed:", this);
-  };
+  function attachKeyboardListener(input) {
+    if (!input || input._keyboardAttached) return; // 二重attach防止
+    input._keyboardAttached = true;
 
-  // キーボード表示時のスクロール量検知
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", () => {
-      const vh = window.visualViewport.height;
-      const keyboardHeight = initialHeight - vh;
-      console.log("キーボードによる押し上げ量:", keyboardHeight);
+    // visualViewport がある場合は resize でキーボード高さ検知
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", () => {
+        const vh = window.visualViewport.height;
+        const keyboardHeight = initialHeight - vh;
 
-      // Unity 側に送信
-      if (typeof SendMessage === "function") {
-        SendMessage("UiRoot", "OnKeyboardScroll", keyboardHeight.toString());
-      }
+        if (typeof SendMessage === "function") {
+          SendMessage("UiRoot", "OnKeyboardScroll", keyboardHeight.toString());
+        }
+      });
+    }
+
+    // フォーカス時に preventScroll を試す
+    input.addEventListener("focus", () => {
+      setTimeout(() => input.focus({ preventScroll: true }), 0);
     });
   }
 
-  // フォーカス時に preventScroll を試す
-  input.addEventListener("focus", () => {
-    setTimeout(() => input.focus({ preventScroll: true }), 0);
+  // 動的生成される input を監視
+  const observer = new MutationObserver(mutations => {
+    for (const mutation of mutations) {
+      mutation.addedNodes.forEach(node => {
+        if (node.tagName === "INPUT") attachKeyboardListener(node);
+
+        // subtree に input がある場合も対応
+        node.querySelectorAll?.("input")?.forEach(child => attachKeyboardListener(child));
+      });
+    }
   });
+
+  observer.observe(document.body, { childList: true, subtree: true });
 })();
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -148,6 +159,7 @@
     </script>
   </body>
 </html>
+
 
 
 
