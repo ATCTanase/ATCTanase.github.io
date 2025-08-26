@@ -44,14 +44,17 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
+      
       const input = document.querySelector("input"); // 対象の TMP_InputField
-const observer = new MutationObserver(() => {
-    const rect = input.getBoundingClientRect();
-    console.log("input moved", rect.top, rect.left);
-});
+      const observer = new MutationObserver(() => {
+        const rect = input.getBoundingClientRect();
+        console.log("input moved", rect.top, rect.left);
+      });
+      
       input.addEventListener("focus", () => console.log("focus"));
-input.addEventListener("blur", () => console.log("blur"));
-observer.observe(input, { attributes: true, attributeFilter: ["style"] });
+      input.addEventListener("blur", () => console.log("blur"));
+      observer.observe(input, { attributes: true, attributeFilter: ["style"] });
+      
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -128,5 +131,6 @@ observer.observe(input, { attributes: true, attributeFilter: ["style"] });
     </script>
   </body>
 </html>
+
 
 
