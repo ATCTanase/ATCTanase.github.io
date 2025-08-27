@@ -93,6 +93,8 @@
         for (let mutation of mutationsList) {
           mutation.addedNodes.forEach(node => {
             if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
+              console.log("New input/textarea created:", node);
+
               node.addEventListener("focus", () => {
                 console.log("Input focused:");
               });
@@ -187,3 +189,4 @@
     </script>
   </body>
 </html>
+
