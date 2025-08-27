@@ -84,15 +84,8 @@
         window.visualViewport.addEventListener("resize", () => {
             const percent = calculateKeyboardPercent();
             console.log("Keyboard percent:", percent);
-
-        // フォーカス中の input を取得
-        const focusedInput = document.querySelector("input:focus, textarea:focus");
-        if (!focusedInput) return;
-
-        const id = focusedInput.getAttribute("data-webgl-id");
-        if (!id) return;
-        console.log("Keyboard percent:", percent, "id:", id);
-            safeSendMessage("UIRoot", "OnKeyboardScrollPercent",id+":"+percent.toString());
+        console.log("Keyboard percent:", percent);
+            safeSendMessage("UIRoot", "OnKeyboardScrollPercent",percent.toString());
         });
 
       // 動的生成監視（Input に id を付与）
@@ -100,14 +93,11 @@
         for (let mutation of mutationsList) {
           mutation.addedNodes.forEach(node => {
             if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
-              if (!node.hasAttribute("data-webgl-id")) {
-                console.warn("⚠ Unityからidが渡されていないinputを検知", node);
-              }
               node.addEventListener("focus", () => {
-                console.log("Input focused:", node.getAttribute("data-webgl-id"));
+                console.log("Input focused:");
               });
               node.addEventListener("blur", () => {
-                console.log("Input blurred:", node.getAttribute("data-webgl-id"));
+                console.log("Input blurred:");
               });
             }
           });
@@ -149,12 +139,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/2997e55265165db1477b1385f9babe61.loader.js";
+      var loaderUrl = buildUrl + "/ba5a02bf53dd878ce07fbd236c50ddc2.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/e45ed6b41439f5cbdddaac4393cd81f6.data.unityweb",
-        frameworkUrl: buildUrl + "/ca38c86b613f6fe337b958443ccd39bf.framework.js.unityweb",
-        codeUrl: buildUrl + "/d61db5f0a323dd4fc627c36728163174.wasm.unityweb",
+        dataUrl: buildUrl + "/5fab0a7e1fea86d2ae7475345cb1cf22.data.unityweb",
+        frameworkUrl: buildUrl + "/192d0680638e6ad4aa04d4f3125c98f1.framework.js.unityweb",
+        codeUrl: buildUrl + "/e4e5f32379cdd21858ccb97e04690a5c.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
