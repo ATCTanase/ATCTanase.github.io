@@ -88,7 +88,7 @@
             safeSendMessage("UIRoot", "OnKeyboardScrollPercent",percent.toString());
         });
 
-      // 動的生成監視（Input に id を付与）
+        // 動的生成も含め MutationObserver で監視
       const observer = new MutationObserver((mutationsList) => {
         for (let mutation of mutationsList) {
           mutation.addedNodes.forEach(node => {
@@ -140,12 +140,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/dbb42fad141e908ad511309071d58583.loader.js";
+      var loaderUrl = buildUrl + "/475fd98d1c9000b88c2de874442d41db.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/2c3b92fec92004d0bf1a59f7d8b7391f.data.unityweb",
+        dataUrl: buildUrl + "/cdd5a82953356e784e1fb89f4d5e90e9.data.unityweb",
         frameworkUrl: buildUrl + "/192d0680638e6ad4aa04d4f3125c98f1.framework.js.unityweb",
-        codeUrl: buildUrl + "/6de3bbf3b6eafe778266ff8165f5a486.wasm.unityweb",
+        codeUrl: buildUrl + "/bd613f8ab807414ed1a7e178a5b62168.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
