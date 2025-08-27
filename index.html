@@ -7,25 +7,7 @@
     <link rel="icon" href="TemplateData/favicons/favicon.png">
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="manifest" href="manifest.webmanifest">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-orientation" content="landscape">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   </head>
-  <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    background-color: #000000; /* 黒 */
-  }
-  #unityContainer {
-    width: 100%;
-    height: 100%;
-    background-color: #000000; /* 黒 */
-  }
-</style>
   <body>
     <div id="unity-container">
       <canvas id="unity-canvas" width=1280 height=800 tabindex="-1"></canvas>
@@ -43,68 +25,6 @@
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
-    // Unity インスタンス
-    let unityInstance = null;
-    let pendingKeyboardEvents = [];
-
-    // キーボード占有率計算
-    function calculateKeyboardPercent() {
-        if (!window.visualViewport) return 0;
-        const viewportHeight = window.visualViewport.height;
-        const totalHeight = window.innerHeight;
-        const occupied = totalHeight - viewportHeight;
-        return Math.max(0, Math.min(1, occupied / totalHeight));
-    }
-
-    // 安全に SendMessage を呼ぶ
-    function safeSendMessage(gameObject, method, param) {
-        if (unityInstance && typeof unityInstance.SendMessage === "function") {
-            unityInstance.SendMessage(gameObject, method, param);
-        } else {
-            pendingKeyboardEvents.push({gameObject, method, param});
-            console.warn("Unity instance not ready, queued", param);
-        }
-    }
-
-    // キューに積まれたイベントをフラッシュ
-    function flushPendingEvents() {
-        if (!unityInstance) return;
-        pendingKeyboardEvents.forEach(msg => {
-            unityInstance.SendMessage(msg.gameObject, msg.method, msg.param);
-        });
-        pendingKeyboardEvents = [];
-    }
-
-    // InputField 監視
-    function bindKeyboardEvents() {
-        if (!window.visualViewport) return;
-
-        // visualViewport resize でキーボード検知
-        window.visualViewport.addEventListener("resize", () => {
-            const percent = calculateKeyboardPercent();
-            console.log("Keyboard percent:", percent);
-            safeSendMessage("UIRoot", "OnKeyboardScrollPercent", percent.toString());
-        });
-
-        // 動的生成も含め MutationObserver で監視
-        const observer = new MutationObserver((mutationsList) => {
-            for (let mutation of mutationsList) {
-                mutation.addedNodes.forEach(node => {
-                    if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
-                        node.addEventListener("focus", () => console.log("Input focused:", node));
-                        node.addEventListener("blur", () => console.log("Input blurred:", node));
-                    }
-                });
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        // 初期の input も監視
-        document.querySelectorAll("input, textarea").forEach(input => {
-            input.addEventListener("focus", () => console.log("Input focused:", input));
-            input.addEventListener("blur", () => console.log("Input blurred:", input));
-        });
-    }
 
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -137,12 +57,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/af4edf0a689b108f821f2225242f9882.loader.js";
+      var loaderUrl = buildUrl + "/da0191d3da7c19b493a94749d7e0e481.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/77764531b30c6e86bd2390f72443d29b.data.unityweb",
-        frameworkUrl: buildUrl + "/192d0680638e6ad4aa04d4f3125c98f1.framework.js.unityweb",
-        codeUrl: buildUrl + "/950f61659da47ed1b11a6de9d37988f0.wasm.unityweb",
+        dataUrl: buildUrl + "/447a0d717618b4ab32ee524691e48637.data.unityweb",
+        frameworkUrl: buildUrl + "/571b0a3f5953eb1d547217406be1de2c.framework.js.unityweb",
+        codeUrl: buildUrl + "/feda8e55016570c0b9f99d5b5e3892e3.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -172,11 +92,8 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-        }).then((instance) => {
-            unityInstance = instance;
-            loadingBar.style.display = "none";
-            flushPendingEvents();
-            bindKeyboardEvents();     
+        }).then((unityInstance) => {
+          loadingBar.style.display = "none";
         }).catch((message) => {
           alert(message);
         });
