@@ -48,6 +48,11 @@
     let unityInstance = null;
     let pendingKeyboardEvents = [];
 
+    let iosFocusTimeout = null;
+
+    // iOS 判定
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      
     // キーボード占有率計算
     function calculateKeyboardPercent() {
         if (!window.visualViewport) return 0;
@@ -79,15 +84,48 @@
     // InputField 監視
     function bindKeyboardEvents() {
         if (!window.visualViewport) return;
-
         // visualViewport resize でキーボード検知
         window.visualViewport.addEventListener("resize", () => {
             const percent = calculateKeyboardPercent();
-            console.log("Keyboard percent:", percent);
-        console.log("Keyboard percent:", percent);
-            safeSendMessage("UIRoot", "OnKeyboardScrollPercent",percent.toString());
+
+            // 遅延タイマーが残っていればキャンセル
+            if (iosFocusTimeout) {
+                clearTimeout(iosFocusTimeout);
+                iosFocusTimeout = null;
+                console.log("Delayed focusin cancelled because resize fired");
+            }
+
+            safeSendMessage("UIRoot", "OnKeyboardScrollPercent", percent.toString());
         });
 
+        // iOS 用：focusin/focusout で遅延送信
+        if (isIOS) {
+            document.body.addEventListener("focusin", (e) => {
+                if (e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") return;
+
+                // 以前のタイマーがあればキャンセル
+                if (iosFocusTimeout) {
+                    clearTimeout(iosFocusTimeout);
+                    iosFocusTimeout = null;
+                }
+
+                iosFocusTimeout = setTimeout(() => {
+                    const percent = calculateKeyboardPercent();
+                    console.log("Keyboard percent (focusin, delayed):", percent);
+                    safeSendMessage("UIRoot", "OnKeyboardScrollPercent", percent.toString());
+                    iosFocusTimeout = null;
+                }, 300);
+            });
+
+            document.body.addEventListener("focusout", (e) => {
+                if (e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") return;
+
+                // 遅延でゼロ送信
+                setTimeout(() => {
+                    safeSendMessage("UIRoot", "OnKeyboardScrollPercent", "0");
+                }, 300);
+            });
+        }
         // 動的生成も含め MutationObserver で監視
       const observer = new MutationObserver((mutationsList) => {
         for (let mutation of mutationsList) {
@@ -188,3 +226,4 @@
     </script>
   </body>
 </html>
+
