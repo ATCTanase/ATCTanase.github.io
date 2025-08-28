@@ -81,7 +81,7 @@
         pendingKeyboardEvents = [];
     }
 
-    // InputField 監視
+   // InputField 監視
     function bindKeyboardEvents() {
         if (!window.visualViewport) return;
         // visualViewport resize でキーボード検知
@@ -95,7 +95,7 @@
                 console.log("Delayed focusin cancelled because resize fired");
             }
 
-            safeSendMessage("UIRoot", "OnKeyboardScrollPercent",percent.toString());
+            safeSendMessage("UIRoot", "OnKeyboardScrollPercent", percent.toString());
         });
 
         // iOS 用：focusin/focusout で遅延送信
@@ -178,12 +178,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/84fb9ba1aa79eb55379d41bbc9ea96b6.loader.js";
+      var loaderUrl = buildUrl + "/81c0d30160a4730d5080b45df7fea267.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/3f79becff5191bb1cad7736b5b5eb99e.data.unityweb",
+        dataUrl: buildUrl + "/2ced2cb5c2d9cf4e2ecb88b52cde50c2.data.unityweb",
         frameworkUrl: buildUrl + "/0b75bbee0fa456d72e2a153769f46fb9.framework.js.unityweb",
-        codeUrl: buildUrl + "/6373ce2a3ba421d12a153e289acb5bb7.wasm.unityweb",
+        codeUrl: buildUrl + "/3e648c120e6e5bad9aa660112fc58b5e.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
