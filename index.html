@@ -44,6 +44,71 @@
         }
       });
 
+    // Unity インスタンス
+    let unityInstance = null;
+    let pendingKeyboardEvents = [];
+
+    // キーボード占有率計算
+    function calculateKeyboardPercent() {
+        if (!window.visualViewport) return 0;
+        const viewportHeight = window.visualViewport.height;
+        const totalHeight = window.innerHeight;
+        const occupied = totalHeight - viewportHeight;
+        return Math.max(0, Math.min(1, occupied / totalHeight));
+    }
+
+    // 安全に SendMessage を呼ぶ
+    function safeSendMessage(gameObject, method, param) {
+        if (unityInstance && typeof unityInstance.SendMessage === "function") {
+            unityInstance.SendMessage(gameObject, method, param);
+        } else {
+            pendingKeyboardEvents.push({gameObject, method, param});
+            console.warn("Unity instance not ready, queued", param);
+        }
+    }
+
+    // キューに積まれたイベントをフラッシュ
+    function flushPendingEvents() {
+        if (!unityInstance) return;
+        pendingKeyboardEvents.forEach(msg => {
+            unityInstance.SendMessage(msg.gameObject, msg.method, msg.param);
+        });
+        pendingKeyboardEvents = [];
+    }
+
+    // InputField 監視
+    function bindKeyboardEvents() {
+        if (!window.visualViewport) return;
+
+        // visualViewport resize でキーボード検知
+        window.visualViewport.addEventListener("resize", () => {
+            const percent = calculateKeyboardPercent();
+            console.log("Keyboard percent:", percent);
+        console.log("Keyboard percent:", percent);
+            safeSendMessage("UIRoot", "OnKeyboardScrollPercent",percent.toString());
+        });
+
+        // 動的生成も含め MutationObserver で監視
+      const observer = new MutationObserver((mutationsList) => {
+        for (let mutation of mutationsList) {
+          mutation.addedNodes.forEach(node => {
+            if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
+              console.log("New input/textarea created:", node);
+              node.addEventListener("focus", () => {
+                console.log("Input focused:");
+              });
+              node.addEventListener("blur", () => {
+                console.log("Input blurred:");
+              });
+            }
+          });
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+
+
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -75,12 +140,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/c3eb8d90ead3df41c1d1b3c82c8de82b.loader.js";
+      var loaderUrl = buildUrl + "/c7d98dad462270eaba0952c7a7f9c423.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/f9a783c6ef3cf3c3789f934785f07f6a.data.unityweb",
-        frameworkUrl: buildUrl + "/c29a9dcc891d685ec0bce1ccf783986c.framework.js.unityweb",
-        codeUrl: buildUrl + "/29da1a4617c2552d5f8bbda31e339eca.wasm.unityweb",
+        dataUrl: buildUrl + "/f4d637a13d23c5158631a4c15f3f3cd2.data.unityweb",
+        frameworkUrl: buildUrl + "/192d0680638e6ad4aa04d4f3125c98f1.framework.js.unityweb",
+        codeUrl: buildUrl + "/9779a265d9b031f048e1a55738d8a411.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -110,8 +175,11 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
-          loadingBar.style.display = "none";
+        }).then((instance) => {
+            unityInstance = instance;
+            loadingBar.style.display = "none";
+            flushPendingEvents();
+            bindKeyboardEvents();     
         }).catch((message) => {
           alert(message);
         });
