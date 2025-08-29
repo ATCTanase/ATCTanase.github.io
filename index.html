@@ -124,20 +124,34 @@
         for (let mutation of mutationsList) {
           mutation.addedNodes.forEach(node => {
             if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
-              console.log("New input/textarea created:", node);
-              node.addEventListener("focus", () => {
-                console.log("Input focused:");
-              });
-              node.addEventListener("blur", () => {
-                console.log("Input blurred:");
-              });
+                    console.log("New input/textarea created:", node);
+                    // 削除監視を開始
+                    watchGeneratedInput(node);
             }
           });
         }
       });
       observer.observe(document.body, { childList: true, subtree: true });
     }
-
+// 生成済み Input を監視して削除時に通知
+function watchGeneratedInput(input) {
+    if (!input) return;
+    const parent = input.parentNode;
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.removedNodes.forEach((node) => {
+                if (node === input) {
+                    console.log("Input removed:", node);
+                unityInstance.SendMessage(unityObjectName, unityMethodName, "0");
+                    observer.disconnect(); // 監視終了
+                }
+            });
+        });
+    });
+  if (isIOS) {
+    observer.observe(parent, { childList: true });
+  }
+}
 
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -218,4 +232,5 @@
     </script>
   </body>
 </html>
+
 
