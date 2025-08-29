@@ -52,7 +52,28 @@
 
     // iOS 判定
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-      
+   const unityObjectName = "UIRootRotator"; // Unity 側の GameObject 名
+    const unityMethodName = "OnKeyboardScrollPercent"; // 呼び出すメソッド名
+
+    (function () {
+      if (!window.visualViewport) return; // 対応してないブラウザは無視
+      function notifyKeyboardPercent() {
+        // viewport の高さ (キーボードが出ていると縮む)
+        const viewportHeight = window.visualViewport.height;
+        // 画面全体の高さ
+        const screenHeight = window.screen.height;
+        // キーボード上端の比率 (0 = 下端, 1 = 上端)
+        const percent = viewportHeight / screenHeight;
+
+        if (typeof unityInstance !== "undefined" && unityInstance != null) {
+          unityInstance.SendMessage(unityObjectName, unityMethodName, percent.toString());
+        }
+      }
+      if (isIOS()) {
+        window.visualViewport.addEventListener("resize", notifyKeyboardPercent);
+      }
+    })();
+
     // キーボード占有率計算
     function calculateKeyboardPercent() {
         if (!window.visualViewport) return 0;
@@ -88,45 +109,10 @@
         window.visualViewport.addEventListener("resize", () => {
             const percent = calculateKeyboardPercent();
 
-            // 遅延タイマーが残っていればキャンセル
-            if (iosFocusTimeout) {
-                clearTimeout(iosFocusTimeout);
-                iosFocusTimeout = null;
-                console.log("Delayed focusin cancelled because resize fired");
-            }
-
-            safeSendMessage("UIRoot", "OnKeyboardScrollPercent", percent.toString());
+            safeSendMessage(unityObjectName, unityMethodName, percent.toString());
         });
-
-        // iOS 用：focusin/focusout で遅延送信
-        if (isIOS) {
-            document.body.addEventListener("focusin", (e) => {
-                if (e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") return;
-
-                // 以前のタイマーがあればキャンセル
-                if (iosFocusTimeout) {
-                    clearTimeout(iosFocusTimeout);
-                    iosFocusTimeout = null;
-                }
-
-                iosFocusTimeout = setTimeout(() => {
-                    const percent = calculateKeyboardPercent();
-                    console.log("Keyboard percent (focusin, delayed):", percent);
-                    safeSendMessage("UIRoot", "OnKeyboardScrollPercent", percent.toString());
-                    iosFocusTimeout = null;
-                }, 300);
-            });
-
-            document.body.addEventListener("focusout", (e) => {
-                if (e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") return;
-
-                // 遅延でゼロ送信
-                setTimeout(() => {
-                    safeSendMessage("UIRoot", "OnKeyboardScrollPercent", "0");
-                }, 300);
-            });
-        }
-        // 動的生成も含め MutationObserver で監視
+      
+      // 動的生成も含め MutationObserver で監視
       const observer = new MutationObserver((mutationsList) => {
         for (let mutation of mutationsList) {
           mutation.addedNodes.forEach(node => {
@@ -144,8 +130,6 @@
       });
       observer.observe(document.body, { childList: true, subtree: true });
     }
-
-
 
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -226,3 +210,4 @@
     </script>
   </body>
 </html>
+
