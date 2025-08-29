@@ -138,18 +138,17 @@ function watchGeneratedInput(input) {
     if (!input) return;
     const parent = input.parentNode;
     const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.removedNodes.forEach((node) => {
-                if (node === input) {
+        mutations.forEach(mutation => {
+            mutation.removedNodes.forEach(node => {
+                if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
                     console.log("Input removed:", node);
-                unityInstance.SendMessage(unityObjectName, unityMethodName, "0");
-                    observer.disconnect(); // 監視終了
+                    safeSendMessage(unityObjectName, unityMethodName, "0");
                 }
             });
         });
     });
   if (isIOS) {
-    observer.observe(parent, { childList: true });
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 }
 
@@ -232,5 +231,6 @@ function watchGeneratedInput(input) {
     </script>
   </body>
 </html>
+
 
 
