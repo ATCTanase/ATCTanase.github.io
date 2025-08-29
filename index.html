@@ -38,119 +38,18 @@
       <div id="unity-warning"> </div>
     </div>
     <script>
+      if (!window.deferredPrompt) {
+        window.addEventListener('beforeinstallprompt', function(e) {
+          e.preventDefault(); // Chromeの自動バナーを抑制
+          window.deferredPrompt = e;
+          console.log("beforeinstallprompt captured");
+        });
+      }
       window.addEventListener("load", function () {
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
-
-    // Unity インスタンス
-    let unityInstance = null;
-    let pendingKeyboardEvents = [];
-
-    // iOS 判定
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    
-    const unityObjectName = "UIRoot"; // Unity 側の GameObject 名
-    const unityMethodName = "OnKeyboardScrollPercent"; // 呼び出すメソッド名
-
-// (function () {
-//     if (!window.visualViewport) return; // 対応してないブラウザは無視
-
-//     let debounceTimer = null;
-//     const DEBOUNCE_MS = 100; // 更新が止まったと見なす時間
-
-//     function notifyKeyboardPercent() {
-//         const viewportHeight = window.visualViewport.height;
-//         const screenHeight = window.screen.height;
-//         const percent = viewportHeight / screenHeight;
-
-//         // デバウンス処理
-//         if (debounceTimer) clearTimeout(debounceTimer);
-//         debounceTimer = setTimeout(() => {
-//             if (typeof unityInstance !== "undefined" && unityInstance != null) {
-//                 console.log("KeyboardPercent Final percent:", percent);
-//                 unityInstance.SendMessage(unityObjectName, unityMethodName, percent.toString());
-//             }
-//         }, DEBOUNCE_MS);
-//     }
-
-//     if (isIOS) {
-//         window.visualViewport.addEventListener("resize", notifyKeyboardPercent);
-//     }
-// })();
-
-    // キーボード占有率計算
-    function calculateKeyboardPercent() {
-        if (!window.visualViewport) return 0;
-        const viewportHeight = window.visualViewport.height;
-        const totalHeight = window.innerHeight;
-        const occupied = totalHeight - viewportHeight;
-        return Math.max(0, Math.min(1, occupied / totalHeight));
-    }
-
-    // 安全に SendMessage を呼ぶ
-    function safeSendMessage(gameObject, method, param) {
-        if (unityInstance && typeof unityInstance.SendMessage === "function") {
-            unityInstance.SendMessage(gameObject, method, param);
-        } else {
-            pendingKeyboardEvents.push({gameObject, method, param});
-            console.warn("Unity instance not ready, queued", param);
-        }
-    }
-
-    // キューに積まれたイベントをフラッシュ
-    function flushPendingEvents() {
-        if (!unityInstance) return;
-        pendingKeyboardEvents.forEach(msg => {
-            unityInstance.SendMessage(msg.gameObject, msg.method, msg.param);
-        });
-        pendingKeyboardEvents = [];
-    }
-
-   // InputField 監視
-    function bindKeyboardEvents() {
-        if (!window.visualViewport) return;
-        if (isIOS) return;
-        // visualViewport resize でキーボード検知
-        window.visualViewport.addEventListener("resize", () => {
-            const percent = calculateKeyboardPercent();
-
-            safeSendMessage(unityObjectName, unityMethodName, percent.toString());
-        });
-      
-      // 動的生成も含め MutationObserver で監視
-      const observer = new MutationObserver((mutationsList) => {
-        for (let mutation of mutationsList) {
-          mutation.addedNodes.forEach(node => {
-            if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
-                    console.log("New input/textarea created:", node);
-                    // 削除監視を開始
-                    watchGeneratedInput(node);
-            }
-          });
-        }
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
-    }
-// // 生成済み Input を監視して削除時に通知
-// function watchGeneratedInput(input) {
-//     if (!input) return;
-//     const parent = input.parentNode;
-//     const observer = new MutationObserver((mutations) => {
-//         mutations.forEach(mutation => {
-//             mutation.removedNodes.forEach(node => {
-//                 if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
-//                     console.log("Input removed:", node);
-//                     safeSendMessage(unityObjectName, unityMethodName, "0");
-//                 }
-//             });
-//         });
-//     });
-//   if (isIOS) {
-//     observer.observe(document.body, { childList: true, subtree: true });
-//   }
-// }
 
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -183,12 +82,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/014b203fbf0ac3b6eb577a4a2ec10148.loader.js";
+      var loaderUrl = buildUrl + "/4bbc35fa3355087ecedc0aa1e0592e51.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/f1f73ebc65665655400dd381e665be49.data.unityweb",
-        frameworkUrl: buildUrl + "/0b75bbee0fa456d72e2a153769f46fb9.framework.js.unityweb",
-        codeUrl: buildUrl + "/eac13fb8e6b992578e3b3ac99c3c3cf3.wasm.unityweb",
+        dataUrl: buildUrl + "/ae9a4362e80fbaf2a20b6798c8f4233f.data.unityweb",
+        frameworkUrl: buildUrl + "/31593012ae4170870222f29e223a7a36.framework.js.unityweb",
+        codeUrl: buildUrl + "/aace5f4df5e23c30553dea1a1ec961bd.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -218,11 +117,8 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-        }).then((instance) => {
-            unityInstance = instance;
-            loadingBar.style.display = "none";
-            flushPendingEvents();
-            bindKeyboardEvents();     
+        }).then((unityInstance) => {
+          loadingBar.style.display = "none";
         }).catch((message) => {
           alert(message);
         });
@@ -231,7 +127,3 @@
     </script>
   </body>
 </html>
-
-
-
-
