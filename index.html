@@ -48,8 +48,6 @@
     let unityInstance = null;
     let pendingKeyboardEvents = [];
 
-    let iosFocusTimeout = null;
-
     // iOS 判定
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const unityObjectName = "UIRoot"; // Unity 側の GameObject 名
@@ -66,7 +64,6 @@
         const percent = viewportHeight / screenHeight;
 
         if (typeof unityInstance !== "undefined" && unityInstance != null) {
-        console.log("KeyboardPercent Parsed percent:", percent);
           unityInstance.SendMessage(unityObjectName, unityMethodName, percent.toString());
         }
       }
@@ -105,9 +102,8 @@
 
    // InputField 監視
     function bindKeyboardEvents() {
-      if (!window.visualViewport) return;
-      if (isIOS) return;
-        
+        if (!window.visualViewport) return;
+        if (isIOS) return;
         // visualViewport resize でキーボード検知
         window.visualViewport.addEventListener("resize", () => {
             const percent = calculateKeyboardPercent();
@@ -133,6 +129,7 @@
       });
       observer.observe(document.body, { childList: true, subtree: true });
     }
+
 
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -165,12 +162,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/81c0d30160a4730d5080b45df7fea267.loader.js";
+      var loaderUrl = buildUrl + "/260c659157f07aec58334bbc0e221cb0.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/2ced2cb5c2d9cf4e2ecb88b52cde50c2.data.unityweb",
+        dataUrl: buildUrl + "/05fd55589217e8f77736c70240ebb2b8.data.unityweb",
         frameworkUrl: buildUrl + "/0b75bbee0fa456d72e2a153769f46fb9.framework.js.unityweb",
-        codeUrl: buildUrl + "/3e648c120e6e5bad9aa660112fc58b5e.wasm.unityweb",
+        codeUrl: buildUrl + "/a1a825ad3a90813dcfe57996b63f5db5.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -213,9 +210,3 @@
     </script>
   </body>
 </html>
-
-
-
-
-
-
