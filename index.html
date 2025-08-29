@@ -52,7 +52,7 @@
 
     // iOS 判定
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-   const unityObjectName = "UIRootRotator"; // Unity 側の GameObject 名
+    const unityObjectName = "UIRootRotator"; // Unity 側の GameObject 名
     const unityMethodName = "OnKeyboardScrollPercent"; // 呼び出すメソッド名
 
     (function () {
@@ -69,7 +69,7 @@
           unityInstance.SendMessage(unityObjectName, unityMethodName, percent.toString());
         }
       }
-      if (isIOS()) {
+      if (isIOS) {
         window.visualViewport.addEventListener("resize", notifyKeyboardPercent);
       }
     })();
@@ -210,4 +210,5 @@
     </script>
   </body>
 </html>
+
 
