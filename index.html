@@ -54,24 +54,31 @@
     const unityObjectName = "UIRoot"; // Unity 側の GameObject 名
     const unityMethodName = "OnKeyboardScrollPercent"; // 呼び出すメソッド名
 
-    (function () {
-      if (!window.visualViewport) return; // 対応してないブラウザは無視
-      function notifyKeyboardPercent() {
-        // viewport の高さ (キーボードが出ていると縮む)
+(function () {
+    if (!window.visualViewport) return; // 対応してないブラウザは無視
+
+    let debounceTimer = null;
+    const DEBOUNCE_MS = 100; // 更新が止まったと見なす時間
+
+    function notifyKeyboardPercent() {
         const viewportHeight = window.visualViewport.height;
-        // 画面全体の高さ
         const screenHeight = window.screen.height;
-        // キーボード上端の比率 (0 = 下端, 1 = 上端)
         const percent = viewportHeight / screenHeight;
 
-        if (typeof unityInstance !== "undefined" && unityInstance != null) {
-          unityInstance.SendMessage(unityObjectName, unityMethodName, percent.toString());
-        }
-      }
-      if (isIOS) {
+        // デバウンス処理
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            if (typeof unityInstance !== "undefined" && unityInstance != null) {
+                console.log("KeyboardPercent Final percent:", percent);
+                unityInstance.SendMessage(unityObjectName, unityMethodName, percent.toString());
+            }
+        }, DEBOUNCE_MS);
+    }
+
+    if (isIOS) {
         window.visualViewport.addEventListener("resize", notifyKeyboardPercent);
-      }
-    })();
+    }
+})();
 
     // キーボード占有率計算
     function calculateKeyboardPercent() {
@@ -211,3 +218,4 @@
     </script>
   </body>
 </html>
+
