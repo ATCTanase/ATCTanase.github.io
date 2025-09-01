@@ -46,31 +46,32 @@
         });
       }
       
+      window.isStandalone = false; 
       function CheckStandalone() {
           console.log("CheckStandalone");
-          let isStandalone = false;
+          window.isStandalone = false;
           // iOS Safari
           if (window.navigator.standalone === true){ 
-            isStandalone = true;
-            console.log("CheckStandalone:ios",isStandalone);
+            window.isStandalone = true;
+            console.log("CheckStandalone:ios",window.isStandalone);
           }// Android Chrome PWA
           else if (window.matchMedia('(display-mode: standalone)').matches) {
-            isStandalone = true;
-            console.log("CheckStandalone:Android",isStandalone);
+            window.isStandalone = true;
+            console.log("CheckStandalone:Android",window.isStandalone);
           }
           // URL パラメータによる強制判定
           else {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('standalone') === '1') {
-              isStandalone = true;
-              console.log("CheckStandalone:Params",isStandalone);
+              window.isStandalone = true;
+              console.log("CheckStandalone:Params",window.isStandalone);
             }
           }
           // Unity に通知（初期化されるまで待つ）
           function sendToUnity() {
             if (unityInstance && typeof unityInstance.SendMessage === "function") {
               console.log("sendToUnity");
-              unityInstance.SendMessage('InitScene', 'OnStandaloneChecked', isStandalone ? '1' : '0');
+              unityInstance.SendMessage('InitScene', 'OnStandaloneChecked', window.isStandalone ? '1' : '0');
             } else {
               console.log("sendToUnity:wait50");
               setTimeout(sendToUnity, 50); // 50ms 後に再実行
@@ -271,5 +272,6 @@
     </script>
   </body>
 </html>
+
 
 
