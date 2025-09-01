@@ -66,11 +66,19 @@
               console.log("CheckStandalone:Params",isStandalone);
             }
           }
-          // Unity に通知
-          if (typeof gameInstance !== 'undefined') {
+          // Unity に通知（初期化されるまで待つ）
+          function sendToUnity() {
+            if (unityInstance && typeof unityInstance.SendMessage === "function") {
+              console.log("sendToUnity");
               unityInstance.SendMessage('InitScene', 'OnStandaloneChecked', isStandalone ? '1' : '0');
+            } else {{
+              console.log("sendToUnity:wait50");
+              setTimeout(sendToUnity, 50); // 50ms 後に再実行
+            }
           }
+        sendToUnity();
       }
+      
       window.addEventListener("load", function () {
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("ServiceWorker.js");
@@ -263,3 +271,4 @@
     </script>
   </body>
 </html>
+
