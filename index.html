@@ -50,6 +50,9 @@
         if (window.navigator.standalone === true) return 1;
         // Android Chrome PWA
         if (window.matchMedia('(display-mode: standalone)').matches) return 1;
+        // URL パラメータによる強制判定
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('standalone') === '1') return 1; 
         return 0;
       }
       window.addEventListener("load", function () {
@@ -134,3 +137,4 @@
     </script>
   </body>
 </html>
+
