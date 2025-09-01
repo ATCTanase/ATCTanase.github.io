@@ -71,7 +71,7 @@
             if (unityInstance && typeof unityInstance.SendMessage === "function") {
               console.log("sendToUnity");
               unityInstance.SendMessage('InitScene', 'OnStandaloneChecked', isStandalone ? '1' : '0');
-            } else {{
+            } else {
               console.log("sendToUnity:wait50");
               setTimeout(sendToUnity, 50); // 50ms 後に再実行
             }
@@ -271,4 +271,5 @@
     </script>
   </body>
 </html>
+
 
