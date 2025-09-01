@@ -1,7 +1,7 @@
 {
   "name": "DWAI",
   "short_name": "DWAI",
-  "start_url": "index.html",
+  "start_url": "index.html?standalone=1",
   "display": "fullscreen",
   "orientation": "landscape",
   "background_color": "#231F20",
@@ -15,4 +15,5 @@
       "purpose": "any maskable"
     }
   ]
+
 }
