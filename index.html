@@ -47,24 +47,30 @@
       }
       
       function CheckStandalone() {
+          console.log("CheckStandalone");
           let isStandalone = false;
-
           // iOS Safari
-          if (window.navigator.standalone === true) isStandalone = true;
-
-          // Android Chrome PWA
-          if (window.matchMedia('(display-mode: standalone)').matches) isStandalone = true;
-
+          if (window.navigator.standalone === true){ 
+            isStandalone = true;
+            console.log("CheckStandalone:ios",isStandalone);
+          }// Android Chrome PWA
+          else if (window.matchMedia('(display-mode: standalone)').matches) {
+            isStandalone = true;
+            console.log("CheckStandalone:Android",isStandalone);
+          }
           // URL パラメータによる強制判定
-          const urlParams = new URLSearchParams(window.location.search);
-          if (urlParams.get('standalone') === '1') isStandalone = true;
-
+          else {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('standalone') === '1') {
+              isStandalone = true;
+              console.log("CheckStandalone:Params",isStandalone);
+            }
+          }
           // Unity に通知
           if (typeof gameInstance !== 'undefined') {
               gameInstance.SendMessage('InitScene', 'OnStandaloneChecked', isStandalone ? '1' : '0');
           }
       }
-
       window.addEventListener("load", function () {
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("ServiceWorker.js");
@@ -102,12 +108,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/8246e46573ec5e4590c2757d93542e64.loader.js";
+      var loaderUrl = buildUrl + "/910c282bcab75c58351df169fe106eda.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/e5af161484146a1620ad6e510fafa41a.data.unityweb",
+        dataUrl: buildUrl + "/2f804099289822e9e23731ae562c93b0.data.unityweb",
         frameworkUrl: buildUrl + "/6a0dc83d3c925798fbbf0467774d3439.framework.js.unityweb",
-        codeUrl: buildUrl + "/8cb499965e1c7f49a2ed5a13f2f943f4.wasm.unityweb",
+        codeUrl: buildUrl + "/4a22b4606248eda40fb52eb83da1feb2.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
