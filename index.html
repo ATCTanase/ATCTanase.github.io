@@ -45,16 +45,26 @@
           console.log("beforeinstallprompt captured");
         });
       }
-      function IsStandalone() {
-        // iOS Safari
-        if (window.navigator.standalone === true) return 1;
-        // Android Chrome PWA
-        if (window.matchMedia('(display-mode: standalone)').matches) return 1;
-        // URL パラメータによる強制判定
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('standalone') === '1') return 1; 
-        return 0;
+      
+      function CheckStandalone() {
+          let isStandalone = false;
+
+          // iOS Safari
+          if (window.navigator.standalone === true) isStandalone = true;
+
+          // Android Chrome PWA
+          if (window.matchMedia('(display-mode: standalone)').matches) isStandalone = true;
+
+          // URL パラメータによる強制判定
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.get('standalone') === '1') isStandalone = true;
+
+          // Unity に通知
+          if (typeof gameInstance !== 'undefined') {
+              gameInstance.SendMessage('InitScene', 'OnStandaloneChecked', isStandalone ? '1' : '0');
+          }
       }
+
       window.addEventListener("load", function () {
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("ServiceWorker.js");
@@ -92,12 +102,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/e200f8e3c75accc06c0df4bcc365bf14.loader.js";
+      var loaderUrl = buildUrl + "/8246e46573ec5e4590c2757d93542e64.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/c238527863d64f114c40a969d4473b9d.data.unityweb",
-        frameworkUrl: buildUrl + "/d5bad807a8a14eaac258545898fdb46b.framework.js.unityweb",
-        codeUrl: buildUrl + "/a13cb93a9179f37aaf16e93c777e70c3.wasm.unityweb",
+        dataUrl: buildUrl + "/e5af161484146a1620ad6e510fafa41a.data.unityweb",
+        frameworkUrl: buildUrl + "/6a0dc83d3c925798fbbf0467774d3439.framework.js.unityweb",
+        codeUrl: buildUrl + "/8cb499965e1c7f49a2ed5a13f2f943f4.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -137,4 +147,3 @@
     </script>
   </body>
 </html>
-
