@@ -79,12 +79,6 @@
           }
         sendToUnity();
       }
-      
-      window.addEventListener("load", function () {
-        if ("serviceWorker" in navigator) {
-          navigator.serviceWorker.register("ServiceWorker.js");
-        }
-      });
 
        // Unity インスタンス
     let unityInstance = null;
@@ -228,7 +222,7 @@
       var config = {
         arguments: [],
         dataUrl: buildUrl + "/93132aab0f277d7cd40aed144f3214b1.data.unityweb",
-        frameworkUrl: buildUrl + "/6a0dc83d3c925798fbbf0467774d3439.framework.js.unityweb",
+        frameworkUrl: buildUrl + "/8193e6bc13cfaf0966fe0850ca673642.framework.js.unityweb",
         codeUrl: buildUrl + "/4a22b4606248eda40fb52eb83da1feb2.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
@@ -272,6 +266,3 @@
     </script>
   </body>
 </html>
-
-
-
