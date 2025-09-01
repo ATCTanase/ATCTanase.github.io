@@ -45,13 +45,13 @@
           console.log("beforeinstallprompt captured");
         });
       }
-    function IsStandalone() {
-    // iOS Safari
-    if (window.navigator.standalone === true) return 1;
-    // Android Chrome PWA
-    if (window.matchMedia('(display-mode: standalone)').matches) return 1;
-    return 0;
-}
+      function IsStandalone() {
+        // iOS Safari
+        if (window.navigator.standalone === true) return 1;
+        // Android Chrome PWA
+        if (window.matchMedia('(display-mode: standalone)').matches) return 1;
+        return 0;
+      }
       window.addEventListener("load", function () {
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("ServiceWorker.js");
@@ -89,12 +89,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/db3c030688ca7547e9be046fa87a8cb0.loader.js";
+      var loaderUrl = buildUrl + "/e200f8e3c75accc06c0df4bcc365bf14.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/288bfb724ed71f14db863f79ba6d78bc.data.unityweb",
-        frameworkUrl: buildUrl + "/2604b6db14011a060ca1bf34b09676d5.framework.js.unityweb",
-        codeUrl: buildUrl + "/964ccda911c8bd3fa488d5e655e368e9.wasm.unityweb",
+        dataUrl: buildUrl + "/c238527863d64f114c40a969d4473b9d.data.unityweb",
+        frameworkUrl: buildUrl + "/d5bad807a8a14eaac258545898fdb46b.framework.js.unityweb",
+        codeUrl: buildUrl + "/a13cb93a9179f37aaf16e93c777e70c3.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -134,4 +134,3 @@
     </script>
   </body>
 </html>
-
