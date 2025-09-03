@@ -44,6 +44,113 @@
         }
       });
 
+       // Unity インスタンス
+    let unityInstance = null;
+    let pendingKeyboardEvents = [];
+
+    // iOS 判定
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    
+    const unityObjectName = "UIRoot"; // Unity 側の GameObject 名
+    const unityMethodName = "OnKeyboardScrollPercent"; // 呼び出すメソッド名
+
+// (function () {
+//     if (!window.visualViewport) return; // 対応してないブラウザは無視
+
+//     let debounceTimer = null;
+//     const DEBOUNCE_MS = 100; // 更新が止まったと見なす時間
+
+//     function notifyKeyboardPercent() {
+//         const viewportHeight = window.visualViewport.height;
+//         const screenHeight = window.screen.height;
+//         const percent = viewportHeight / screenHeight;
+
+//         // デバウンス処理
+//         if (debounceTimer) clearTimeout(debounceTimer);
+//         debounceTimer = setTimeout(() => {
+//             if (typeof unityInstance !== "undefined" && unityInstance != null) {
+//                 console.log("KeyboardPercent Final percent:", percent);
+//                 unityInstance.SendMessage(unityObjectName, unityMethodName, percent.toString());
+//             }
+//         }, DEBOUNCE_MS);
+//     }
+
+//     if (isIOS) {
+//         window.visualViewport.addEventListener("resize", notifyKeyboardPercent);
+//     }
+// })();
+
+    // キーボード占有率計算
+    function calculateKeyboardPercent() {
+        if (!window.visualViewport) return 0;
+        const viewportHeight = window.visualViewport.height;
+        const totalHeight = window.innerHeight;
+        const occupied = totalHeight - viewportHeight;
+        return Math.max(0, Math.min(1, occupied / totalHeight));
+    }
+
+    // 安全に SendMessage を呼ぶ
+    function safeSendMessage(gameObject, method, param) {
+        if (unityInstance && typeof unityInstance.SendMessage === "function") {
+            unityInstance.SendMessage(gameObject, method, param);
+        } else {
+            pendingKeyboardEvents.push({gameObject, method, param});
+            console.warn("Unity instance not ready, queued", param);
+        }
+    }
+
+    // キューに積まれたイベントをフラッシュ
+    function flushPendingEvents() {
+        if (!unityInstance) return;
+        pendingKeyboardEvents.forEach(msg => {
+            unityInstance.SendMessage(msg.gameObject, msg.method, msg.param);
+        });
+        pendingKeyboardEvents = [];
+    }
+
+   // InputField 監視
+    function bindKeyboardEvents() {
+        if (!window.visualViewport) return;
+        if (isIOS) return;
+        // visualViewport resize でキーボード検知
+        window.visualViewport.addEventListener("resize", () => {
+            const percent = calculateKeyboardPercent();
+
+            safeSendMessage(unityObjectName, unityMethodName, percent.toString());
+        });
+      
+      // 動的生成も含め MutationObserver で監視
+      const observer = new MutationObserver((mutationsList) => {
+        for (let mutation of mutationsList) {
+          mutation.addedNodes.forEach(node => {
+            if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
+                    console.log("New input/textarea created:", node);
+                    // 削除監視を開始
+                    //watchGeneratedInput(node);
+            }
+          });
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+// // 生成済み Input を監視して削除時に通知
+// function watchGeneratedInput(input) {
+//     if (!input) return;
+//     const parent = input.parentNode;
+//     const observer = new MutationObserver((mutations) => {
+//         mutations.forEach(mutation => {
+//             mutation.removedNodes.forEach(node => {
+//                 if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
+//                     console.log("Input removed:", node);
+//                     safeSendMessage(unityObjectName, unityMethodName, "0");
+//                 }
+//             });
+//         });
+//     });
+//   if (isIOS) {
+//     observer.observe(document.body, { childList: true, subtree: true });
+//   }
+// }
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -75,12 +182,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/6f4084b6b1f58314f2000e2e45b68dbd.loader.js";
+      var loaderUrl = buildUrl + "/c42872e02630bab67dd3292b743249b5.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/43ecd5f1b5084d59a70491358ca4d78c.data.unityweb",
-        frameworkUrl: buildUrl + "/d5bad807a8a14eaac258545898fdb46b.framework.js.unityweb",
-        codeUrl: buildUrl + "/b1b67c718a188168e01e6a98b408a2ac.wasm.unityweb",
+        dataUrl: buildUrl + "/5aa46f362b52f5d7bac1427e328253f3.data.unityweb",
+        frameworkUrl: buildUrl + "/ba99507b348e7547e4309e5fa366aad1.framework.js.unityweb",
+        codeUrl: buildUrl + "/4f35d6f3d1084d36b58d89c412e58e32.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -110,8 +217,11 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
-          loadingBar.style.display = "none";
+        }).then((instance) => {
+            unityInstance = instance;
+            loadingBar.style.display = "none";
+            flushPendingEvents();
+            bindKeyboardEvents();     
         }).catch((message) => {
           alert(message);
         });
