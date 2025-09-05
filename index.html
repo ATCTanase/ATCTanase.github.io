@@ -184,6 +184,9 @@ function watchGeneratedInput(input) {
     input.addEventListener("blur", () => {
         unityInstance.SendMessage(unityObjectName, unityMethodName, "0"); // hide
     });
+    input.addEventListener("focusout", () => {
+        unityInstance.SendMessage(unityObjectName, unityMethodName, "0"); // hide (Done/OK対応)
+    });
 
     // MutationObserver で削除検知（blurが飛ばない場合の補強）
     const observer = new MutationObserver((mutations) => {
@@ -294,3 +297,4 @@ function setupVisualViewportWatcher() {
     </script>
   </body>
 </html>
+
