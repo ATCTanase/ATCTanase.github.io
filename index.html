@@ -94,43 +94,33 @@
     
     const unityObjectName = "UIRoot"; // Unity 側の GameObject 名
     const unityMethodName = "OnKeyboardScrollPercent"; // 呼び出すメソッド名
-      
-(function () {
-    if (!window.visualViewport) return; // 対応してないブラウザは無視
 
-    let debounceTimer = null;
-    const DEBOUNCE_MS = 250; // 更新が止まったと見なす時間
-    let lastViewportHeight = window.visualViewport.height; // 前回の高さを保持
+// (function () {
+//     if (!window.visualViewport) return; // 対応してないブラウザは無視
 
-    function notifyKeyboardPercent() {
-        if (debounceTimer) clearTimeout(debounceTimer);
+//     let debounceTimer = null;
+//     const DEBOUNCE_MS = 100; // 更新が止まったと見なす時間
 
-        debounceTimer = setTimeout(() => {
-            if (typeof unityInstance === "undefined" || unityInstance == null) return;
+//     function notifyKeyboardPercent() {
+//         const viewportHeight = window.visualViewport.height;
+//         const screenHeight = window.screen.height;
+//         const percent = viewportHeight / screenHeight;
 
-            const viewportHeight = window.visualViewport.height;
-            const screenHeight = window.screen.height;
+//         // デバウンス処理
+//         if (debounceTimer) clearTimeout(debounceTimer);
+//         debounceTimer = setTimeout(() => {
+//             if (typeof unityInstance !== "undefined" && unityInstance != null) {
+//                 console.log("KeyboardPercent Final percent:", percent);
+//                 unityInstance.SendMessage(unityObjectName, unityMethodName, percent.toString());
+//             }
+//         }, DEBOUNCE_MS);
+//     }
 
-            if (viewportHeight < lastViewportHeight) {
-                // 減少 → キーボード出現
-                const percent = viewportHeight / screenHeight;
-                console.log("KeyboardPercent Final percent:", percent);
-                unityInstance.SendMessage(unityObjectName, unityMethodName, percent.toString());
-            } else if (viewportHeight >= lastViewportHeight) {
-                // 増加または元に戻った → キーボード消失
-                console.log("Keyboard hidden");
-                unityInstance.SendMessage(unityObjectName, unityMethodName, "0"); // hide
-            }
+//     if (isIOS) {
+//         window.visualViewport.addEventListener("resize", notifyKeyboardPercent);
+//     }
+// })();
 
-            // 今回の高さを保存
-            lastViewportHeight = viewportHeight;
-        }, DEBOUNCE_MS);
-    }
-
-    if (isIOS) {
-        window.visualViewport.addEventListener("resize", notifyKeyboardPercent);
-    }
-})();
     // キーボード占有率計算
     function calculateKeyboardPercent() {
         if (!window.visualViewport) return 0;
@@ -166,7 +156,8 @@
         // visualViewport resize でキーボード検知
         window.visualViewport.addEventListener("resize", () => {
             const percent = calculateKeyboardPercent();
-                unityInstance.SendMessage(unityObjectName, unityMethodName, "1"); // show
+
+            safeSendMessage(unityObjectName, unityMethodName, percent.toString());
         });
       
       // 動的生成も含め MutationObserver で監視
@@ -183,51 +174,24 @@
       });
       observer.observe(document.body, { childList: true, subtree: true });
     }
-// 生成済み Input を監視して削除時に通知
-function watchGeneratedInput(input) {
-    if (!isIOS || !input) return;
-
-    // focus / blur イベントで通知
-    input.addEventListener("focus", () => {
-        unityInstance.SendMessage(unityObjectName, unityMethodName, "1"); // show
-    });
-    input.addEventListener("blur", () => {
-        unityInstance.SendMessage(unityObjectName, unityMethodName, "0"); // hide
-    });
-    input.addEventListener("focusout", () => {
-        unityInstance.SendMessage(unityObjectName, unityMethodName, "0"); // hide (Done/OK対応)
-    });
-
-    // MutationObserver で削除検知（blurが飛ばない場合の補強）
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach(mutation => {
-            mutation.removedNodes.forEach(node => {
-                if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
-                    console.log("Input removed:", node);
-                    unityInstance.SendMessage(unityObjectName, unityMethodName, "0"); // hide
-                }
-            });
-        });
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-}
-
-// visualViewport を監視して高さ変化を検知
-function setupVisualViewportWatcher() {
-    if (!isIOS || !window.visualViewport) return;
-
-    window.visualViewport.addEventListener("resize", () => {
-        const heightDiff = window.innerHeight - window.visualViewport.height;
-        if (heightDiff > 150) {
-            // キーボード出現
-            safeSendMessage(unityObjectName, unityMethodName, "1");
-        } else {
-            // キーボード消失
-            safeSendMessage(unityObjectName, unityMethodName, "0");
-        }
-    });
-}
+// // 生成済み Input を監視して削除時に通知
+// function watchGeneratedInput(input) {
+//     if (!input) return;
+//     const parent = input.parentNode;
+//     const observer = new MutationObserver((mutations) => {
+//         mutations.forEach(mutation => {
+//             mutation.removedNodes.forEach(node => {
+//                 if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
+//                     console.log("Input removed:", node);
+//                     safeSendMessage(unityObjectName, unityMethodName, "0");
+//                 }
+//             });
+//         });
+//     });
+//   if (isIOS) {
+//     observer.observe(document.body, { childList: true, subtree: true });
+//   }
+// }
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -259,12 +223,12 @@ function setupVisualViewportWatcher() {
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/9fecd001974b02ef950933d6efbe4963.loader.js";
+      var loaderUrl = buildUrl + "/a1464dd345ce7d09e17981951f3169c7.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/30468410ce38a375d9fdbc2038daa095.data.unityweb",
+        dataUrl: buildUrl + "/dcf146c7050fcbdb5b895698e5d6ef78.data.unityweb",
         frameworkUrl: buildUrl + "/55e5d94051c3f2a03047b58e40f01d79.framework.js.unityweb",
-        codeUrl: buildUrl + "/f51f46e173c743e6829584dc187e3834.wasm.unityweb",
+        codeUrl: buildUrl + "/9bc2df0fcfcb80cd6d99f69a3b6848a5.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "workhappiness",
         productName: "DWAI",
@@ -307,5 +271,3 @@ function setupVisualViewportWatcher() {
     </script>
   </body>
 </html>
-
-
