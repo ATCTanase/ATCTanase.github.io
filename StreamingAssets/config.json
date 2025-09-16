@@ -1,0 +1,8 @@
+{
+  "dev": {
+    "gasUrl": "https://script.google.com/macros/s/AKfycbyegWIDQ7igx4nADar4IVuLl_n0gIV_rI1zGvXj7AzfX60anlsecjW149-6OdCjm3Pr/exec"
+  },
+  "prod": {
+    "gasUrl": "https://script.google.com/macros/s/AKfycbyegWIDQ7igx4nADar4IVuLl_n0gIV_rI1zGvXj7AzfX60anlsecjW149-6OdCjm3Pr/exec"
+  }
+}
