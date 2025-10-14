@@ -1,16 +1,17 @@
 const videoPlane = document.getElementById("videoPlane");
 const marker     = document.getElementById("barcodeMarker");
 
-// Canvasを作成
+// 画面依存ではなく、plane に合わせたテクスチャサイズ
+const planeWidth  = 1;
+let offset; // 画像縦横比
+let markerVisible = false;
+
+// canvas 作成
 const canvas = document.createElement("canvas");
-canvas.width  = window.innerWidth;
-canvas.height = window.innerHeight;
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 videoPlane.setAttribute("material", "src", canvas);
 
-let offset;
-let markerVisible = false;
-
+// AR画像フレーム
 const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手";
 const frameCount = 1;
 const frameExt = ".png";
@@ -19,11 +20,10 @@ let currentFrame = 0;
 const fps = 20;
 let playTimer = null;
 
-
 const loadingOverlay = document.getElementById("loadingOverlay");
 const progressText   = document.getElementById("progress");
 
-// 🔹 全フレームをロード
+// 🔹 全フレームロード
 function preloadFrames(callback) {
     let loaded = 0;
     for (let i = 1; i <= frameCount; i++) {
@@ -33,17 +33,29 @@ function preloadFrames(callback) {
         img.onload = () => {
             loaded++;
             progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
+
             if (loaded === frameCount) {
                 console.log("✅ 全フレームロード完了");
                 loadingOverlay.style.display = "none";
-                callback();
+
+                // 画像縦横比計算
                 offset = img.height / img.width;
+
+                // canvas サイズ設定（plane に合わせ、devicePixelRatio考慮）
+                const dpr = window.devicePixelRatio || 1;
+                const planeHeight = planeWidth * offset;
+                canvas.width  = 1024 * dpr; // 任意解像度
+                canvas.height = Math.floor(1024 * (planeHeight / planeWidth) * dpr);
+                ctx.scale(dpr, dpr);
+
+                callback();
             }
         };
         frames.push(img);
     }
 }
 
+// 🔹 次フレーム描画
 function drawNextFrame() {
     const img = frames[currentFrame];
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -65,24 +77,29 @@ function stopPlayback() {
     }
 }
 
+// plane の pivot 調整（下端に揃える）
+function adjustPlanePivot() {
+    const planeHeight = videoPlane.getAttribute("height");
+    const planeMesh = videoPlane.getObject3D("mesh");
+    if (planeMesh && !videoPlane.dataset.pivotAdjusted) {
+        planeMesh.geometry.translate(0, planeHeight / 2, 0);
+        videoPlane.dataset.pivotAdjusted = true;
+    }
+}
 
+// 🔹 マーカー検出時
 marker.addEventListener("markerFound", () => {
     markerVisible = true;
 
-    // plane サイズを調整（初回だけ）
+    // plane サイズ調整（初回だけ）
     if (!videoPlane.dataset.initialized) {
-        const width = videoPlane.getAttribute("width");
-        const height = width * offset;
-        videoPlane.setAttribute("height", height);
-
-        const planeMesh = videoPlane.getObject3D("mesh");
-        if (planeMesh) {
-            planeMesh.geometry.translate(0, height / 2, 0);
-        }
+        videoPlane.setAttribute("width", planeWidth);
+        videoPlane.setAttribute("height", planeWidth * offset);
+        adjustPlanePivot();
         videoPlane.dataset.initialized = true;
     }
 
-    // マーカーの位置に再配置（毎回更新）
+    // マーカー位置に毎回再配置
     const markerWorldPos = new THREE.Vector3();
     marker.object3D.updateMatrixWorld(true);
     marker.object3D.getWorldPosition(markerWorldPos);
@@ -92,13 +109,13 @@ marker.addEventListener("markerFound", () => {
     startPlayback();
 });
 
-// マーカーを失っても表示はそのまま
+// 🔹 マーカー失っても表示維持
 marker.addEventListener("markerLost", () => {
     markerVisible = false;
-    // ここで videoPlane を非表示にしない
+    // videoPlane.visible はそのまま
 });
 
-// 🔹 フレームを読み込み開始
+// 🔹 フレーム読み込み開始
 preloadFrames(() => {
     console.log("アニメーション準備完了");
 });
