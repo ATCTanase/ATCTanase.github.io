@@ -1,0 +1,103 @@
+/*＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+ * 建物解説画面
+ *＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
+#detailBuildingContents {
+  position: absolute;
+  display: none;
+  width: 100%;
+  background-color: #D7EDBB;
+  z-index: 1;
+}
+.detailBuildingTopImgArea {
+  position: relative;
+}
+.detailBuildingTopImgArea img {
+  display: block;
+  width: 100%;
+  pointer-events: none;
+}
+#detailBuildingImgLabel {
+  position: absolute;
+  bottom: 10%;
+}
+#detailBuildingArea {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 10px 15% 6% 5%;
+}
+#detailBuildingArea img {
+  pointer-events: none;
+}
+#detailBuildingPeriod {
+  width: 15%;
+  margin-right: 10px;
+}
+#detailBuildingName {
+  width: 60%;
+  margin-bottom: 2%;
+}
+#detailBuildingVoiceBtn {
+  width: 11%;
+  margin-left: auto;
+}
+#detailBuildingVoiceStopBtn {
+  display: none;
+  width: 11%;
+  margin-left: auto;
+}
+#detailBuildingLine {
+  position: absolute;
+  left: 0;
+  bottom: -19%;
+  width: 100%;
+}
+#detailBuildingLineText {
+  position: absolute;
+  top: 0;
+  right: -10%;
+  width: 4%;
+}
+#detailBuildingTextArea {
+  margin: 0 15% 20px 5%;
+}
+#detailBuildingTextArea p {
+  margin: 0 0 30px;
+  line-height: 2;
+  letter-spacing: 1px;
+  text-align: justify;
+  font-size: 4vw;
+  font-weight: bold;
+  color: #303030;
+}
+#detailBuildingTextArea rt {
+  margin-bottom: -0.3rem;
+  translate: 0 0.2rem;
+}
+#detailBuildingTextArea figure {
+  padding-bottom: 50px;
+  margin: 0;
+  text-align: center;
+  pointer-events: none;
+}
+#detailBuildingTextArea figure p {
+  font-size: 2vw;
+  text-align: center;
+}
+#detailBuildingFigImg {
+  width: 100%;
+}
+#detailBuildingFigTextImg {
+  width: 50%;
+}
+/* 英語ページ */
+#detailBuildingTextArea.en p {
+  text-align: left;
+}
+#detailBuildingTextArea.en figure p {
+  text-align: center;
+}
+.en #detailBuildingFigTextImg {
+  display: block;
+  width: 100%;
+}

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>ポイントA</title>
+
+    <!-- ↓faviconエラー消すための1行 -->
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="../03_css/menu.css">
+    <link rel="stylesheet" href="../03_css/pointA.css">
+    <link rel="stylesheet" href="../03_css/style.css">
+    <link type="text/css" rel="stylesheet" href="../03_css/arContents.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- YouTube IFrame API を読み込み  -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <?php include($_SERVER['DOCUMENT_ROOT'] . "/common/inc/gtm_head.php"); ?>
+    <style>
+      #flickImage1{
+        background-color: red;
+        height: 100%;
+        width: 100%;
+      }
+      #flickImage2{
+        background-color: blue;
+        height: 100%;
+        width: 100%;
+      }
+      #flickImage3{
+        background-color: green;
+        height: 100%;
+        width: 100%;
+      }
+
+      #flickImageLamp1, #flickImageLamp2, #flickImageLamp3{
+        width: 25%; 
+        height: 50%; 
+        margin-top: 1%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <?php include($_SERVER['DOCUMENT_ROOT'] . "/common/inc/gtm_body.php"); ?>
+    <div id="mainContents">
+      <div id="menu">
+        <div id="kariBackButton">
+          <div class="kariBackButtonFlex">
+            <button id="kariTopBack" onclick="topBack()">
+              Top
+            </button>
+          </div>
+          <div class="kariBackButtonFlex">
+            <button id="kariOnceBack" onclick="onceBack()">
+              もどる
+            </button>
+          </div>
+        </div>
+
+        <div id="kariMainContentsExplanation">
+          説明
+        </div>
+        <div id="kariImageFlick">
+          <div style="width: 100%; height: 90%;">
+            <div id="flickImage1"></div>
+            <div id="flickImage2" style="display: none;"></div>
+            <div id="flickImage3" style="display: none;"></div>
+          </div>
+          <div style="width: 100%; height: 10%; display: flex; justify-content: space-evenly;">
+            <div id="flickImageLamp1" style="background-color: orange;"></div>
+            <div id="flickImageLamp2" style="background-color: white;"></div>
+            <div id="flickImageLamp3" style="background-color: white;"></div>
+          </div>
+        </div>
+
+        <dialog id="modalDialog" class="dialog">
+          <!-- Youtubeの「共有 → 埋め込み」で出力したiframe -->
+          <!-- 閉じるボタンを押下したら動画が止まるように、srcの末尾に"?enablejsapi=1"を追加 -->
+          <iframe id="youtube" width="100%" height="auto" src="https://www.youtube.com/embed/5WrnSDIDWbU?si=YEFY-j-oE01f2aS_?enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <button id="closeDialog" onclick="closeDialog()">閉じる</button>
+          <button id="pause" onclick="pauseVideo()">一時停止</button>
+        </dialog>
+        <!-- <iframe id="youtube" width="560" height="315" src="https://www.youtube.com/embed/Ujb-ZeX7Mo8?si=xgSSiwkBAIStK7aF" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> -->
+
+        <div id="kariWatchContents">
+          <button id="kariWatchMovie" onclick="openDialog()">映像を見る</button>
+          <button id="kariWatchAR"    onclick="location.href='./6Dof/6Dof_1.html'">ARを見る</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 画面を縦向きにしてください -->
+    <div id="msgContents">
+      <img id="msgRotationImg">
+    </div>
+
+    <script src="../02_javascript/common.js"></script>
+    <script src="../02_javascript/data-store.js"></script>
+    <script src="../02_javascript/image-controller.js"></script>
+    <script src="../02_javascript/explanationImageFlickChange.js"></script>
+    <script type="module">
+      setMenuImg();
+      setRotationImg();
+
+      // ボタン名、オフ時のボタン名、オン時のボタン名、url
+      pushBtn("changeLanguageBtn",    "langBtnImg",         "langBtnImgOn",         false);
+      pushBtn("langBtnEn",            "langBtnEnImg",       "langBtnEnImgOn",       false);
+      pushBtn("langBtnJp",            "langBtnJpImg",       "langBtnJpImgOn",       false);
+      pushBtn("menuAboutBtn",         "menuAbout",          "menuAboutOn",          false);
+    </script>
+    <script>
+      // const youtubeWindow = document.getElementById("youtube").contentWindow;
+      // function y_iframeController(action, arg=null){
+      //   youtubeWindow.postMessage('{"event":"command", "func":"'+action+'", "args":'+arg+'}', '*');
+      // };
+      // document.getElementById("pause").addEventListener("click", function(){
+      //   y_iframeController("pauseVideo");
+      // });
+
+      let player;
+      // API読み込み後に呼ばれる
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player("player", {
+          events: {
+            "onReady": onPlayerReady
+          }
+        });
+      }
+
+      function onPlayerReady(event) {
+        console.log("YouTube Player Ready!");
+      }
+
+      // 一時停止用関数
+      function pauseVideo() {
+        if (player) {
+          player.pauseVideo();
+        }
+      }
+
+
+
+
+      function onceBack() {
+        window.location.href = "./inHouseMap.html";
+      }
+      function topBack() {
+        window.location.href = "./index.html";
+      }
+
+      function closeDialog() {
+        const dialog = document.getElementById("modalDialog");
+        dialog.close();
+      }
+      function openDialog() {
+        const dialog = document.getElementById("modalDialog");
+        // ダイアログを表示。背景も普通にクリックできる
+        dialog.show();
+
+        // モーダルダイアログを表示。背景がクリックできず、モーダル扱いになる
+        // dialog.showModal();
+        // モーダルダイアログを表示する際に背景部分がスクロールしないようにする
+        // document.documentElement.style.overflow = "hidden";
+      }
+    </script>
+  </body>
+</html>

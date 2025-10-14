@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>説明ページ</title>
+
+    <!-- ↓faviconエラー消すための1行 -->
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="../../03_css/contentsExplanation.css">
+    <link rel="stylesheet" href="../../03_css/style.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <?php include($_SERVER['DOCUMENT_ROOT'] . "/common/inc/gtm_head.php"); ?>
+    <style>
+      #flickImage1{
+        background-color: red;
+        height: 100%;
+        width: 100%;
+      }
+      #flickImage2{
+        background-color: blue;
+        height: 100%;
+        width: 100%;
+      }
+      #flickImage3{
+        background-color: green;
+        height: 100%;
+        width: 100%;
+      }
+
+      #flickImageLamp1, #flickImageLamp2, #flickImageLamp3{
+        width: 25%; 
+        height: 50%; 
+        margin-top: 1%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <?php include($_SERVER['DOCUMENT_ROOT'] . "/common/inc/gtm_body.php"); ?>
+    <div id="mainContents" style="background-color: rgb(188, 219, 148);">
+      <div id="contentsExplanation">
+        <!-- TOPボタン -->
+        <div id="topPageBackBtnErea" style="right: 50px;">
+          <button type="button" id="topPageBackBtn">
+            <img id="topPageBack">
+            <img id="topPageBackOn">
+          </button>
+        </div>
+        <!-- 戻るボタン -->
+        <div id="pageBackBtnErea">
+          <button type="button" id="pageBackBtn" onclick="location.href='../inHouseMap/inHouseMap.html'">
+            <!-- <img id="pageBack">
+            <img id="pageBackOn"> -->
+            戻る
+          </button>
+        </div>
+
+        <!-- 古民家ARロゴ -->
+        <div id="kominkaArLogoErea">
+          <img id="kominkaArLogo">
+        </div>
+
+        <div id="contentsExplanationErea">
+          <!-- 説明 -->
+          <div id="explanationErea">
+            説明
+          </div>
+
+          <!-- 画像フリック -->
+          <div id="imageFlickErea">
+            <div id="explanationImagesErea">
+              <div id="flickImage1" style="align-items: center; display: flex; justify-content: center;"></div>
+              <div id="flickImage2" style="display: none;"></div>
+              <div id="flickImage3" style="display: none;"></div>
+            </div>
+            <div id="imageChoiceIconErea">
+              <div id="flickImageLamp1" style="background-color: orange;"></div>
+              <div id="flickImageLamp2" style="background-color: white;"></div>
+              <div id="flickImageLamp3" style="background-color: white;"></div>
+            </div>
+          </div>
+        </div>
+
+        <dialog id="modalDialog" class="dialog">
+          <!-- Youtubeの「共有 → 埋め込み」で出力したiframe -->
+          <iframe id="youtube" width="100%" height="auto" src="https://www.youtube.com/embed/5WrnSDIDWbU?si=YEFY-j-oE01f2aS_?enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <button id="closeDialog" onclick="closeDialog()">閉じる</button>
+        </dialog>
+
+        <div id="kariWatchContents">
+          <button id="kariWatchMovie" onclick="openDialog()">映像を見る</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 画面を縦向きにしてください -->
+    <div id="msgContents">
+      <img id="msgRotationImg">
+    </div>
+
+    <script src="../../02_javascript/common.js"></script>
+    <script src="../../02_javascript/data-store.js"></script>
+    <script src="../../02_javascript/image-controller.js"></script>
+    <script src="../../02_javascript/contentsExplanation/explanation-image-flick-change.js"></script>
+    <script src="../../02_javascript/contentsExplanation/identification-no-ar.js"></script>
+    <script type="module">
+      setContentsExplanation();
+
+      // ボタン名、オフ時のボタン名、オン時のボタン名、url
+      pushBtn("topPageBackBtn", "topPageBack", "topPageBackOn", "../");
+    </script>
+    <script>
+      function closeDialog() {
+        const dialog = document.getElementById("modalDialog");
+        dialog.close();
+      }
+      function openDialog() {
+        const dialog = document.getElementById("modalDialog");
+        dialog.show();
+      }
+    </script>
+  </body>
+</html>

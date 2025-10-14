@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>古民家AR</title>
+
+    <!-- ↓faviconエラー消すための1行 -->
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="../../03_css/inHouseMap.css">
+    <link rel="stylesheet" href="../../03_css/style.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <?php include($_SERVER['DOCUMENT_ROOT'] . "/common/inc/gtm_head.php"); ?>
+  </head>
+
+  <body style="overflow: hidden;">
+    <?php include($_SERVER['DOCUMENT_ROOT'] . "/common/inc/gtm_body.php"); ?>
+    <div id="mainContents">
+      <div id="inHouseMap">
+        <!-- TOPボタン -->
+        <div id="topPageBackBtnErea">
+          <button type="button" id="topPageBackBtn">
+            <img id="topPageBack"   src="../../04_image/common/common_btn_top_off.png">
+            <img id="topPageBackOn" src="../../04_image/common/common_btn_top_press.png">
+          </button>
+        </div>
+
+        <!-- 古民家ARロゴ -->
+        <div id="kominkaArLogoErea">
+          <img id="kominkaArLogo">
+        </div>
+
+        <img id="inHouseMapBackgroud">
+
+        <div id="inHouseMapContents">
+          <!-- 館内マップ 古民家に着いたら～ -->
+          <div id="inHouseMapExplanationErea">
+            <img id="inHouseMapExplanation">
+          </div>
+        </div>
+      </div>
+
+      <!-- 地図スワイプ -->
+      <div id="inHouseMapDisplayErea">
+        <div id="inHouseMapSwipeEreaOuteside">
+          <div id="inHouseMapSwipeErea">
+            <img id="inHouseMapImg">
+
+            <button id="arExplanationButton1" onclick="transitionDestinationIdentification()">
+              <img id="nagayamonOfKawatihuse"> <!-- 河内布施の長屋門 -->
+            </button>
+            <button id="arExplanationButton2" onclick="transitionDestinationIdentification()">
+              <img id="komeguraOfDozima"> <!-- 堂島の米蔵 -->
+            </button>
+            <button id="arExplanationButton3" onclick="transitionDestinationIdentification()">
+              <img id="minkaOfHidanSirakawa"> <!-- 飛騨白川の民家 -->
+            </button>
+            <button id="arExplanationButton4" onclick="transitionDestinationIdentification()">
+              <img id="minkaOfHyugaSiba"> <!-- 日向椎葉の民家 -->
+            </button>
+            <button id="arExplanationButton5" onclick="transitionDestinationIdentification()">
+              <img id="minkaOfSettunose"> <!-- 摂津能勢の民家 -->
+            </button>
+            <button id="arExplanationButton6" onclick="transitionDestinationIdentification()">
+              <img id="takakuraOfAmamiosima"> <!-- 庵美大島の高倉 -->
+            </button>
+            <button id="arExplanationButton7" onclick="transitionDestinationIdentification()">
+              <img id="minkaOfSinanoAkiyama"> <!-- 信濃秋山の民家 -->
+            </button>
+            <button id="arExplanationButton8" onclick="transitionDestinationIdentification()">
+              <img id="minkaOfYamatoTotugawa"> <!-- 大和十津川の民家 -->
+            </button>
+            <button id="arExplanationButton9" onclick="transitionDestinationIdentification()">
+              <img id="nosonKabukiButaiOfAzukizima"> <!-- 小豆島の農村歌舞伎舞台 -->
+            </button>
+            <button id="arExplanationButton10" onclick="transitionDestinationIdentification()">
+              <img id="magariyaOfNanbu"> <!-- 南部の曲家 -->
+            </button>
+            <button id="arExplanationButton11" onclick="transitionDestinationIdentification()">
+              <img id="minkaOfEtizenSuruga"> <!-- 越前敦賀の民家 -->
+            </button>
+            <button id="arExplanationButton12" onclick="transitionDestinationIdentification()">
+              <img id="tyasituOfKitakawauti"> <!-- 北河内の茶室 -->
+            </button>
+          </div>
+        </div>
+
+        <!-- 拡縮ボタン -->
+        <div id="inHouseMapScaleUpDownErea">
+          <img id="inHouseMapScaleUpDownImg">
+
+          <div id="inHouseMapScaleUpDownGrid">
+            <div id="inHouseMapScaleUpDownButton">
+              <button id="scaleUpButton" onclick="scaleUp()">
+                <img id="scaleUpBtn">
+                <img id="scaleUpBtnOn">
+              </button>
+            </div>
+            <div id="inHouseMapScaleUpDownButton">
+              <button id="scaleDownButton" onclick="scaleDown()">
+                <img id="scaleDownBtn">
+                <img id="scaleDownBtnOn">
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 画面を縦向きにしてください -->
+    <div id="msgContents">
+      <img id="msgRotationImg">
+    </div>
+
+    <script src="../../02_javascript/common.js"></script>
+    <script src="../../02_javascript/data-store.js"></script>
+    <script src="../../02_javascript/image-controller.js"></script>
+    <script src="../../02_javascript/map/display-current-location-above-map.js"></script>
+    <script src="../../02_javascript/map/get-frame-height.js"></script>
+    <script src="../../02_javascript/map/map-pinch-operation.js"></script>
+    <script src="../../02_javascript/map/map-scale-up-down.js"></script>
+    <script src="../../02_javascript/map/transition-destination-identification.js"></script>
+    <script>
+      setInHouseMapImg();
+
+      // ボタン名、オフ時のボタン名、オン時のボタン名、url
+      pushBtn("topPageBackBtn", "topPageBack", "topPageBackOn", "../");
+    </script>
+    <!-- <script>
+    const one = document.getElementById("inHouseMapSwipeEreaOuteside");
+    const img = document.getElementById("inHouseMapSwipeErea");
+
+    let mapScale = 1;
+    let startScale = 1;
+    let startDistance = 0;
+    let baseWidth = img.clientWidth;
+    let baseHeight = img.clientHeight;
+
+    let isPinching = false;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+
+    // 2本指の距離
+    function getDistance(touches) {
+      const [t1, t2] = touches;
+      const dx = t1.pageX - t2.pageX;
+      const dy = t1.pageY - t2.pageY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    one.addEventListener("touchstart", (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        isPinching = true;
+        startDistance = getDistance(e.touches);
+        startScale = mapScale;
+      } else if (e.touches.length === 1) {
+        // ドラッグ開始位置を記録
+        lastTouchX = e.touches[0].pageX;
+        lastTouchY = e.touches[0].pageY;
+      }
+    });
+
+    one.addEventListener("touchmove", (e) => {
+      if (e.touches.length === 2 && isPinching) {
+        // ピンチ操作
+        e.preventDefault();
+        const currentDistance = getDistance(e.touches);
+        const pinchRatio = currentDistance / startDistance;
+        mapScale = Math.min(Math.max(startScale * pinchRatio, 0.5), 3); // 0.5〜3倍
+
+        // width, height を拡大縮小
+        img.style.width = baseWidth * mapScale + "px";
+        img.style.height = baseHeight * mapScale + "px";
+      } else if (e.touches.length === 1 && !isPinching) {
+        // ドラッグでスクロール
+        const touch = e.touches[0];
+        const deltaX = touch.pageX - lastTouchX;
+        const deltaY = touch.pageY - lastTouchY;
+        one.scrollLeft -= deltaX;
+        one.scrollTop -= deltaY;
+        lastTouchX = touch.pageX;
+        lastTouchY = touch.pageY;
+      }
+    });
+
+    one.addEventListener("touchend", (e) => {
+      if (e.touches.length < 2) {
+        isPinching = false;
+        // 現在のサイズを次回の基準に
+        baseWidth = img.clientWidth;
+        baseHeight = img.clientHeight;
+      }
+    });
+  </script> -->
+  </body>
+</html>

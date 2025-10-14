@@ -1,0 +1,114 @@
+[
+  {
+    "id": 1,
+    "name": "内裏",
+    "name_path": "/common/images/AR/02_img_AR_label_01.png",
+    "building_path": "/common/images/AR/AR01_building.jpg",
+    "detail": {
+      "image_path": "/common/images/info/03_img_header_01.png",
+      "label_path": "/common/images/info/03_img_header_01_txt_jp.png",
+      "name_path": "/common/images/info/03_img_txt_title_01.png",
+      "period": "/common/images/info/03_img_icon_late.png",
+      "text": "<ruby>宮殿<rp>(</rp><rt>きゅうでん</rt><rp>)</rp></ruby>中心部の北寄りにある内裏は、天皇の日常生活の場であり、また政務を行う場でもあった。後期難波宮の内裏は、周囲を<ruby>回廊<rp>(</rp><rt>かいろう</rt><rp>)</rp></ruby>や<ruby>塀<rp>(</rp><rt>へい</rt><rp>)</rp></ruby>で区画した空間の中心に<ruby>内裏正殿<rp>(</rp><rt>だいりせいでん</rt><rp>)</rp></ruby>がある。その規模は<ruby>発掘<rp>(</rp><rt>はっくつ</rt><rp>)</rp></ruby>調査で正面26.9ｍ、<ruby>奥行<rp>(</rp><rt>おくゆき</rt><rp>)</rp></ruby>11.9ｍであることがわかっている。<ruby>掘立柱式<rp>(</rp><rt>ほったてばしらしき</rt><rp>)</rp></ruby>の<ruby>高床<rp>(</rp><rt>たかゆか</rt><rp>)</rp></ruby>構造、屋根は<ruby>入母屋<rp>(</rp><rt>いりもや</rt><rp>)</rp></ruby>造りの<ruby>檜皮葺<rp>(</rp><rt>ひわだぶ</rt><rp>)</rp></ruby>きというわが国の伝統的な宮殿建築様式で、四周に<ruby>縁<rp>(</rp><rt>えん</rt><rp>)</rp></ruby>と<ruby>高欄<rp>(</rp><rt>こうらん</rt><rp>)</rp></ruby>をめぐらせた格式高い建物と考えられる。",
+      "photo_path": "/common/images/info/03_img_photo_01.png",
+      "photo_text_path": "/common/images/info/03_txt_photo_01.png",
+      "voice": "/common/voice/AR01_detail.wav"
+    }
+  },
+  {
+    "id": 2,
+    "name": "内裏西回廊",
+    "name_path": "/common/images/AR/02_img_AR_label_02.png",
+    "building_path": "/common/images/AR/AR02_building.jpg",
+    "detail": {
+      "image_path": "/common/images/info/03_img_header_02.png",
+      "label_path": "/common/images/info/03_img_header_02_txt_jp.png",
+      "name_path": "/common/images/info/03_img_txt_title_02.png",
+      "period": "/common/images/info/03_img_icon_late.png",
+      "text": "内裏は天皇の日常生活の場であり、また政務を行う場でもあった。周囲を<ruby>回廊<rp>(</rp><rt>かいろう</rt><rp>)</rp></ruby>・<ruby>塀<rp>(</rp><rt>へい</rt><rp>)</rp></ruby>で区画した格式ある空間の中に、中心となる建物を配置していた。回廊は<ruby>複廊<rp>(</rp><rt>ふくろう</rt><rp>)</rp></ruby>という格式の高い構造で、中央は窓のある<ruby>壁<rp>(</rp><rt>かべ</rt><rp>)</rp></ruby>で仕切られ、その両側は人が往来できる<ruby>廊下<rp>(</rp><rt>ろうか</rt><rp>)</rp></ruby>となっていた。",
+      "photo_path": "/common/images/info/03_img_photo_02.png",
+      "photo_text_path": "/common/images/info/03_txt_photo_02.png",
+      "voice": "/common/voice/AR02_detail.wav"
+    }
+  },
+  {
+    "id": 3,
+    "name": "内裏",
+    "name_path": "/common/images/AR/02_img_AR_label_03.png",
+    "building_path": "/common/images/AR/AR03_building.jpg",
+    "detail": {
+      "image_path": "/common/images/info/03_img_header_03.png",
+      "label_path": "/common/images/info/03_img_header_03_txt_jp.png",
+      "name_path": "/common/images/info/03_img_txt_title_03.png",
+      "period": "/common/images/info/03_img_icon_early.png",
+      "text": "内裏は天皇の日常生活の場であり、また政務を行う場でもあった。後の<ruby>宮殿<rp>(</rp><rt>きゅうでん</rt><rp>)</rp></ruby>では<ruby>大極殿院<rp>(</rp><rt>だいごくでんいん</rt><rp>)</rp></ruby>や<ruby>朝堂院<rp>(</rp><rt>ちょうどういん</rt><rp>)</rp></ruby>の北側に<ruby>離<rp>(</rp><rt>はな</rt><rp>)</rp></ruby>れて配置されるが、前期難波宮では、内裏の正門である内裏南門の南に朝堂院の広大な空間が広がっていた。内裏南門は正面が７柱間（約32.7ｍ）あって、これは古代の宮殿の門としては最大である。<ruby>掘立柱式<rp>(</rp><rt>ほったてばしらしき</rt><rp>)</rp></ruby>で、屋根を<ruby>板葺<rp>(</rp><rt>いたぶ</rt><rp>)</rp></ruby>きとする伝統的な<ruby>宮殿<rp>(</rp><rt>きゅうでん</rt><rp>)</rp></ruby>建築様式であったと推定されている。",
+      "photo_path": "/common/images/info/03_img_photo_03.png",
+      "photo_text_path": "/common/images/info/03_txt_photo_03.png",
+      "voice": "/common/voice/AR03_detail.wav"
+    }
+  },
+  {
+    "id": 4,
+    "name": "八角殿",
+    "name_path": "/common/images/AR/02_img_AR_label_04.png",
+    "building_path": "/common/images/AR/AR04_building.jpg",
+    "detail": {
+      "image_path": "/common/images/info/03_img_header_04.png",
+      "label_path": "/common/images/info/03_img_header_04_txt_jp.png",
+      "name_path": "/common/images/info/03_img_txt_title_04.png",
+      "period": "/common/images/info/03_img_icon_early.png",
+      "text": "八角殿は<ruby>内裏<rp>(</rp><rt>だいり</rt><rp>)</rp></ruby>南門の東西に配置され、<ruby>発掘<rp>(</rp><rt>はっくつ</rt><rp>)</rp></ruby>調査の結果、内部の柱が柱穴の１辺を<ruby>斜<rp>(</rp><rt>なな</rt><rp>)</rp></ruby>めに<ruby>掘<rp>(</rp><rt>ほ</rt><rp>)</rp></ruby>り広げるという<ruby>特殊<rp>(</rp><rt>とくしゅ</rt><rp>)</rp></ruby>な方法で立てられていることから、外観は重層で、高さは15ｍ近くあったことが推測される。何に使われたかは諸説あり明確ではないが、八角形の<ruby>楼閣建築<rp>(</rp><rt>ろうかくけんちく</rt><rp>)</rp></ruby>は<ruby>宮殿<rp>(</rp><rt>きゅうでん</rt><rp>)</rp></ruby>の中心部を<ruby>荘厳化<rp>(</rp><rt>そうごんか</rt><rp>)</rp></ruby>する目的があったと思われ、大陸の宮殿造営思想を色<ruby>濃<rp>(</rp><rt>こ</rt><rp>)</rp></ruby>く反映していたことがうかがわれる。",
+      "photo_path": "/common/images/info/03_img_photo_04.png",
+      "photo_text_path": "/common/images/info/03_txt_photo_04.png",
+      "voice": "/common/voice/AR04_detail.wav"
+    }
+  },
+  {
+    "id": 5,
+    "name": "大極殿院",
+    "name_path": "/common/images/AR/02_img_AR_label_05.png",
+    "building_path": "/common/images/AR/AR05_building.jpg",
+    "detail": {
+      "image_path": "/common/images/info/03_img_header_05.png",
+      "label_path": "/common/images/info/03_img_header_00-05_txt_jp.png",
+      "name_path": "/common/images/info/03_img_txt_title_05.png",
+      "period": "/common/images/info/03_img_icon_late.png",
+      "text": "大極殿院は格式高い<ruby>複廊<rp>(</rp><rt>ふくろう</rt><rp>)</rp></ruby>で囲まれた空間の中に、後期難波宮の最も重要な建物である<ruby>大極殿<rp>(</rp><rt>だいごくでん</rt><rp>)</rp></ruby>と、<ruby>大極殿後殿<rp>(</rp><rt>だいごくでんこうでん</rt><rp>)</rp></ruby>が建っていた。大極殿は正面約42ｍ、<ruby>奥行<rp>(</rp><rt>おくゆき</rt><rp>)</rp></ruby>約21ｍで、石造りの<ruby>基壇<rp>(</rp><rt>きだん</rt><rp>)</rp></ruby>上に建ち、屋根は<ruby>瓦葺<rp>(</rp><rt>かわらぶ</rt><rp>)</rp></ruby>きで、柱は赤く塗られた中国風の外観だったと考えられている。軒先にはシンプルな文様の<ruby>重圏文軒丸瓦<rp>(</rp><rt>じゅうけんもんのきまるがわら</rt><rp>)</rp></ruby>・<ruby>軒平瓦<rp>(</rp><rt>のきひらがわら</rt><rp>)</rp></ruby>が用いられた。<ruby>臣下<rp>(</rp><rt>しんか</rt><rp>)</rp></ruby>が天皇に新年の<ruby>挨拶<rp>(</rp><rt>あいさつ</rt><rp>)</rp></ruby>をする<ruby>元日朝賀<rp>(</rp><rt>がんじつちょうが</rt><rp>)</rp></ruby>や外国使節の<ruby>謁見<rp>(</rp><rt>えっけん</rt><rp>)</rp></ruby>など国家的な<ruby>儀式<rp>(</rp><rt>ぎしき</rt><rp>)</rp></ruby>の際に、天皇は大極殿中央に置かれた「<ruby>高御座<rp>(</rp><rt>たかみくら</rt><rp>)</rp></ruby>」に着座した。",
+      "photo_path": "/common/images/info/03_img_photo_05.png",
+      "photo_text_path": "/common/images/info/03_txt_photo_05.png",
+      "voice": "/common/voice/AR05_06_detail.wav"
+    }
+  },
+  {
+    "id": 6,
+    "name": "大極殿院",
+    "name_path": "/common/images/AR/02_img_AR_label_05.png",
+    "building_path": "/common/images/AR/AR06_building.jpg",
+    "detail": {
+      "image_path": "/common/images/info/03_img_header_05.png",
+      "label_path": "/common/images/info/03_img_header_00-05_txt_jp.png",
+      "name_path": "/common/images/info/03_img_txt_title_05.png",
+      "period": "/common/images/info/03_img_icon_late.png",
+      "text": "大極殿院は格式高い<ruby>複廊<rp>(</rp><rt>ふくろう</rt><rp>)</rp></ruby>で囲まれた空間の中に、後期難波宮の最も重要な建物である<ruby>大極殿<rp>(</rp><rt>だいごくでん</rt><rp>)</rp></ruby>と、<ruby>大極殿後殿<rp>(</rp><rt>だいごくでんこうでん</rt><rp>)</rp></ruby>が建っていた。大極殿は正面約42ｍ、<ruby>奥行<rp>(</rp><rt>おくゆき</rt><rp>)</rp></ruby>約21ｍで、石造りの<ruby>基壇<rp>(</rp><rt>きだん</rt><rp>)</rp></ruby>上に建ち、屋根は<ruby>瓦葺<rp>(</rp><rt>かわらぶ</rt><rp>)</rp></ruby>きで、柱は赤く塗られた中国風の外観だったと考えられている。軒先にはシンプルな文様の<ruby>重圏文軒丸瓦<rp>(</rp><rt>じゅうけんもんのきまるがわら</rt><rp>)</rp></ruby>・<ruby>軒平瓦<rp>(</rp><rt>のきひらがわら</rt><rp>)</rp></ruby>が用いられた。<ruby>臣下<rp>(</rp><rt>しんか</rt><rp>)</rp></ruby>が天皇に新年の<ruby>挨拶<rp>(</rp><rt>あいさつ</rt><rp>)</rp></ruby>をする<ruby>元日朝賀<rp>(</rp><rt>がんじつちょうが</rt><rp>)</rp></ruby>や外国使節の<ruby>謁見<rp>(</rp><rt>えっけん</rt><rp>)</rp></ruby>など国家的な<ruby>儀式<rp>(</rp><rt>ぎしき</rt><rp>)</rp></ruby>の際に、天皇は大極殿中央に置かれた「<ruby>高御座<rp>(</rp><rt>たかみくら</rt><rp>)</rp></ruby>」に着座した。",
+      "photo_path": "/common/images/info/03_img_photo_05.png",
+      "photo_text_path": "/common/images/info/03_txt_photo_05.png",
+      "voice": "/common/voice/AR05_06_detail.wav"
+    }
+  },
+  {
+    "id": 7,
+    "name": "大極殿後殿",
+    "name_path": "/common/images/AR/02_img_AR_label_06.png",
+    "building_path": "/common/images/AR/AR07_building.jpg",
+    "detail": {
+      "image_path": "/common/images/info/03_img_header_06.png",
+      "label_path": "/common/images/info/03_img_header_06_txt_jp.png",
+      "name_path": "/common/images/info/03_img_txt_title_06.png",
+      "period": "/common/images/info/03_img_icon_late.png",
+      "text": "大極殿後殿は<ruby>大極殿院<rp>(</rp><rt>だいごくでんいん</rt><rp>)</rp></ruby>を構成する建物の１つで、<ruby>大極殿<rp>(</rp><rt>だいごくでん</rt><rp>)</rp></ruby>の北側に位置する。両者は<ruby>軒廊<rp>(</rp><rt>こんろう</rt><rp>)</rp></ruby>で結ばれ、天皇が政務や<ruby>儀式<rp>(</rp><rt>ぎしき</rt><rp>)</rp></ruby>のために大極殿に<ruby>出御<rp>(</rp><rt>しゅつぎょ</rt><rp>)</rp></ruby>する際に<ruby>控<rp>(</rp><rt>ひか</rt><rp>)</rp></ruby>える場として用いられた。後殿の両側には大極殿院の北面<ruby>回廊<rp>(</rp><rt>かいろう</rt><rp>)</rp></ruby>が取り付いていた。前期難波宮の内裏南門と重なる位置に建てられていて、<ruby>発掘<rp>(</rp><rt>はっくつ</rt><rp>)</rp></ruby>調査では後殿の<ruby>基壇<rp>(</rp><rt>きだん</rt><rp>)</rp></ruby>に使われた<ruby>凝灰岩<rp>(</rp><rt>ぎょうかいがん</rt><rp>)</rp></ruby>を取り外した<ruby>痕跡<rp>(</rp><rt>こんせき</rt><rp>)</rp></ruby>が、内裏南門の柱穴とともに検出された。",
+      "photo_path": "/common/images/info/03_img_photo_06.png",
+      "photo_text_path": "/common/images/info/03_txt_photo_06.png",
+      "voice": "/common/voice/AR07_detail.wav"
+    }
+  }
+]
