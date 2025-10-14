@@ -64,31 +64,27 @@ function stopPlayback() {
         playTimer = null;
     }
 }
-
-// 🔹 マーカー検出時
 marker.addEventListener("markerFound", () => {
-    // マーカーの現在位置を取得
+    // マーカーの位置を取得
     const markerWorldPos = new THREE.Vector3();
+    const markerWorldQuat = new THREE.Quaternion();
     marker.object3D.updateMatrixWorld(true);
     marker.object3D.getWorldPosition(markerWorldPos);
+    marker.object3D.getWorldQuaternion(markerWorldQuat);
 
-    // videoPlane の座標をマーカーに合わせる
+    // videoPlane をシーン直下に移動
+    const scene = document.querySelector("a-scene");
+    scene.appendChild(videoPlane);
+
+    // ワールド座標・回転を維持
     videoPlane.object3D.position.copy(markerWorldPos);
+    videoPlane.object3D.quaternion.copy(markerWorldQuat);
 
-    // plane サイズ調整
-    const width = videoPlane.getAttribute("width");
-    videoPlane.setAttribute("height", width * offset);
-
-    // plane の原点を下端に移動（1回だけでOK）
-    const planeMesh = videoPlane.getObject3D("mesh");
-    if (planeMesh) {
-        planeMesh.geometry.translate(0, videoPlane.getAttribute("height") / 2, 0);
-    }
-
-    lastMarkerPosition.copy(markerWorldPos); // 座標を保存
+    lastMarkerPosition.copy(markerWorldPos);
     videoPlane.setAttribute("visible", true);
     startPlayback();
 });
+
 
 // 🔹 マーカーを失ったとき
 marker.addEventListener("markerLost", () => {
