@@ -19,6 +19,10 @@ let currentFrame = 0;
 const fps = 20;
 let playTimer = null;
 
+
+const loadingOverlay = document.getElementById("loadingOverlay");
+const progressText   = document.getElementById("progress");
+
 // 🔹 全フレームをロード
 function preloadFrames(callback) {
     let loaded = 0;
