@@ -65,22 +65,24 @@ function stopPlayback() {
     }
 }
 
-// 🔹 マーカー検出時
+
 marker.addEventListener("markerFound", () => {
     markerVisible = true;
-    
-    // plane サイズを調整
-    const width = videoPlane.getAttribute("width");
-    const height = width * offset;
-    videoPlane.setAttribute("height", height);
 
-    // plane の原点を下端に移動（1回だけでOK）
-    const planeMesh = videoPlane.getObject3D("mesh");
-    if (planeMesh) {
-        planeMesh.geometry.translate(0, height / 2, 0);
+    // plane サイズを調整（初回だけ）
+    if (!videoPlane.dataset.initialized) {
+        const width = videoPlane.getAttribute("width");
+        const height = width * offset;
+        videoPlane.setAttribute("height", height);
+
+        const planeMesh = videoPlane.getObject3D("mesh");
+        if (planeMesh) {
+            planeMesh.geometry.translate(0, height / 2, 0);
+        }
+        videoPlane.dataset.initialized = true;
     }
 
-    // マーカーの位置に再配置
+    // マーカーの位置に再配置（毎回更新）
     const markerWorldPos = new THREE.Vector3();
     marker.object3D.updateMatrixWorld(true);
     marker.object3D.getWorldPosition(markerWorldPos);
@@ -90,11 +92,10 @@ marker.addEventListener("markerFound", () => {
     startPlayback();
 });
 
-// 🔹 マーカーを失っても表示は保持
+// マーカーを失っても表示はそのまま
 marker.addEventListener("markerLost", () => {
     markerVisible = false;
-    // ARオブジェクトの位置はそのままにする
-    stopPlayback(); // アニメーションは止めたい場合はここで
+    // ここで videoPlane を非表示にしない
 });
 
 // 🔹 フレームを読み込み開始
