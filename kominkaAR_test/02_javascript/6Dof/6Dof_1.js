@@ -24,7 +24,7 @@ const progressText   = document.getElementById("progress");
 const scene = document.querySelector('a-scene').object3D;
 
 // Three.jsオブジェクト作成（例: Planeに画像）
-const texture = new THREE.TextureLoader().load('ARImage');
+const texture = new THREE.TextureLoader().load(ARImage);
 const ratio = texture.image ? texture.image.height / texture.image.width : 1;
 const geometry = new THREE.PlaneGeometry(1, ratio);
 geometry.translate(0, 0.5 * ratio, 0); // 下端中央基準
