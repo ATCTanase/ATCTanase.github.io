@@ -1,119 +1,120 @@
-const videoPlane = document.getElementById("videoPlane");
-const marker     = document.getElementById("barcodeMarker");
+    // A-Frameシーンが完全にロードされてからメインスクリプトを実行
+    document.querySelector('a-scene').addEventListener('loaded', function () {
+        const videoPlane = document.getElementById("videoPlane");
+        const marker     = document.getElementById("barcodeMarker");
+        // const scene      = document.querySelector('a-scene'); // a-scene要素はここでは直接不要だが、参考用
 
-// Canvasを作成
-const canvas = document.createElement("canvas");
-canvas.width  = window.innerWidth;
-canvas.height = window.innerHeight;
-const ctx = canvas.getContext("2d", { willReadFrequently: true });
-videoPlane.setAttribute("material", "src", canvas);
-let offset;
+        // Canvasを作成
+        const canvas = document.createElement("canvas");
+        canvas.width  = 512; // 画像の幅と高さに合わせて調整してください
+        canvas.height = 512; // Three.jsのテクスチャサイズとして一般的な512x512
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        videoPlane.setAttribute("material", "src", canvas);
+        let offset; // 画像の縦横比 (height / width)
 
-const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手";
-const frameCount = 1;
-const frameExt = ".png";
-const frames = [];
-let currentFrame = 0;
-const fps = 20;
-let playTimer = null;
+        const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手";
+        const frameCount = 1; // 現状は1フレーム
+        const frameExt = ".png";
+        const frames = [];
+        let currentFrame = 0;
+        const fps = 20; // フレームレート
+        let playTimer = null;
 
-const loadingOverlay = document.getElementById("loadingOverlay");
-const progressText   = document.getElementById("progress");
+        const loadingOverlay = document.getElementById("loadingOverlay");
+        const progressText   = document.getElementById("progress");
 
-// Three.js シーン取得
-const aframeScene = document.querySelector("a-scene");
-const threeScene = aframeScene.object3D;
+        let isImageFixed = false; // 画像がAR空間に固定されたかどうかのフラグ
 
-// 固定オブジェクト用の Three.js Mesh を作成
-const texture = new THREE.TextureLoader().load(`${ARImage}${frameExt}`);
-const ratio = 1; // 仮で1:1（後で画像の比率で調整）
-const geometry = new THREE.PlaneGeometry(1, ratio);
-geometry.translate(0, ratio / 2, 0); // 基準を下端中央に
-const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
-const fixedMesh = new THREE.Mesh(geometry, material);
-fixedMesh.visible = false;
-threeScene.add(fixedMesh);
-
-// === アニメーション処理 ===
-function preloadFrames(callback) {
-    let loaded = 0;
-    for (let i = 1; i <= frameCount; i++) {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = `${ARImage}${frameExt}`;
-        img.onload = () => {
-            loaded++;
-            progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
-            if (loaded === frameCount) {
-                console.log("✅ 全フレームロード完了");
-                loadingOverlay.style.display = "none";
-                callback();
-                offset = img.height / img.width;
+        // 🔹 全フレームをロード
+        function preloadFrames(callback) {
+            let loaded = 0;
+            for (let i = 1; i <= frameCount; i++) {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.src = `${ARImage}${frameExt}`; // ご提示のコードに合わせて修正
+                img.onload = () => {
+                    loaded++;
+                    progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
+                    if (loaded === frameCount) {
+                        console.log("✅ 全フレームロード完了");
+                        loadingOverlay.style.display = "none"; // ローディング画面を隠す
+                        callback();
+                        offset =  img.height / img.width; // 縦横比を計算
+                    }
+                };
+                img.onerror = () => {
+                    console.error(`Error loading image: ${img.src}`);
+                };
+                frames.push(img);
             }
-        };
-        frames.push(img);
-    }
-}
+        }
 
-function drawNextFrame() {
-    const img = frames[currentFrame];
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        function drawNextFrame() {
+            if (frames.length === 0 || !frames[currentFrame]) return;
 
-    const mat = videoPlane.getObject3D("mesh")?.material;
-    if (mat?.map) mat.map.needsUpdate = true;
+            const img = frames[currentFrame];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    currentFrame = (currentFrame + 1) % frameCount;
-}
+            const mat = videoPlane.getObject3D("mesh")?.material;
+            if (mat?.map) mat.map.needsUpdate = true;
 
-function startPlayback() {
-    if (!playTimer) playTimer = setInterval(drawNextFrame, 1000 / fps);
-}
-function stopPlayback() {
-    if (playTimer) {
-        clearInterval(playTimer);
-        playTimer = null;
-    }
-}
+            currentFrame = (currentFrame + 1) % frameCount;
+        }
 
-// === マーカーイベント ===
-marker.addEventListener("markerFound", () => {
-    // マーカーのワールド座標を取得
-    const markerPos = new THREE.Vector3();
-    marker.object3D.updateMatrixWorld(true);
-    marker.object3D.getWorldPosition(markerPos);
-    const markerQuat = new THREE.Quaternion();
-    marker.object3D.getWorldQuaternion(markerQuat);
+        function startPlayback() {
+            if (!playTimer) {
+                drawNextFrame(); // 最初のフレームをすぐに描画
+                if (frameCount > 1) { // 複数フレームの場合のみアニメーションを繰り返す
+                    playTimer = setInterval(drawNextFrame, 1000 / fps);
+                }
+            }
+        }
+        function stopPlayback() {
+            if (playTimer) {
+                clearInterval(playTimer);
+                playTimer = null;
+            }
+        }
 
-    // ここで原点をマーカーに設定
-    const worldOrigin = new THREE.Group();
-    worldOrigin.position.copy(markerPos);
-    worldOrigin.quaternion.copy(markerQuat);
-    threeScene.add(worldOrigin);
+        // Three.jsのヘルパーオブジェクト（一時的な格納用）
+        const tempPosition = new THREE.Vector3();
+        const tempQuaternion = new THREE.Quaternion();
 
-    // fixedMeshをworldOriginの子にする
-    worldOrigin.add(fixedMesh);
+        // マーカーイベント
+        marker.addEventListener("markerFound", () => {
+            console.log("Marker found!");
+            if (!isImageFixed) { // まだAR空間に固定されていない場合のみ実行
+                videoPlane.setAttribute("visible", true);
+                videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
 
-    // 下端中央オフセット
-    const ratio = fixedMesh.geometry.parameters.height / fixedMesh.geometry.parameters.width;
-    fixedMesh.position.set(0, -0.5 * ratio, 0);  // 原点からの相対座標
-    fixedMesh.quaternion.set(0, 0, 0, 1);        // 原点の回転はworldOriginで補正済み
-    fixedMesh.visible = true;
+                // マーカーの現在のワールド座標と回転を取得
+                marker.object3D.getWorldPosition(tempPosition);
+                marker.object3D.getWorldQuaternion(tempQuaternion);
 
-    // videoPlaneも再生開始（Canvasの更新）
-    videoPlane.setAttribute("visible", true);
-    videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
-    startPlayback();
+                // videoPlaneにワールド座標と回転を設定
+                // A-Frameのrotation="-90 0 0"は、Three.jsではX軸の-PI/2ラジアン回転に相当
+                // マーカーの回転にこのオフセットを適用する必要がある
+                const planeInitialRotation = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
+                tempQuaternion.multiply(planeInitialRotation); // マーカーの回転にPlaneの初期回転を結合
 
-    console.log("🎯 マーカー位置に固定配置完了");
-});
+                videoPlane.object3D.position.copy(tempPosition);
+                videoPlane.object3D.quaternion.copy(tempQuaternion);
 
-marker.addEventListener("markerLost", () => {
-    // マーカーを失っても非表示にしない
-    console.log("ℹ️ マーカー見失ったがオブジェクトは保持");
-});
+                isImageFixed = true; // 画像を固定するフラグを立てる
+                startPlayback();
+            }
+        });
 
-// === フレーム読み込み開始 ===
-preloadFrames(() => {
-    console.log("アニメーション準備完了");
-});
+        marker.addEventListener("markerLost", () => {
+            console.log("Marker lost!");
+            // マーカーが失われてもvideoPlaneのvisible属性は変更しない
+            // isImageFixedがtrueなので、videoPlaneはすでにAR空間に固定されている
+            stopPlayback();
+        });
+
+        // 🔹 まずフレームを読み込み開始
+        preloadFrames(() => {
+            console.log("アニメーション準備完了");
+        });
+    });
