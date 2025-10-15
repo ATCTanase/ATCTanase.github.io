@@ -46,17 +46,11 @@ originGroup.add(fixedMesh);
 let originSet = false;
 let followMarker = false;
 
-// -----------------------------
 // マーカー検出イベント
-// -----------------------------
-marker.addEventListener("markerFound", () => {
-    followMarker = true;
+marker.addEventListener("markerFound", ()=>{
     fixedMesh.visible = true;
 
-    console.log("🟢 markerFound!");
-
-    if (!originSet) {
-        // マーカー座標を原点に設定
+    if(!originSet){
         const markerPos = new THREE.Vector3();
         const markerQuat = new THREE.Quaternion();
         marker.object3D.getWorldPosition(markerPos);
@@ -66,59 +60,41 @@ marker.addEventListener("markerFound", () => {
         originGroup.quaternion.copy(markerQuat);
 
         originSet = true;
-
-        console.log("📍 マーカー原点固定:");
-        console.log("   markerPos:", markerPos);
-        console.log("   markerQuat:", markerQuat);
+        console.log("マーカー原点固定:", markerPos);
     }
 });
 
-marker.addEventListener("markerLost", () => {
-    followMarker = false;
-    console.log("🔴 markerLost!");
+marker.addEventListener("markerLost", ()=>{
+    // 固定なのでここでは何もしない
 });
 
-// -----------------------------
-// マーカーON/OFF切替用
-// -----------------------------
-let guidemarkerOnOff = false;
-function onOff() {
-    if (guidemarkerOnOff) {
-        marker.removeAttribute("axes-helper");
-        guidemarkerOnOff = false;
-    } else {
-        marker.setAttribute("axes-helper", "size: 3");
-        guidemarkerOnOff = true;
-    }
+if (navigator.xr) {
+    navigator.xr.requestSession("immersive-ar", { optionalFeatures:["local-floor","bounded-floor","hit-test"] })
+    .then((session)=>{
+        renderer.xr.enabled = true;
+        renderer.xr.setSession(session);
+        console.log("WebXR ARセッション開始");
+    })
+    .catch(err=>console.error(err));
 }
 
 // -----------------------------
 // 毎フレーム更新
 // -----------------------------
-const arCamera = document.querySelector("a-entity[camera]").object3D;
-const tempPos = new THREE.Vector3();
-const tempQuat = new THREE.Quaternion();
-
+const arCamera = document.querySelector("#arCamera").object3D;
 function animate() {
-    requestAnimationFrame(animate);
+    renderer.setAnimationLoop(()=>{
+        // AR.js / XR カメラ姿勢を Three.js camera にコピー
+        const pos = new THREE.Vector3();
+        const quat = new THREE.Quaternion();
+        arCamera.position.copy(pos);
+        arCamera.quaternion.copy(quat);
 
-    // AR.js カメラに追従
-    arCamera.getWorldPosition(tempPos);
-    arCamera.getWorldQuaternion(tempQuat);
-
-    camera.position.copy(tempPos);
-    camera.quaternion.copy(tempQuat);
-
-    // デバッグログ：1秒に1回だけ
-    if (Math.floor(performance.now() / 1000) % 1 === 0 && originSet) {
-        const objPos = fixedMesh.getWorldPosition(new THREE.Vector3());
-        console.log("---- FRAME LOG ----");
-        console.log("📸 arCamera:", tempPos);
-        console.log("🌍 originGroup:", originGroup.position);
-        console.log("🧱 fixedMesh:", objPos);
+        camera.position.copy(pos);
+        camera.quaternion.copy(quat);
+        
+        renderer.render(scene, camera);
     }
-
-    renderer.render(scene, camera);
 }
 
 animate();
