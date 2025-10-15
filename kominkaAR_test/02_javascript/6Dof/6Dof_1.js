@@ -57,9 +57,11 @@ originGroup.add(fixedMesh);
 let followMarker = false;
 let baselinePosition = new THREE.Vector3();
 let baselineRotation = new THREE.Quaternion();
-let currentRotationEuler = new THREE.Euler();
+let baselineEuler = new THREE.Euler(); // マーカー追従時の回転を固定
 
-const moveScale = 0.05; // 傾きによる疑似移動量
+let initialBeta = 0;
+let initialGamma = 0;
+const moveScale = 0.05;
 
 // -----------------------------
 // Canvas描画
@@ -110,13 +112,16 @@ marker.addEventListener("markerFound", ()=>{
 marker.addEventListener("markerLost", ()=>{
     followMarker = false;
 
-    // マーカー消失時の基準姿勢
+    // マーカー消失時の位置固定
     marker.object3D.getWorldPosition(baselinePosition);
 
-    const alpha = currentRotationEuler.z || 0;
-    const beta  = currentRotationEuler.x || 0;
-    const gamma = currentRotationEuler.y || 0;
-    baselineRotation.setFromEuler(new THREE.Euler(beta, gamma, alpha, 'ZXY'));
+    // マーカー追従時の回転を固定
+    marker.object3D.getWorldQuaternion(baselineRotation);
+    baselineEuler.setFromQuaternion(baselineRotation, 'ZXY');
+
+    // 初期角度を記録
+    initialBeta = currentRotationEuler.x;
+    initialGamma = currentRotationEuler.y;
 });
 
 // -----------------------------
@@ -151,21 +156,19 @@ function updateFixedMesh(){
         fixedMesh.quaternion.copy(quat);
 
     } else {
-        // マーカー消失後: 基準からの回転差
-        const currentQuat = new THREE.Quaternion().setFromEuler(currentRotationEuler);
-        const deltaQuat = currentQuat.clone().multiply(baselineRotation.clone().invert());
+        // マーカー消失後: 回転は固定
+        fixedMesh.quaternion.copy(baselineRotation);
 
-        // 回転適用
-        fixedMesh.quaternion.copy(deltaQuat);
+        // スマホの傾き差分
+        const deltaBeta  = currentRotationEuler.x - initialBeta;   // 前後傾き → 上下移動
+        const deltaGamma = currentRotationEuler.y - initialGamma;  // 左右傾き → 横移動
 
-        // 疑似移動（前後＋左右を疑似空間で）
-        const deltaEuler = new THREE.Euler().setFromQuaternion(deltaQuat, 'ZXY');
+        const right = new THREE.Vector3(1,0,0);   // 横方向
+        const up    = new THREE.Vector3(0,1,0);   // 上下方向
 
-        const forward = new THREE.Vector3(0,0,-1).applyEuler(deltaEuler);
-        const right   = new THREE.Vector3(1,0,0).applyEuler(deltaEuler);
-
-        const moveForward = forward.multiplyScalar(Math.sin(deltaEuler.x)*moveScale);
-        const moveRight   = right.multiplyScalar(Math.sin(deltaEuler.y)*moveScale);
+        // リバース適用
+        const moveRight = right.clone().multiplyScalar(-Math.sin(deltaGamma)*moveScale);
+        const moveUp    = up.clone().multiplyScalar(-Math.sin(deltaBeta)*moveScale);
 
         fixedMesh.position.copy(baselinePosition).add(moveForward).add(moveRight);
     }
