@@ -29,18 +29,15 @@ renderer.xr.enabled = true;  // XR対応
 
 document.body.appendChild(renderer.domElement);
 
-navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['local-floor'] })
-    .then(session => renderer.xr.setSession(session));
-
-const camera = new THREE.PerspectiveCamera();
-scene.add(camera);
-
-function render() {
-    renderer.setAnimationLoop(() => {
-        renderer.render(scene, camera); // camera は自動で端末トラッキングに従う
+document.querySelector("#startButton").addEventListener("click", async () => {
+    const session = await navigator.xr.requestSession('immersive-ar', {
+        requiredFeatures: ['local-floor']
     });
-}
-render();
+    renderer.xr.setSession(session);
+    document.getElementById("#startButton").style.display = "none";
+});
+
+
 
 // 固定オブジェクト用の Three.js Mesh を作成
 const texture = new THREE.TextureLoader().load(`${ARImage}${frameExt}`);
@@ -51,6 +48,15 @@ const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, 
 const fixedMesh = new THREE.Mesh(geometry, material);
 fixedMesh.visible = false;
 threeScene.add(fixedMesh);
+const camera = new THREE.PerspectiveCamera();
+threeScene.add(camera);
+
+function render() {
+    renderer.setAnimationLoop(() => {
+        renderer.render(threeScene, camera); // camera は自動で端末トラッキングに従う
+    });
+}
+render();
 
 // === アニメーション処理 ===
 function preloadFrames(callback) {
