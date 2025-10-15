@@ -106,8 +106,8 @@ function updateFixedMesh(){
         fixedMesh.quaternion.copy(baselineRotation);
 
         // スマホ傾き差分
-        const deltaBeta  = currentRotationEuler.x - initialBeta;   // 前後傾き → Y移動
-        const deltaGamma = currentRotationEuler.y - initialGamma;  // 左右傾き → X移動
+        const deltaBeta  = currentEuler.x - initialBeta;   // 前後傾き → Y移動
+        const deltaGamma = currentEuler.y - initialGamma;  // 左右傾き → X移動
 
         // 移動量（度換算 & スケール）
         const moveY = -THREE.MathUtils.radToDeg(deltaBeta) * moveScale;   // 上に傾けると下に
