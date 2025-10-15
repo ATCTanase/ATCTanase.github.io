@@ -106,20 +106,24 @@ function updateFixedMesh(){
         fixedMesh.quaternion.copy(baselineRotation);
 
         // スマホ傾き差分
-        const deltaBeta  = currentEuler.x - initialBeta;   // 前後傾き → Y移動
-        const deltaGamma = currentEuler.y - initialGamma;  // 左右傾き → X移動
+        const deltaBeta  = currentRotationEuler.x - initialBeta;   // 前後傾き → Y移動
+        const deltaGamma = currentRotationEuler.y - initialGamma;  // 左右傾き → X移動
 
         // 移動量（度換算 & スケール）
-
-        const moveRight = new THREE.Vector3(1,0,0).multiplyScalar(-degGamma*moveScale); // 0.02～0.05くらい
-        const moveUp    = new THREE.Vector3(0,1,0).multiplyScalar(-degBeta*moveScale);
+        const moveY = -THREE.MathUtils.radToDeg(deltaBeta) * moveScale;   // 上に傾けると下に
+        const moveX = -THREE.MathUtils.radToDeg(deltaGamma) * moveScale;
 
         console.log("deltaBeta:", THREE.MathUtils.radToDeg(deltaBeta).toFixed(2),
-                    "deltaGamma:", THREE.MathUtils.radToDeg(deltaGamma).toFixed(2));
-        console.log("moveRight:", moveRight,
-                    "moveUp:", moveUp);
+            "deltaGamma:", THREE.MathUtils.radToDeg(deltaGamma).toFixed(2));
+        console.log("moveX:", moveX,
+            "moveY:", moveY);
+
         // YとXにのみ加算
-        fixedMesh.position.copy(baselinePosition).add(moveRight).add(moveUp);
+        fixedMesh.position.set(
+            baselinePosition.x + moveX,
+            baselinePosition.y + moveY,
+            baselinePosition.z
+);
     }
 }
 
