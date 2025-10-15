@@ -51,7 +51,7 @@ let currentEuler = new THREE.Euler('ZXY');
 
 let initialBeta  = 0;
 let initialGamma = 0;
-const moveScale = 0.05;
+const moveScale = 1;
 
 // -----------------------------
 // マーカーイベント
