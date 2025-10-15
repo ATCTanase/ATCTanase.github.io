@@ -68,6 +68,7 @@ marker.addEventListener("markerLost", ()=>{
     // 固定なのでここでは何もしない
 });
 
+document.getElementById("startAR").addEventListener("click", async ()=>{
 if (navigator.xr) {
     navigator.xr.requestSession("immersive-ar", { optionalFeatures:["local-floor","bounded-floor","hit-test"] })
     .then((session)=>{
@@ -77,11 +78,14 @@ if (navigator.xr) {
     })
     .catch(err=>console.error(err));
 }
+document.getElementById("startAR").style.display = "none";
+});
 
 // -----------------------------
 // 毎フレーム更新
 // -----------------------------
-const arCamera = document.querySelector("#arCamera").object3D;
+const arCamera = document.querySelector("a-entity[camera]").object3D;
+
 function animate() {
     renderer.setAnimationLoop(()=>{
         // AR.js / XR カメラ姿勢を Three.js camera にコピー
