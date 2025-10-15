@@ -63,7 +63,7 @@ let currentRotationEuler = new THREE.Euler();
 
 let initialBeta = 0;
 let initialGamma = 0;
-const moveScale = 0.05;
+const moveScale = 0.1;
 
 // -----------------------------
 // Canvas描画
@@ -137,6 +137,17 @@ window.addEventListener("deviceorientation", (event)=>{
         'ZXY'
     );
 });
+// -----------------------------
+// 3秒ごとのログ
+// -----------------------------
+setInterval(()=>{
+    const deltaBeta  = currentEuler.x - initialBeta;
+    const deltaGamma = currentEuler.y - initialGamma;
+    console.log("---- 3秒ログ ----");
+    console.log("deltaBeta:", THREE.MathUtils.radToDeg(deltaBeta).toFixed(2),
+                "deltaGamma:", THREE.MathUtils.radToDeg(deltaGamma).toFixed(2));
+    console.log("fixedMesh.position:", fixedMesh.position);
+}, 3000);
 
 // -----------------------------
 // 毎フレーム更新
