@@ -90,6 +90,10 @@ marker.addEventListener("markerFound", () => {
 // 🔹 マーカーを失ったとき
 marker.addEventListener("markerLost", () => {
     followMarker = false;   // 追従終了、位置固定
+    
+    // マーカーが消えたとき、最後の位置・回転を保存
+    marker.object3D.getWorldPosition(lastMarkerPosition);
+    lastMarkerQuaternion = marker.object3D.getWorldQuaternion(new THREE.Quaternion());
 });
 
 // 🔹 フレーム読み込み開始
@@ -106,6 +110,14 @@ function updateFixedMesh() {
 
         fixedMesh.position.copy(pos);
         fixedMesh.quaternion.copy(quat);
+
+        lastMarkerPosition.copy(pos);
+        lastMarkerQuaternion.copy(quat);
+
+    } else {
+        // マーカーが消えたら最後の座標に固定
+        fixedMesh.position.copy(lastMarkerPosition);
+        fixedMesh.quaternion.copy(lastMarkerQuaternion);
     }
 
     requestAnimationFrame(updateFixedMesh);
