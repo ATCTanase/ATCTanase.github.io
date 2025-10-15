@@ -122,8 +122,9 @@ function updateFixedMesh(){
         const deltaGamma = currentEuler.y - initialGamma;  // 左右傾き → X移動
 
         // 移動量（度換算 & スケール）
-        const moveY = -THREE.MathUtils.radToDeg(deltaBeta) * 0.02;   // 上に傾けると下に
-        const moveX = -THREE.MathUtils.radToDeg(deltaGamma) * 0.02;  // 左に傾けると右に
+        const moveY = -deltaBeta * 0.5;   // 上に傾けると下
+        const moveX = deltaGamma * 0.5;  // 左に傾けると右
+
         // YとXにのみ加算
         fixedMesh.position.set(
             baselinePosition.x + moveX,
