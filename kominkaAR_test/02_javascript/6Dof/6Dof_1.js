@@ -1,105 +1,115 @@
-// -----------------------------
-// DOM要素
-// -----------------------------
+const videoPlane = document.getElementById("videoPlane");
+const marker     = document.getElementById("barcodeMarker");
+
+// Canvas作成
+const canvas = document.createElement("canvas");
+canvas.width  = window.innerWidth;
+canvas.height = window.innerHeight;
+const ctx = canvas.getContext("2d", { willReadFrequently: true });
+videoPlane.setAttribute("material", "src", canvas);
+
+let offset;
+
+const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手";
+const frameCount = 1;
+const frameExt = ".png";
+const frames = [];
+const imagePath = ARImage + frameExt;
+
+let currentFrame = 0;
+const fps = 20;
+let playTimer = null;
+
 const loadingOverlay = document.getElementById("loadingOverlay");
-const marker = document.querySelector("#barcodeMarker");
+const progressText   = document.getElementById("progress");
 
-// -----------------------------
-// Three.js 独立シーン
-// -----------------------------
-const scene = new THREE.Scene();
-const renderer = new THREE.WebGLRenderer({ alpha: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.domElement.style.position = "fixed";
-renderer.domElement.style.top = "0";
-renderer.domElement.style.left = "0";
-document.body.appendChild(renderer.domElement);
+const scene = document.querySelector('a-scene').object3D;
 
-// AR.js カメラ追従用
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 1000);
-camera.position.set(0, 0, 0);
+// Three.jsオブジェクト作成（例: Planeに画像）
 
-// 原点代わりの親グループ
-const originGroup = new THREE.Group();
-scene.add(originGroup);
-
-// -----------------------------
-// 固定画像オブジェクト
-// -----------------------------
-const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手.png";
-const texture = new THREE.TextureLoader().load(ARImage, () => {
-    if (loadingOverlay) loadingOverlay.style.display = "none";
-    console.log("[✅] テクスチャ読み込み完了");
-});
-
+const texture = new THREE.TextureLoader().load(imagePath);
 const ratio = texture.image ? texture.image.height / texture.image.width : 1;
 const geometry = new THREE.PlaneGeometry(1, ratio);
+geometry.translate(0, 0.5 * ratio, 0); // 下端中央基準
 const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
 const fixedMesh = new THREE.Mesh(geometry, material);
-fixedMesh.position.set(0, 0, 0); // 原点に配置
 fixedMesh.visible = false;
-originGroup.add(fixedMesh);
+scene.add(fixedMesh);
 
-// -----------------------------
-// マーカー原点固定フラグ
-// -----------------------------
-let originSet = false;
-let followMarker = false;
+// 最後にマーカーがあった座標を保持
+let lastMarkerPosition = new THREE.Vector3();
 
-// マーカー検出イベント
-marker.addEventListener("markerFound", ()=>{
-    fixedMesh.visible = true;
-
-    if(!originSet){
-        const markerPos = new THREE.Vector3();
-        const markerQuat = new THREE.Quaternion();
-        marker.object3D.getWorldPosition(markerPos);
-        marker.object3D.getWorldQuaternion(markerQuat);
-
-        originGroup.position.copy(markerPos);
-        originGroup.quaternion.copy(markerQuat);
-
-        originSet = true;
-        console.log("マーカー原点固定:", markerPos);
+// 🔹 全フレームロード
+function preloadFrames(callback) {
+    let loaded = 0;
+    for (let i = 1; i <= frameCount; i++) {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = `${ARImage}${frameExt}`;
+        img.onload = () => {
+            loaded++;
+            progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
+            if (loaded === frameCount) {
+                loadingOverlay.style.display = "none";
+                callback();
+                offset = img.height / img.width;
+            }
+        };
+        frames.push(img);
     }
-});
-
-marker.addEventListener("markerLost", ()=>{
-    // 固定なのでここでは何もしない
-});
-
-const startBtn = document.getElementById("startAR");
-startBtn.addEventListener("click", async ()=>{
-    if (navigator.xr) {
-        navigator.xr.requestSession("immersive-ar", { optionalFeatures:["local-floor","bounded-floor","hit-test"] })
-        .then((session)=>{
-            renderer.xr.enabled = true;
-            renderer.xr.setSession(session);
-            console.log("WebXR ARセッション開始");
-        })
-        .catch(err=>console.error(err));
-    }
-    startBtn.style.display = "none";
-});
-
-// -----------------------------
-// 毎フレーム更新
-// -----------------------------
-const arCamera = document.querySelector("a-entity[camera]").object3D;
-
-function animate() {
-    renderer.setAnimationLoop(()=>{
-        // AR.js / XR カメラ姿勢を Three.js camera にコピー
-        const pos = new THREE.Vector3();
-        const quat = new THREE.Quaternion();
-        arCamera.position.copy(pos);
-        arCamera.quaternion.copy(quat);
-
-        camera.position.copy(pos);
-        camera.quaternion.copy(quat);
-        
-        renderer.render(scene, camera);
-    });
 }
 
-animate();
+function drawNextFrame() {
+    const img = frames[currentFrame];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    const mat = videoPlane.getObject3D("mesh")?.material;
+    if (mat?.map) mat.map.needsUpdate = true;
+
+    currentFrame = (currentFrame + 1) % frameCount;
+}
+
+let followMarker = false; 
+
+function startPlayback() {
+    if (!playTimer) playTimer = setInterval(drawNextFrame, 1000 / fps);
+}
+function stopPlayback() {
+    if (playTimer) {
+        clearInterval(playTimer);
+        playTimer = null;
+    }
+}
+marker.addEventListener("markerFound", () => {
+    followMarker = true;    // 追従開始
+    fixedMesh.visible = true;
+
+    startPlayback();
+});
+
+
+// 🔹 マーカーを失ったとき
+marker.addEventListener("markerLost", () => {
+    followMarker = false;   // 追従終了、位置固定
+});
+
+// 🔹 フレーム読み込み開始
+preloadFrames(() => {
+    console.log("アニメーション準備完了");
+});
+function updateFixedMesh() {
+    if (followMarker) {
+        // マーカーのワールド位置・回転をコピー
+        const pos = new THREE.Vector3();
+        const quat = new THREE.Quaternion();
+        marker.object3D.getWorldPosition(pos);
+        marker.object3D.getWorldQuaternion(quat);
+
+        fixedMesh.position.copy(pos);
+        fixedMesh.quaternion.copy(quat);
+    }
+
+    requestAnimationFrame(updateFixedMesh);
+}
+updateFixedMesh();
