@@ -1,71 +1,102 @@
-// ---------------------
-// 独立 Three.js シーン
-// ---------------------
-const independentScene = new THREE.Scene();
+// -----------------------------
+// DOM要素
+// -----------------------------
+const loadingOverlay = document.getElementById("loadingOverlay");
+const marker = document.querySelector("#barcodeMarker");
+
+// -----------------------------
+// Three.js 独立シーン
+// -----------------------------
+const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.domElement.style.position = "fixed";
+renderer.domElement.style.top = "0";
+renderer.domElement.style.left = "0";
 document.body.appendChild(renderer.domElement);
 
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.01, 1000);
-camera.position.z = 5;
+// AR.js カメラ追従用
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 1000);
+camera.position.set(0, 0, 0);
 
-// ---------------------
-// 固定用テクスチャ
-// ---------------------
+// 原点代わりの親グループ
+const originGroup = new THREE.Group();
+scene.add(originGroup);
+
+// -----------------------------
+// 固定画像オブジェクト
+// -----------------------------
 const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手.png";
-const loadingOverlay = document.getElementById("loadingOverlay");
-
-const texture = new THREE.TextureLoader().load(
-  ARImage,
-  () => {
-    // 読み込み完了時に非表示
-    if (loadingOverlay) loadingOverlay.style.display = "none";
-  }
-);
+const texture = new THREE.TextureLoader().load(ARImage, ()=>{
+    if(loadingOverlay) loadingOverlay.style.display = "none";
+});
 
 const ratio = texture.image ? texture.image.height / texture.image.width : 1;
-const planeGeometry = new THREE.PlaneGeometry(1, ratio);
-const planeMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
-const fixedMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+const geometry = new THREE.PlaneGeometry(1, ratio);
+const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
+const fixedMesh = new THREE.Mesh(geometry, material);
+fixedMesh.position.set(0, 0, 0); // 原点に配置
 fixedMesh.visible = false;
-independentScene.add(fixedMesh);
+originGroup.add(fixedMesh);
 
-// ---------------------
-// マーカー処理
-// ---------------------
-const marker = document.querySelector("#barcodeMarker");
+// -----------------------------
+// マーカー原点固定フラグ
+// -----------------------------
+let originSet = false;
 let followMarker = false;
-let lastWorldPos = new THREE.Vector3();
-let lastWorldQuat = new THREE.Quaternion();
 
-marker.addEventListener("markerFound", () => {
+// -----------------------------
+// マーカー検出イベント
+// -----------------------------
+marker.addEventListener("markerFound", ()=>{
     followMarker = true;
     fixedMesh.visible = true;
-});
 
-marker.addEventListener("markerLost", () => {
-    followMarker = false;
+    if(!originSet){
+        // マーカー座標を原点に設定
+        const markerPos = new THREE.Vector3();
+        const markerQuat = new THREE.Quaternion();
+        marker.object3D.getWorldPosition(markerPos);
+        marker.object3D.getWorldQuaternion(markerQuat);
 
-    // マーカー座標をワールド座標に変換して固定
-    marker.object3D.getWorldPosition(lastWorldPos);
-    marker.object3D.getWorldQuaternion(lastWorldQuat);
-});
+        originGroup.position.copy(markerPos);
+        originGroup.quaternion.copy(markerQuat);
 
-// ---------------------
-// 毎フレーム更新
-// ---------------------
-function update() {
-    requestAnimationFrame(update);
-
-    if (followMarker) {
-        marker.object3D.getWorldPosition(lastWorldPos);
-        marker.object3D.getWorldQuaternion(lastWorldQuat);
+        originSet = true;
     }
+});
 
-    fixedMesh.position.copy(lastWorldPos);
-    fixedMesh.quaternion.copy(lastWorldQuat);
+marker.addEventListener("markerLost", ()=>{
+    followMarker = false;
+});
 
-    renderer.render(independentScene, camera);
+// -----------------------------
+// マーカーON/OFF切替用
+// -----------------------------
+let guidemarkerOnOff = false;
+function onOff(){
+    if(guidemarkerOnOff){
+        marker.removeAttribute("axes-helper");
+        guidemarkerOnOff = false;
+    }else{
+        marker.setAttribute("axes-helper", "size: 3");
+        guidemarkerOnOff = true;
+    }
 }
 
-update();
+// -----------------------------
+// 毎フレーム更新
+// -----------------------------
+const arCamera = document.querySelector("a-entity[camera]").object3D;
+
+function animate(){
+    requestAnimationFrame(animate);
+
+    // AR.js カメラに追従
+    camera.position.copy(arCamera.getWorldPosition(new THREE.Vector3()));
+    camera.quaternion.copy(arCamera.getWorldQuaternion(new THREE.Quaternion()));
+
+    renderer.render(scene, camera);
+}
+
+animate();
