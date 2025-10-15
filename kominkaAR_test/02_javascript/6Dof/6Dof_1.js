@@ -83,18 +83,6 @@ window.addEventListener("deviceorientation", (event)=>{
 });
 
 // -----------------------------
-// 3秒ごとのログ
-// -----------------------------
-setInterval(()=>{
-    const deltaBeta  = currentEuler.x - initialBeta;
-    const deltaGamma = currentEuler.y - initialGamma;
-    console.log("---- 3秒ログ ----");
-    console.log("deltaBeta:", THREE.MathUtils.radToDeg(deltaBeta).toFixed(2),
-                "deltaGamma:", THREE.MathUtils.radToDeg(deltaGamma).toFixed(2));
-    console.log("fixedMesh.position:", fixedMesh.position);
-}, 3000);
-
-// -----------------------------
 // 毎フレーム更新
 // -----------------------------
 function updateFixedMesh(){
@@ -122,15 +110,16 @@ function updateFixedMesh(){
         const deltaGamma = currentEuler.y - initialGamma;  // 左右傾き → X移動
 
         // 移動量（度換算 & スケール）
-        const moveY = -deltaBeta * 0.5;   // 上に傾けると下
-        const moveX = deltaGamma * 0.5;  // 左に傾けると右
 
+        const moveRight = new THREE.Vector3(1,0,0).multiplyScalar(-degGamma*moveScale); // 0.02～0.05くらい
+        const moveUp    = new THREE.Vector3(0,1,0).multiplyScalar(-degBeta*moveScale);
+
+        console.log("deltaBeta:", THREE.MathUtils.radToDeg(deltaBeta).toFixed(2),
+                    "deltaGamma:", THREE.MathUtils.radToDeg(deltaGamma).toFixed(2));
+        console.log("moveRight:", moveRight,
+                    "moveUp:", moveUp);
         // YとXにのみ加算
-        fixedMesh.position.set(
-            baselinePosition.x + moveX,
-            baselinePosition.y + moveY,
-            baselinePosition.z
-        );
+        fixedMesh.position.copy(baselinePosition).add(moveRight).add(moveUp);
     }
 }
 
