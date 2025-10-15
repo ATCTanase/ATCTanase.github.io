@@ -27,8 +27,9 @@ scene.add(originGroup);
 // 固定画像オブジェクト
 // -----------------------------
 const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手.png";
-const texture = new THREE.TextureLoader().load(ARImage, ()=>{
-    if(loadingOverlay) loadingOverlay.style.display = "none";
+const texture = new THREE.TextureLoader().load(ARImage, () => {
+    if (loadingOverlay) loadingOverlay.style.display = "none";
+    console.log("[✅] テクスチャ読み込み完了");
 });
 
 const ratio = texture.image ? texture.image.height / texture.image.width : 1;
@@ -48,11 +49,13 @@ let followMarker = false;
 // -----------------------------
 // マーカー検出イベント
 // -----------------------------
-marker.addEventListener("markerFound", ()=>{
+marker.addEventListener("markerFound", () => {
     followMarker = true;
     fixedMesh.visible = true;
 
-    if(!originSet){
+    console.log("🟢 markerFound!");
+
+    if (!originSet) {
         // マーカー座標を原点に設定
         const markerPos = new THREE.Vector3();
         const markerQuat = new THREE.Quaternion();
@@ -63,22 +66,27 @@ marker.addEventListener("markerFound", ()=>{
         originGroup.quaternion.copy(markerQuat);
 
         originSet = true;
+
+        console.log("📍 マーカー原点固定:");
+        console.log("   markerPos:", markerPos);
+        console.log("   markerQuat:", markerQuat);
     }
 });
 
-marker.addEventListener("markerLost", ()=>{
+marker.addEventListener("markerLost", () => {
     followMarker = false;
+    console.log("🔴 markerLost!");
 });
 
 // -----------------------------
 // マーカーON/OFF切替用
 // -----------------------------
 let guidemarkerOnOff = false;
-function onOff(){
-    if(guidemarkerOnOff){
+function onOff() {
+    if (guidemarkerOnOff) {
         marker.removeAttribute("axes-helper");
         guidemarkerOnOff = false;
-    }else{
+    } else {
         marker.setAttribute("axes-helper", "size: 3");
         guidemarkerOnOff = true;
     }
@@ -88,13 +96,27 @@ function onOff(){
 // 毎フレーム更新
 // -----------------------------
 const arCamera = document.querySelector("a-entity[camera]").object3D;
+const tempPos = new THREE.Vector3();
+const tempQuat = new THREE.Quaternion();
 
-function animate(){
+function animate() {
     requestAnimationFrame(animate);
 
     // AR.js カメラに追従
-    camera.position.copy(arCamera.getWorldPosition(new THREE.Vector3()));
-    camera.quaternion.copy(arCamera.getWorldQuaternion(new THREE.Quaternion()));
+    arCamera.getWorldPosition(tempPos);
+    arCamera.getWorldQuaternion(tempQuat);
+
+    camera.position.copy(tempPos);
+    camera.quaternion.copy(tempQuat);
+
+    // デバッグログ：1秒に1回だけ
+    if (Math.floor(performance.now() / 1000) % 1 === 0 && originSet) {
+        const objPos = fixedMesh.getWorldPosition(new THREE.Vector3());
+        console.log("---- FRAME LOG ----");
+        console.log("📸 arCamera:", tempPos);
+        console.log("🌍 originGroup:", originGroup.position);
+        console.log("🧱 fixedMesh:", objPos);
+    }
 
     renderer.render(scene, camera);
 }
