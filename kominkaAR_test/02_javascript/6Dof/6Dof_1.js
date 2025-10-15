@@ -94,7 +94,7 @@ function animate() {
         camera.quaternion.copy(quat);
         
         renderer.render(scene, camera);
-    }
+    });
 }
 
 animate();
