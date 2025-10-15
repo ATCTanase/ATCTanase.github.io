@@ -172,7 +172,7 @@ function updateFixedMesh(){
         const moveRight = right.clone().multiplyScalar(-Math.sin(deltaGamma)*moveScale);
         const moveUp    = up.clone().multiplyScalar(-Math.sin(deltaBeta)*moveScale);
 
-        fixedMesh.position.copy(baselinePosition).add(moveForward).add(moveRight);
+        fixedMesh.position.copy(baselinePosition).add(moveRight).add(moveUp);
     }
 
     requestAnimationFrame(updateFixedMesh);
