@@ -1,17 +1,25 @@
+// -----------------------------
+// DOM要素
+// -----------------------------
 const videoPlane = document.getElementById("videoPlane");
 const marker     = document.getElementById("barcodeMarker");
+const loadingOverlay = document.getElementById("loadingOverlay");
+const progressText   = document.getElementById("progress");
 
+// -----------------------------
 // Canvas作成
+// -----------------------------
 const canvas = document.createElement("canvas");
 canvas.width  = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 videoPlane.setAttribute("material", "src", canvas);
 
-let offset;
-
+// -----------------------------
+// AR画像
+// -----------------------------
 const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手";
-const frameCount = 1;
+const frameCount = 1; // 今回は1枚固定
 const frameExt = ".png";
 const frames = [];
 const imagePath = ARImage + frameExt;
@@ -20,99 +28,100 @@ let currentFrame = 0;
 const fps = 20;
 let playTimer = null;
 
-const loadingOverlay = document.getElementById("loadingOverlay");
-const progressText   = document.getElementById("progress");
-
+// -----------------------------
+// A-Frameシーン
+// -----------------------------
 const scene = document.querySelector('a-scene').object3D;
 
-// Three.jsオブジェクト作成（例: Planeに画像）
+// -----------------------------
+// originGroupを作り、fixedMeshを追加
+// -----------------------------
+const originGroup = new THREE.Group();
+scene.add(originGroup);
 
-const texture = new THREE.TextureLoader().load(imagePath);
+const texture = new THREE.TextureLoader().load(imagePath, ()=>{
+    if(loadingOverlay) loadingOverlay.style.display = "none";
+});
+
 const ratio = texture.image ? texture.image.height / texture.image.width : 1;
 const geometry = new THREE.PlaneGeometry(1, ratio);
 geometry.translate(0, 0.5 * ratio, 0); // 下端中央基準
 const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
 const fixedMesh = new THREE.Mesh(geometry, material);
 fixedMesh.visible = false;
-scene.add(fixedMesh);
+originGroup.add(fixedMesh);
 
-// 最後にマーカーがあった座標を保持
-let lastMarkerPosition = new THREE.Vector3();
-let lastRotation = new THREE.Quaternion();
+// -----------------------------
+// 状態フラグ
+// -----------------------------
+let followMarker = false;
+let baselinePosition = new THREE.Vector3();
+let baselineRotation = new THREE.Quaternion();
+let currentRotationEuler = new THREE.Euler();
 
-// 🔹 全フレームロード
-function preloadFrames(callback) {
+const moveScale = 0.05; // 傾きによる疑似移動量
+
+// -----------------------------
+// Canvas描画
+// -----------------------------
+function preloadFrames(callback){
     let loaded = 0;
-    for (let i = 1; i <= frameCount; i++) {
+    for(let i=0; i<frameCount; i++){
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.src = `${ARImage}${frameExt}`;
-        img.onload = () => {
+        img.onload = ()=>{
             loaded++;
-            progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
-            if (loaded === frameCount) {
-                loadingOverlay.style.display = "none";
+            progressText.textContent = Math.floor((loaded/frameCount)*100) + "%";
+            if(loaded===frameCount){
+                if(loadingOverlay) loadingOverlay.style.display = "none";
                 callback();
-                offset = img.height / img.width;
             }
         };
         frames.push(img);
     }
 }
 
-function drawNextFrame() {
+function drawNextFrame(){
     const img = frames[currentFrame];
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
 
     const mat = videoPlane.getObject3D("mesh")?.material;
-    if (mat?.map) mat.map.needsUpdate = true;
+    if(mat?.map) mat.map.needsUpdate = true;
 
-    currentFrame = (currentFrame + 1) % frameCount;
+    currentFrame = (currentFrame+1) % frameCount;
 }
 
-function startPlayback() {
-    if (!playTimer) playTimer = setInterval(drawNextFrame, 1000 / fps);
-}
-function stopPlayback() {
-    if (playTimer) {
-        clearInterval(playTimer);
-        playTimer = null;
-    }
+function startPlayback(){
+    if(!playTimer) playTimer = setInterval(drawNextFrame, 1000/fps);
 }
 
-let followMarker = false;
+preloadFrames(()=>{ console.log("アニメーション準備完了"); startPlayback(); });
 
-// マーカー消失時の基準
-let baselineRotation = new THREE.Quaternion();
-let baselinePosition = new THREE.Vector3();
-
-let currentRotationEuler = new THREE.Euler();
-
-
-const moveScale = 0.05; // 傾きに応じた移動量の倍率
-
-marker.addEventListener("markerFound", () => {
-    followMarker = true;    // 追従開始
+// -----------------------------
+// マーカーイベント
+// -----------------------------
+marker.addEventListener("markerFound", ()=>{
+    followMarker = true;
     fixedMesh.visible = true;
-
-    startPlayback();
 });
 
+marker.addEventListener("markerLost", ()=>{
+    followMarker = false;
 
-// 🔹 マーカーを失ったとき
-marker.addEventListener("markerLost", () => {
-    followMarker = false;   // 追従終了、位置固定
+    // マーカー消失時の基準姿勢
+    marker.object3D.getWorldPosition(baselinePosition);
 
-    // 基準として現在のスマホ姿勢を保存
-    const alpha = THREE.MathUtils.degToRad(currentRotationEuler.z || 0);
-    const beta  = THREE.MathUtils.degToRad(currentRotationEuler.x || 0);
-    const gamma = THREE.MathUtils.degToRad(currentRotationEuler.y || 0);
-
+    const alpha = currentRotationEuler.z || 0;
+    const beta  = currentRotationEuler.x || 0;
+    const gamma = currentRotationEuler.y || 0;
     baselineRotation.setFromEuler(new THREE.Euler(beta, gamma, alpha, 'ZXY'));
-    baselinePosition.copy(fixedMesh.position);
 });
 
+// -----------------------------
+// デバイス傾き
+// -----------------------------
 window.addEventListener("deviceorientation", (event)=>{
     currentRotationEuler.set(
         THREE.MathUtils.degToRad(event.beta  || 0),
@@ -122,21 +131,34 @@ window.addEventListener("deviceorientation", (event)=>{
     );
 });
 
-
+// -----------------------------
+// 毎フレーム更新
+// -----------------------------
 function updateFixedMesh(){
     if(followMarker){
         // マーカー追従
-        marker.object3D.getWorldPosition(fixedMesh.position);
-        marker.object3D.getWorldQuaternion(fixedMesh.quaternion);
+        const pos = new THREE.Vector3();
+        const quat = new THREE.Quaternion();
+        marker.object3D.getWorldPosition(pos);
+        marker.object3D.getWorldQuaternion(quat);
+
+        // originGroup基準に変換
+        originGroup.worldToLocal(pos);
+        const invOriginQuat = originGroup.getWorldQuaternion(new THREE.Quaternion()).invert();
+        quat.premultiply(invOriginQuat);
+
+        fixedMesh.position.copy(pos);
+        fixedMesh.quaternion.copy(quat);
+
     } else {
-        // 基準からの回転差
+        // マーカー消失後: 基準からの回転差
         const currentQuat = new THREE.Quaternion().setFromEuler(currentRotationEuler);
         const deltaQuat = currentQuat.clone().multiply(baselineRotation.clone().invert());
 
-        // 回転に応じてオブジェクト回転
+        // 回転適用
         fixedMesh.quaternion.copy(deltaQuat);
 
-        // 回転差から移動を生成（例：X軸回転→Z移動, Y軸回転→X移動）
+        // 疑似移動
         const deltaEuler = new THREE.Euler().setFromQuaternion(deltaQuat, 'ZXY');
         fixedMesh.position.set(
             baselinePosition.x + Math.sin(deltaEuler.y) * moveScale,
@@ -150,15 +172,16 @@ function updateFixedMesh(){
 
 updateFixedMesh();
 
-
-
-
-
-
-
-
-
-// 🔹 フレーム読み込み開始
-preloadFrames(() => {
-    console.log("アニメーション準備完了");
-});
+// -----------------------------
+// マーカーON/OFF
+// -----------------------------
+let guidemarkerOnOff = false;
+function onOff(){
+    if(guidemarkerOnOff){
+        marker.removeAttribute("axes-helper");
+        guidemarkerOnOff = false;
+    } else {
+        marker.setAttribute("axes-helper","size:3");
+        guidemarkerOnOff = true;
+    }
+}
