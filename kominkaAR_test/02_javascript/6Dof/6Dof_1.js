@@ -38,6 +38,7 @@ scene.add(fixedMesh);
 
 // 最後にマーカーがあった座標を保持
 let lastMarkerPosition = new THREE.Vector3();
+let lastRotation = new THREE.Quaternion();
 
 // 🔹 全フレームロード
 function preloadFrames(callback) {
@@ -81,6 +82,18 @@ function stopPlayback() {
         playTimer = null;
     }
 }
+
+let followMarker = false;
+
+// マーカー消失時の基準
+let baselineRotation = new THREE.Quaternion();
+let baselinePosition = new THREE.Vector3();
+
+let currentRotationEuler = new THREE.Euler();
+
+
+const moveScale = 0.05; // 傾きに応じた移動量の倍率
+
 marker.addEventListener("markerFound", () => {
     followMarker = true;    // 追従開始
     fixedMesh.visible = true;
@@ -92,24 +105,62 @@ marker.addEventListener("markerFound", () => {
 // 🔹 マーカーを失ったとき
 marker.addEventListener("markerLost", () => {
     followMarker = false;   // 追従終了、位置固定
+
+    // 基準として現在のスマホ姿勢を保存
+    const alpha = THREE.MathUtils.degToRad(currentRotationEuler.z || 0);
+    const beta  = THREE.MathUtils.degToRad(currentRotationEuler.x || 0);
+    const gamma = THREE.MathUtils.degToRad(currentRotationEuler.y || 0);
+
+    baselineRotation.setFromEuler(new THREE.Euler(beta, gamma, alpha, 'ZXY'));
+    baselinePosition.copy(fixedMesh.position);
 });
+
+window.addEventListener("deviceorientation", (event)=>{
+    currentRotationEuler.set(
+        THREE.MathUtils.degToRad(event.beta  || 0),
+        THREE.MathUtils.degToRad(event.gamma || 0),
+        THREE.MathUtils.degToRad(event.alpha || 0),
+        'ZXY'
+    );
+});
+
+
+function updateFixedMesh(){
+    if(followMarker){
+        // マーカー追従
+        marker.object3D.getWorldPosition(fixedMesh.position);
+        marker.object3D.getWorldQuaternion(fixedMesh.quaternion);
+    } else {
+        // 基準からの回転差
+        const currentQuat = new THREE.Quaternion().setFromEuler(currentRotationEuler);
+        const deltaQuat = currentQuat.clone().multiply(baselineRotation.clone().invert());
+
+        // 回転に応じてオブジェクト回転
+        fixedMesh.quaternion.copy(deltaQuat);
+
+        // 回転差から移動を生成（例：X軸回転→Z移動, Y軸回転→X移動）
+        const deltaEuler = new THREE.Euler().setFromQuaternion(deltaQuat, 'ZXY');
+        fixedMesh.position.set(
+            baselinePosition.x + Math.sin(deltaEuler.y) * moveScale,
+            baselinePosition.y,
+            baselinePosition.z + Math.sin(deltaEuler.x) * moveScale
+        );
+    }
+
+    requestAnimationFrame(updateFixedMesh);
+}
+
+updateFixedMesh();
+
+
+
+
+
+
+
+
 
 // 🔹 フレーム読み込み開始
 preloadFrames(() => {
     console.log("アニメーション準備完了");
 });
-function updateFixedMesh() {
-    if (followMarker) {
-        // マーカーのワールド位置・回転をコピー
-        const pos = new THREE.Vector3();
-        const quat = new THREE.Quaternion();
-        marker.object3D.getWorldPosition(pos);
-        marker.object3D.getWorldQuaternion(quat);
-
-        fixedMesh.position.copy(pos);
-        fixedMesh.quaternion.copy(quat);
-    }
-
-    requestAnimationFrame(updateFixedMesh);
-}
-updateFixedMesh();
