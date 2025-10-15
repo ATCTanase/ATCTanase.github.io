@@ -117,14 +117,19 @@ function updateFixedMesh(){
         // マーカー消失中: 回転は固定
         fixedMesh.quaternion.copy(baselineRotation);
 
-        // 傾き差分
-        const deltaBeta  = currentEuler.x - initialBeta;
-        const deltaGamma = currentEuler.y - initialGamma;
+        // スマホ傾き差分
+        const deltaBeta  = currentRotationEuler.x - initialBeta;   // 前後傾き → Y移動
+        const deltaGamma = currentRotationEuler.y - initialGamma;  // 左右傾き → X移動
 
-        const moveRight = new THREE.Vector3(1,0,0).multiplyScalar(-deltaGamma*moveScale);
-        const moveUp    = new THREE.Vector3(0,1,0).multiplyScalar(-deltaBeta*moveScale);
-
-        fixedMesh.position.copy(baselinePosition).add(moveRight).add(moveUp);
+        // 移動量（度換算 & スケール）
+        const moveY = -THREE.MathUtils.radToDeg(deltaBeta) * 0.02;   // 上に傾けると下に
+        const moveX = -THREE.MathUtils.radToDeg(deltaGamma) * 0.02;  // 左に傾けると右に
+        // YとXにのみ加算
+        fixedMesh.position.set(
+            baselinePosition.x + moveX,
+            baselinePosition.y + moveY,
+            baselinePosition.z
+        );
     }
 }
 
