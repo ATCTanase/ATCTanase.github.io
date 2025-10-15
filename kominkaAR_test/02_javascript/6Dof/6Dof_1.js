@@ -19,7 +19,7 @@ videoPlane.setAttribute("material", "src", canvas);
 // AR画像
 // -----------------------------
 const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手";
-const frameCount = 1; // 今回は1枚固定
+const frameCount = 1; // 1枚固定
 const frameExt = ".png";
 const frames = [];
 const imagePath = ARImage + frameExt;
@@ -158,30 +158,19 @@ function updateFixedMesh(){
         // 回転適用
         fixedMesh.quaternion.copy(deltaQuat);
 
-        // 疑似移動
+        // 疑似移動（前後＋左右を疑似空間で）
         const deltaEuler = new THREE.Euler().setFromQuaternion(deltaQuat, 'ZXY');
-        fixedMesh.position.set(
-            baselinePosition.x + Math.sin(deltaEuler.y) * moveScale,
-            baselinePosition.y,
-            baselinePosition.z + Math.sin(deltaEuler.x) * moveScale
-        );
+
+        const forward = new THREE.Vector3(0,0,-1).applyEuler(deltaEuler);
+        const right   = new THREE.Vector3(1,0,0).applyEuler(deltaEuler);
+
+        const moveForward = forward.multiplyScalar(Math.sin(deltaEuler.x)*moveScale);
+        const moveRight   = right.multiplyScalar(Math.sin(deltaEuler.y)*moveScale);
+
+        fixedMesh.position.copy(baselinePosition).add(moveForward).add(moveRight);
     }
 
     requestAnimationFrame(updateFixedMesh);
 }
 
 updateFixedMesh();
-
-// -----------------------------
-// マーカーON/OFF
-// -----------------------------
-let guidemarkerOnOff = false;
-function onOff(){
-    if(guidemarkerOnOff){
-        marker.removeAttribute("axes-helper");
-        guidemarkerOnOff = false;
-    } else {
-        marker.setAttribute("axes-helper","size:3");
-        guidemarkerOnOff = true;
-    }
-}
