@@ -68,6 +68,8 @@ function drawNextFrame() {
     currentFrame = (currentFrame + 1) % frameCount;
 }
 
+let followMarker = false; 
+
 function startPlayback() {
     if (!playTimer) playTimer = setInterval(drawNextFrame, 1000 / fps);
 }
@@ -78,26 +80,34 @@ function stopPlayback() {
     }
 }
 marker.addEventListener("markerFound", () => {
-    marker.object3D.updateMatrixWorld(true);
-
-    const pos = new THREE.Vector3();
-    const quat = new THREE.Quaternion();
-    marker.object3D.getWorldPosition(pos);
-    marker.object3D.getWorldQuaternion(quat);
-
-    fixedMesh.position.copy(pos);
-    fixedMesh.quaternion.copy(quat);
-
+    followMarker = true;    // 追従開始
     fixedMesh.visible = true;
+
     startPlayback();
 });
 
 
 // 🔹 マーカーを失ったとき
 marker.addEventListener("markerLost", () => {
+    followMarker = false;   // 追従終了、位置固定
 });
 
 // 🔹 フレーム読み込み開始
 preloadFrames(() => {
     console.log("アニメーション準備完了");
 });
+function updateFixedMesh() {
+    if (followMarker) {
+        // マーカーのワールド位置・回転をコピー
+        const pos = new THREE.Vector3();
+        const quat = new THREE.Quaternion();
+        marker.object3D.getWorldPosition(pos);
+        marker.object3D.getWorldQuaternion(quat);
+
+        fixedMesh.position.copy(pos);
+        fixedMesh.quaternion.copy(quat);
+    }
+
+    requestAnimationFrame(updateFixedMesh);
+}
+updateFixedMesh();
