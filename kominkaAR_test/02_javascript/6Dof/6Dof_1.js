@@ -1,84 +1,119 @@
 const videoPlane = document.getElementById("videoPlane");
 const marker     = document.getElementById("barcodeMarker");
 
-// Canvas作成（任意：使わない場合は削除OK）
+// Canvasを作成
 const canvas = document.createElement("canvas");
 canvas.width  = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 videoPlane.setAttribute("material", "src", canvas);
-
-let imageMesh = null;
 let offset;
 
-// Three.jsのシーン取得（A-Frameの中身を共有）
+const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手";
+const frameCount = 1;
+const frameExt = ".png";
+const frames = [];
+let currentFrame = 0;
+const fps = 20;
+let playTimer = null;
+
+const loadingOverlay = document.getElementById("loadingOverlay");
+const progressText   = document.getElementById("progress");
+
+// Three.js シーン取得
 const aframeScene = document.querySelector("a-scene");
 const threeScene = aframeScene.object3D;
 
-// === 画像設定 ===
-const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手.png";
+// 固定オブジェクト用の Three.js Mesh を作成
+const texture = new THREE.TextureLoader().load(`${ARImage}${frameExt}`);
+const ratio = 1; // 仮で1:1（後で画像の比率で調整）
+const geometry = new THREE.PlaneGeometry(1, ratio);
+geometry.translate(0, ratio / 2, 0); // 基準を下端中央に
+const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
+const fixedMesh = new THREE.Mesh(geometry, material);
+fixedMesh.visible = false;
+threeScene.add(fixedMesh);
 
-// === 状態管理 ===
-let objectPlaced = false; // 配置済みかどうか
-
-// --- Three.js Planeを作成 ---
-new THREE.TextureLoader().load(
-    ARImage,
-    (texture) => {
-        const ratio = texture.image.height / texture.image.width;
-        const geometry = new THREE.PlaneGeometry(1, ratio);
-        geometry.translate(0, ratio / 2, 0); // 🔸 下端を基準点に
-        const material = new THREE.MeshBasicMaterial({
-            map: texture,
-            side: THREE.DoubleSide,
-            transparent: true
-        });
-
-        imageMesh = new THREE.Mesh(geometry, material);
-        imageMesh.visible = false;
-        threeScene.add(imageMesh);
-        console.log("✅ テクスチャロード完了");
+// === アニメーション処理 ===
+function preloadFrames(callback) {
+    let loaded = 0;
+    for (let i = 1; i <= frameCount; i++) {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = `${ARImage}${frameExt}`;
+        img.onload = () => {
+            loaded++;
+            progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
+            if (loaded === frameCount) {
+                console.log("✅ 全フレームロード完了");
+                loadingOverlay.style.display = "none";
+                callback();
+                offset = img.height / img.width;
+            }
+        };
+        frames.push(img);
     }
-);
+}
 
-// --- マーカーイベント ---
+function drawNextFrame() {
+    const img = frames[currentFrame];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    const mat = videoPlane.getObject3D("mesh")?.material;
+    if (mat?.map) mat.map.needsUpdate = true;
+
+    currentFrame = (currentFrame + 1) % frameCount;
+}
+
+function startPlayback() {
+    if (!playTimer) playTimer = setInterval(drawNextFrame, 1000 / fps);
+}
+function stopPlayback() {
+    if (playTimer) {
+        clearInterval(playTimer);
+        playTimer = null;
+    }
+}
+
+// === マーカーイベント ===
 marker.addEventListener("markerFound", () => {
-    if (!imageMesh) return;
-
-    // 🔹 マーカーのワールド位置・回転・スケールを取得
-    marker.object3D.updateMatrixWorld(true);
+    // マーカーのワールド座標を取得
     const markerPos = new THREE.Vector3();
-    const markerQuat = new THREE.Quaternion();
-    const markerScale = new THREE.Vector3();
+    marker.object3D.updateMatrixWorld(true);
     marker.object3D.getWorldPosition(markerPos);
+    const markerQuat = new THREE.Quaternion();
     marker.object3D.getWorldQuaternion(markerQuat);
-    marker.object3D.getWorldScale(markerScale);
 
-    // 🔹 imageMesh が存在すれば座標更新
-    imageMesh.position.copy(markerPos);
-    imageMesh.quaternion.copy(markerQuat);
-    imageMesh.scale.copy(markerScale);
+    // ここで原点をマーカーに設定
+    const worldOrigin = new THREE.Group();
+    worldOrigin.position.copy(markerPos);
+    worldOrigin.quaternion.copy(markerQuat);
+    threeScene.add(worldOrigin);
 
-    // 🔹 基準点を下端中央に補正
-    const ratio = imageMesh.geometry.parameters.height / imageMesh.geometry.parameters.width;
-    const offset = new THREE.Vector3(0, -0.5 * ratio, 0);
-    offset.applyQuaternion(markerQuat);
-    imageMesh.position.add(offset);
+    // fixedMeshをworldOriginの子にする
+    worldOrigin.add(fixedMesh);
 
-    // 🔹 表示ON
-    imageMesh.visible = true;
+    // 下端中央オフセット
+    const ratio = fixedMesh.geometry.parameters.height / fixedMesh.geometry.parameters.width;
+    fixedMesh.position.set(0, -0.5 * ratio, 0);  // 原点からの相対座標
+    fixedMesh.quaternion.set(0, 0, 0, 1);        // 原点の回転はworldOriginで補正済み
+    fixedMesh.visible = true;
 
-    // 🔹 親から切り離して固定（これが重要！）
-    if (!objectPlaced) {
-        threeScene.attach(imageMesh); // markerから独立させる
-        objectPlaced = true;
-        console.log("📍 オブジェクト固定しました");
-    } else {
-        console.log("♻️ 既存オブジェクトを再配置しました");
-    }
+    // videoPlaneも再生開始（Canvasの更新）
+    videoPlane.setAttribute("visible", true);
+    videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
+    startPlayback();
+
+    console.log("🎯 マーカー位置に固定配置完了");
 });
 
-// 🔹 マーカー消失時（何もしない）
 marker.addEventListener("markerLost", () => {
-    // imageMesh.visible = true; // 消さない
+    // マーカーを失っても非表示にしない
+    console.log("ℹ️ マーカー見失ったがオブジェクトは保持");
+});
+
+// === フレーム読み込み開始 ===
+preloadFrames(() => {
+    console.log("アニメーション準備完了");
 });

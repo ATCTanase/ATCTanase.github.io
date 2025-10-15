@@ -129,35 +129,6 @@ function getAngle() {
   return angle;
 }
 
-const scene = document.querySelector("a-scene");
-const startBtn = document.getElementById("startARBtn");
-
-startBtn.addEventListener("click", () => {
-    const marker = document.createElement("a-marker");
-    marker.setAttribute("type", "pattern");
-    marker.setAttribute("url", "../../04_image/patt/AR1.patt");
-    marker.setAttribute("id", "barcodeMarker");
-    marker.setAttribute("size", "0.05");
-    marker.setAttribute("smooth", "true");
-    marker.setAttribute("smoothCount", "10");
-    marker.setAttribute("smoothTolerance", "0.01");
-    marker.setAttribute("smoothThreshold", "5");
-
-    const plane = document.createElement("a-plane");
-    plane.setAttribute("id", "videoPlane");
-    plane.setAttribute("position", "0 -10 0");
-    plane.setAttribute("rotation", "-90 0 0");
-    plane.setAttribute("width", "3");
-    plane.setAttribute("height", "3");
-    plane.setAttribute("visible", "false");
-    plane.setAttribute("material", "shader: flat; side: double; transparent: true; alphaTest:0.01");
-
-    marker.appendChild(plane);
-    scene.appendChild(marker);
-
-    // ボタンを非表示に
-    startBtn.style.display = "none";
-});
 // $("#changeLanguageBtn").on("click", function(){
 //   $(".langArea").toggleClass("langOpen");
 // });
