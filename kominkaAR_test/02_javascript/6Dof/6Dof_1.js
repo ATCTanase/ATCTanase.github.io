@@ -68,17 +68,18 @@ marker.addEventListener("markerLost", ()=>{
     // 固定なのでここでは何もしない
 });
 
-document.getElementById("startAR").addEventListener("click", async ()=>{
-if (navigator.xr) {
-    navigator.xr.requestSession("immersive-ar", { optionalFeatures:["local-floor","bounded-floor","hit-test"] })
-    .then((session)=>{
-        renderer.xr.enabled = true;
-        renderer.xr.setSession(session);
-        console.log("WebXR ARセッション開始");
-    })
-    .catch(err=>console.error(err));
-}
-document.getElementById("startAR").style.display = "none";
+const startBtn = document.getElementById("startAR");
+startBtn.addEventListener("click", async ()=>{
+    if (navigator.xr) {
+        navigator.xr.requestSession("immersive-ar", { optionalFeatures:["local-floor","bounded-floor","hit-test"] })
+        .then((session)=>{
+            renderer.xr.enabled = true;
+            renderer.xr.setSession(session);
+            console.log("WebXR ARセッション開始");
+        })
+        .catch(err=>console.error(err));
+    }
+    startBtn.style.display = "none";
 });
 
 // -----------------------------
