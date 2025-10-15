@@ -58,6 +58,8 @@ let followMarker = false;
 let baselinePosition = new THREE.Vector3();
 let baselineRotation = new THREE.Quaternion();
 let baselineEuler = new THREE.Euler(); // マーカー追従時の回転を固定
+let currentRotationEuler = new THREE.Euler();
+
 
 let initialBeta = 0;
 let initialGamma = 0;
