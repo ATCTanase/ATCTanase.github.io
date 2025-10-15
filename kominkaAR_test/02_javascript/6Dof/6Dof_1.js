@@ -1,12 +1,13 @@
 const videoPlane = document.getElementById("videoPlane");
 const marker     = document.getElementById("barcodeMarker");
 
-// Canvasを作成
+// Canvas作成
 const canvas = document.createElement("canvas");
 canvas.width  = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 videoPlane.setAttribute("material", "src", canvas);
+
 let offset;
 
 const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手";
@@ -20,45 +21,22 @@ let playTimer = null;
 const loadingOverlay = document.getElementById("loadingOverlay");
 const progressText   = document.getElementById("progress");
 
-// Three.js シーン取得
-const aframeScene = document.querySelector("a-scene");
-const threeScene = aframeScene.object3D;
+const scene = document.querySelector('a-scene').object3D;
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.xr.enabled = true;  // XR対応
-
-document.body.appendChild(renderer.domElement);
-
-document.querySelector("#startButton").addEventListener("click", async () => {
-    const session = await navigator.xr.requestSession('immersive-ar', {
-        requiredFeatures: ['local-floor']
-    });
-    renderer.xr.setSession(session);
-    document.getElementById("#startButton").style.display = "none";
-});
-
-
-
-// 固定オブジェクト用の Three.js Mesh を作成
-const texture = new THREE.TextureLoader().load(`${ARImage}${frameExt}`);
-const ratio = 1; // 仮で1:1（後で画像の比率で調整）
+// Three.jsオブジェクト作成（例: Planeに画像）
+const texture = new THREE.TextureLoader().load('ARImage');
+const ratio = texture.image ? texture.image.height / texture.image.width : 1;
 const geometry = new THREE.PlaneGeometry(1, ratio);
-geometry.translate(0, ratio / 2, 0); // 基準を下端中央に
+geometry.translate(0, 0.5 * ratio, 0); // 下端中央基準
 const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
 const fixedMesh = new THREE.Mesh(geometry, material);
 fixedMesh.visible = false;
-threeScene.add(fixedMesh);
-const camera = new THREE.PerspectiveCamera();
-threeScene.add(camera);
+scene.add(fixedMesh);
 
-function render() {
-    renderer.setAnimationLoop(() => {
-        renderer.render(threeScene, camera); // camera は自動で端末トラッキングに従う
-    });
-}
-render();
+// 最後にマーカーがあった座標を保持
+let lastMarkerPosition = new THREE.Vector3();
 
-// === アニメーション処理 ===
+// 🔹 全フレームロード
 function preloadFrames(callback) {
     let loaded = 0;
     for (let i = 1; i <= frameCount; i++) {
@@ -69,7 +47,6 @@ function preloadFrames(callback) {
             loaded++;
             progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
             if (loaded === frameCount) {
-                console.log("✅ 全フレームロード完了");
                 loadingOverlay.style.display = "none";
                 callback();
                 offset = img.height / img.width;
@@ -99,33 +76,27 @@ function stopPlayback() {
         playTimer = null;
     }
 }
-
-// === マーカーイベント ===
 marker.addEventListener("markerFound", () => {
+    marker.object3D.updateMatrixWorld(true);
+
     const pos = new THREE.Vector3();
     const quat = new THREE.Quaternion();
-    marker.object3D.updateMatrixWorld(true);
     marker.object3D.getWorldPosition(pos);
     marker.object3D.getWorldQuaternion(quat);
 
     fixedMesh.position.copy(pos);
     fixedMesh.quaternion.copy(quat);
 
-    const offsetVec = new THREE.Vector3(0, 0.5 * offset, 0);
-    offsetVec.applyQuaternion(quat);
-    fixedMesh.position.add(offsetVec);
-
     fixedMesh.visible = true;
-
-    console.log("🎯 マーカー位置に固定配置完了");
+    startPlayback();
 });
 
+
+// 🔹 マーカーを失ったとき
 marker.addEventListener("markerLost", () => {
-    // マーカーを失っても非表示にしない
-    console.log("ℹ️ マーカー見失ったがオブジェクトは保持");
 });
 
-// === フレーム読み込み開始 ===
+// 🔹 フレーム読み込み開始
 preloadFrames(() => {
     console.log("アニメーション準備完了");
 });
