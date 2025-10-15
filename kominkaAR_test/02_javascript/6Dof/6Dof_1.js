@@ -71,8 +71,6 @@ function drawNextFrame() {
     currentFrame = (currentFrame + 1) % frameCount;
 }
 
-let followMarker = false; 
-
 function startPlayback() {
     if (!playTimer) playTimer = setInterval(drawNextFrame, 1000 / fps);
 }
