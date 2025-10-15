@@ -19,7 +19,8 @@
     読み込み中... <span id="progress">0%</span>
   </div>
 
-  <div id="title" style="top:2px; left:2px; position:fixed; font-size: 30px;">6DOF</div>
+  <div id="title" style="top:2px; left:2px; position:fixed; font-size: 30px;">6DOF1</div>
+
   <a-scene 
     embedded 
     vr-mode-ui="enabled: false" 
@@ -39,10 +40,10 @@
     smoothThreshold="5">
       <a-plane 
         id="videoPlane" 
-        position="0 0 0.5" 
-        rotation="-90 0 -15" 
-        width="1" 
-        height="1" 
+        position="0 -1.2 -2" 
+        rotation="-90 0 0" 
+        width="8" 
+        height="8" 
         visible="false"
         material="shader: flat; side: double; transparent: true; alphaTest:0.01;">
       </a-plane>
@@ -96,20 +97,16 @@
     <button onclick="onOff()">マーカーON・OFF</button>
   </div>
 
-  <div id="RecognitionStartButton" style="position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);">
-    <button id="startARBtn">認識開始</button>
-  </div>
-
   <script src="../../02_javascript/6Dof/6Dof_1.js"></script>
   <script src="../../02_javascript/common.js"></script>
   <script src="../../02_javascript/debugModeSetting_6Dof.js"></script>
   <script>
-  // A-Frame コンポーネントを定義
-  AFRAME.registerComponent('axes-helper', {
-    schema: { size: { type: 'number', default: 1 } },
+    // A-Frame コンポーネントを定義
+    AFRAME.registerComponent('axes-helper', {
+      schema: { size: { type: 'number', default: 1 } },
       init: function () {
         this.helper = new THREE.AxesHelper(this.data.size);
-         this.el.object3D.add(this.helper);
+        this.el.object3D.add(this.helper);
       },
       remove: function () {
         if (this.helper) {
@@ -118,20 +115,21 @@
         }
       }
     });
-  let guidemarkerOnOff = false;
+  </script>
+  <script>
+    let guidemarkerOnOff = false;
 
-  function onOff(){
-    if(guidemarkerOnOff){
-      document.querySelector("#barcodeMarker").removeAttribute("axes-helper");
+    function onOff(){
+      if(guidemarkerOnOff){
+        document.querySelector("#barcodeMarker").removeAttribute("axes-helper");
 
-      guidemarkerOnOff = false;
-    }else{
-      document.querySelector("#barcodeMarker").setAttribute("axes-helper", "size: 3");
+        guidemarkerOnOff = false;
+      }else{
+        document.querySelector("#barcodeMarker").setAttribute("axes-helper", "size: 3");
 
-      guidemarkerOnOff = true;
+        guidemarkerOnOff = true;
+      }
     }
-  }
- 
   </script>
 </body>
 
