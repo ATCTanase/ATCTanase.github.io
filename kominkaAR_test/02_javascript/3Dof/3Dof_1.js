@@ -95,7 +95,10 @@ function update6DoF() {
     
     lastMarkerPos.copy(markerWorldPos);
     lastMarkerQuat.copy(quat);
-
+    
+    const videoPlaneWroldPos = new THREE.QuateVector3rnion();
+    videoPlane.object3D.getWorldPosition(videoPlaneWroldPos)
+    console.log("videoPlaneWroldPos",videoPlaneWroldPos);
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
@@ -135,6 +138,10 @@ barcodeMarker.addEventListener("markerLost", () => {
     videoGroup.object3D.position.copy(lastMarkerPos);
     videoPlane.object3D.quaternion.copy(lastMarkerQuat);
 
+    const videoPlaneWroldPos = new THREE.QuateVector3rnion();
+    videoPlane.object3D.getWorldPosition(videoPlaneWroldPos)
+    console.log("videoPlaneWroldPos",videoPlaneWroldPos);
+    
     stopPlayback();
     if (update6DoFFrameId) { 
         cancelAnimationFrame(update6DoFFrameId);
