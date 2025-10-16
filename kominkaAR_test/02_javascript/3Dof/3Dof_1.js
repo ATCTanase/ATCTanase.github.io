@@ -101,7 +101,7 @@ function update6DoF() {
 
 barcodeMarker.addEventListener("markerFound", () => {
     barcodeMarker.setAttribute("axes-helper", "size: 2");
-    barcodeMarker.object3D.set(0,0,0);
+    barcodeMarker.object3D.position.set(0,0,0);
     // look-controlsを無効化
     camera.setAttribute("look-controls", {
         enabled: false,
@@ -129,7 +129,7 @@ barcodeMarker.addEventListener("markerFound", () => {
 
 barcodeMarker.addEventListener("markerLost", () => {
 //    barcodeMarker.removeAttribute("axes-helper");
-    barcodeMarker.object3D.set(0,0,0);
+    barcodeMarker.object3D.position.set(0,0,0);
     markerVisible = false;
 
     videoGroup.object3D.position.copy(lastMarkerPos);
