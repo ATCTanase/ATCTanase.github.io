@@ -115,7 +115,10 @@ barcodeMarker.addEventListener("markerFound", () => {
     }
     
     startPlayback();
-    update6DoF();
+    
+    setTimeout(() => {
+       update6DoF();
+    }, 200);
 });
 // videoPlane.addEventListener('loaded', () => {
 //     const planeMesh = videoPlane.getObject3D("mesh");
@@ -134,9 +137,8 @@ barcodeMarker.addEventListener("markerLost", () => {
     stopPlayback();
     if (update6DoFFrameId) { 
         cancelAnimationFrame(update6DoFFrameId);
-        
+        update6DoFFrameId = null;
     }
-    update6DoFFrameId = null;
     camera.setAttribute("look-controls", {
         enabled: true,
         magicWindowTrackingEnabled: true
