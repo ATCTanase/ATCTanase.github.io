@@ -4,6 +4,7 @@ const videoGroup    = document.getElementById("videoGroup");
 const markerPos    = document.getElementById("markerPos");
 const camera        = document.querySelector("#mainCamera");
 
+
 let markerTimer = null;
 let markerVisible = false;
 
@@ -85,9 +86,9 @@ function update6DoF() {
     markerPos.object3D.getWorldQuaternion(quat);
 
     videoGroup.object3D.position.copy(markerWorldPos);  
-    videoPlane.object3D.quaternion.copy(quat);
 
     videoPlane.object3D.position.set(markerPositionX, markerPositionY, markerPositionZ);
+    videoPlane.object3D.quaternion.copy(quat);
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
