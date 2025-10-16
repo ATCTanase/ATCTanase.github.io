@@ -88,8 +88,6 @@ function update6DoF() {
     const invOriginQuat = videoPlane.getWorldQuaternion(new THREE.Quaternion()).invert();
     quat.premultiply(invOriginQuat);
     videoPlane.quaternion.copy(quat);
-
-    videoPlane.setAttribute("visible", "true");
     
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
@@ -99,7 +97,7 @@ barcodeMarker.addEventListener("markerFound", () => {
     barcodeMarker.setAttribute("smooth", "true");
     markerVisible = true;
 
-    if(!cameraFrag) {
+    if(cameraFrag) {
         videoPlane.setAttribute("visible", "true");
         cameraFrag = false;
         
