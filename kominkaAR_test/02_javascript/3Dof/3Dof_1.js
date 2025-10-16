@@ -96,7 +96,7 @@ function update6DoF() {
     lastMarkerPos.copy(markerWorldPos);
     lastMarkerQuat.copy(quat);
     
-    const videoPlaneWroldPos = new THREE.QuateVector3rnion();
+    const videoPlaneWroldPos = new THREE.Vector3();
     videoPlane.object3D.getWorldPosition(videoPlaneWroldPos)
     console.log("videoPlaneWroldPos",videoPlaneWroldPos);
     update6DoFFrameId = requestAnimationFrame(update6DoF);
@@ -141,7 +141,7 @@ barcodeMarker.addEventListener("markerLost", () => {
     const videoPlaneWroldPos = new THREE.QuateVector3rnion();
     videoPlane.object3D.getWorldPosition(videoPlaneWroldPos)
     console.log("videoPlaneWroldPos",videoPlaneWroldPos);
-    
+
     stopPlayback();
     if (update6DoFFrameId) { 
         cancelAnimationFrame(update6DoFFrameId);
