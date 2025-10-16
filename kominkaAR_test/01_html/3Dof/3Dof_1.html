@@ -53,11 +53,18 @@
                 material="shader: flat; side: double; transparent: true; alphaTest: 0.01;">
             </a-plane>
         </a-entity>
-        
+
         <a-camera 
             position="0 0 0" 
             id="mainCamera"
+            active="true"
             look-controls="enabled: false; magicWindowTrackingEnabled: false; touchEnabled: false">
+        </a-camera>   
+        <a-camera 
+            position="0 0 0" 
+            id="SubCamera"
+            active="false"
+            look-controls="enabled: true; magicWindowTrackingEnabled: true; touchEnabled: false">
         </a-camera>   
     </a-scene>
 

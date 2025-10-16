@@ -2,6 +2,7 @@ const barcodeMarker = document.getElementById("barcodeMarker");
 const videoPlane    = document.getElementById("videoPlane");
 const videoGroup    = document.getElementById("videoGroup");
 const camera        = document.querySelector("#mainCamera");
+const subCamera        = document.querySelector("#subCamera");
 
 
 let markerTimer = null;
@@ -109,12 +110,27 @@ barcodeMarker.addEventListener("markerFound", () => {
         magicWindowTrackingEnabled: false
     });
     markerVisible = true;
-
-    if(cameraFrag) {
-        videoPlane.setAttribute("visible", "true");
+    
+    if(cameraFrag)
+    {
         cameraFrag = false;
     }
-    
+    else{
+        const pos = new THREE.Vector3();
+        const quat = new THREE.Quaternion();
+
+        subCamera.object3D.updateMatrixWorld(true);
+        subCamera.object3D.getWorldPosition(pos);
+        subCamera.object3D.getWorldQuaternion(quat);
+            
+        // 切り替え後のカメラに座標と回転を適用
+        mainCamera.object3D.position.copy(pos);
+        mainCamera.object3D.quaternion.copy(quat);
+
+        mainCamera.setAttribute('camera', 'active', true);
+        subCamera.setAttribute('camera', 'active', false);
+    }
+
     startPlayback();
     
     setTimeout(() => {
@@ -130,17 +146,25 @@ barcodeMarker.addEventListener("markerFound", () => {
 
 barcodeMarker.addEventListener("markerLost", () => {
     
-    barcodeMarker.setAttribute("visible", "false");
     markerVisible = false;
     stopPlayback();
     if (update6DoFFrameId) { 
         cancelAnimationFrame(update6DoFFrameId);
         update6DoFFrameId = null;
     }
-    camera.setAttribute("look-controls", {
-        enabled: true,
-        magicWindowTrackingEnabled: true
-    });
+        const pos = new THREE.Vector3();
+    const quat = new THREE.Quaternion();
+
+    mainCamera.object3D.updateMatrixWorld(true);
+    mainCamera.object3D.getWorldPosition(pos);
+    mainCamera.object3D.getWorldQuaternion(quat);
+        
+    // 切り替え後のカメラに座標と回転を適用
+    subCamera.object3D.position.copy(pos);
+    subCamera.object3D.quaternion.copy(quat);
+
+    mainCamera.setAttribute('camera', 'active', false);
+    subCamera.setAttribute('camera', 'active', true);
 });
 
 // 🔹 まずフレームを読み込み開始
