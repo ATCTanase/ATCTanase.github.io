@@ -71,43 +71,49 @@ let markerPositionX = 0;
 let markerPositionY = -3.5;
 let markerPositionZ = 1;
 let cameraFrag = true;
+let update6DoFFrameId = null;
+let update6DoFFrameId = null;
 
 barcodeMarker.addEventListener("markerFound", () => {
-    if(!cameraFrag) return;
-
     if (!markerVisible) {
         markerVisible = true;
         videoPlane.setAttribute("visible", "true");
         startPlayback();
-        cameraFrag = false;
 
-        // カメラ視点のリセット（look-controlsを一時有効化）
-        camera.setAttribute("look-controls", {
-            enabled: true,
-            magicWindowTrackingEnabled: true
-        });
+        // 6DoF追従ループ
+        const update6DoF = () => {
+            if (!markerVisible) return; // マーカー喪失で停止
 
-        markerTimer = setTimeout(() => {
-            if (markerVisible) {
-                const markerWorldPos = new THREE.Vector3();
-                barcodeMarker.object3D.updateMatrixWorld(true);
-                barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+            // マーカーのワールド座標・回転をplaneに反映
+            const markerWorldPos = new THREE.Vector3();
+            const markerWorldQuat = new THREE.Quaternion();
+            barcodeMarker.object3D.updateMatrixWorld(true);
+            barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+            barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
 
-                const offsetPosition = markerWorldPos.clone().add(new THREE.Vector3(parseInt(markerPositionX), parseInt(markerPositionY), parseInt(markerPositionZ)));
-                videoPlane.object3D.position.copy(offsetPosition);
-                videoPlane.setAttribute("visible", "true");  // ← マーカー検出時に表示
-            }
-        }, 100);
+            videoPlane.object3D.position.copy(markerWorldPos);
+            videoPlane.object3D.quaternion.copy(markerWorldQuat);
+
+            update6DoFFrameId = requestAnimationFrame(update6DoF);
+        };
+        update6DoF();
     }
 });
 
 barcodeMarker.addEventListener("markerLost", () => {
     markerVisible = false;
-    if (markerTimer) {
-        clearTimeout(markerTimer);
-        markerTimer = null;
+    if (update6DoFFrameId) {
+        cancelAnimationFrame(update6DoFFrameId);
+        update6DoFFrameId = null;
     }
+
+    // マーカー喪失後は3DoF風に固定する場合
+    videoPlane.object3D.getWorldPosition(lastPosition);
+    videoPlane.object3D.getWorldQuaternion(lastQuaternion);
+    videoPlane.object3D.position.copy(lastPosition);
+    videoPlane.object3D.quaternion.copy(lastQuaternion);
 });
+
 
 // 🔹 まずフレームを読み込み開始
 preloadFrames(() => {
