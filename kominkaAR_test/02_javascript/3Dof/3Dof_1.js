@@ -79,23 +79,31 @@ let barcodeMarkerWorldPos = new THREE.Vector3();
 function update6DoF() {
     if (!markerVisible) return;
     const markerWorldPos = new THREE.Vector3();
+    const quat = new THREE.Quaternion();
     markerPos.object3D.updateMatrixWorld(true); // ワールド行列を更新
     markerPos.object3D.getWorldPosition(markerWorldPos);
+    marker.object3D.getWorldQuaternion(quat);
     
     videoGroup.object3D.position.copy(markerWorldPos);
+    
+    const invOriginQuat = originGroup.getWorldQuaternion(new THREE.Quaternion()).invert();
+    quat.premultiply(invOriginQuat);
+    videoPlane.quaternion.copy(quat);
+
     videoPlane.setAttribute("visible", "true");
+    
+
+
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
-    barcodeMarker.addEventListener("markerFound", () => {
-    markerPos.setAttribute("axes-helper", "size: 3");
-    barcodeMarker.setAttribute("smooth-count", 10);
-    barcodeMarker.setAttribute("smooth-tolerance", 0.01);
-    barcodeMarker.setAttribute("smooth-threshold", 5);
+barcodeMarker.addEventListener("markerFound", () => {
+    markerPos.setAttribute("axes-helper", "size: 4");
+    barcodeMarker.setAttribute("smooth", "true");
     markerVisible = true;
     
-    //barcodeMarker.object3D.updateMatrixWorld(true);
-    //barcodeMarker.object3D.getWorldPosition(barcodeMarkerWorldPos);
+    barcodeMarker.object3D.updateMatrixWorld(true);
+    barcodeMarker.object3D.getWorldPosition(barcodeMarkerWorldPos);
     
     if(!cameraFrag) {
         videoPlane.setAttribute("visible", "true");
@@ -122,10 +130,8 @@ function update6DoF() {
 barcodeMarker.addEventListener("markerLost", () => {
     markerPos.removeAttribute("axes-helper");
     markerVisible = false;
-    
-    barcodeMarker.removeAttribute("smooth-count");
-    barcodeMarker.removeAttribute("smooth-tolerance");
-    barcodeMarker.removeAttribute("smooth-threshold");
+    barcodeMarker.setAttribute("smooth", "false");
+
     stopPlayback();
     if (update6DoFFrameId) {
         cancelAnimationFrame(update6DoFFrameId);
