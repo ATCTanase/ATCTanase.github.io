@@ -71,6 +71,7 @@ let markerPositionX = 0;
 let markerPositionY = -1.2;
 let markerPositionZ = -2;
 let cameraFrag = true;
+let update6DoFFrameId = null;
 
 
 barcodeMarker.addEventListener("markerFound", () => {
@@ -88,17 +89,22 @@ barcodeMarker.addEventListener("markerFound", () => {
             magicWindowTrackingEnabled: true
         });
 
-        markerTimer = setTimeout(() => {
-            if (markerVisible) {
-                const markerWorldPos = new THREE.Vector3();
-                barcodeMarker.object3D.updateMatrixWorld(true);
-                barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+        const update6DoF = () => {
+            if (!markerVisible) return;
+            const markerWorldPos = new THREE.Vector3();
+            const markerWorldQuat = new THREE.Quaternion();
+            barcodeMarker.object3D.updateMatrixWorld(true);
+            barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+            barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
+  
+            const offsetPosition = markerWorldPos.clone().add(new THREE.Vector3(parseInt(markerPositionX), parseInt(markerPositionY), parseInt(markerPositionZ)));
+            videoPlane.object3D.position.copy(offsetPosition);
+            videoPlane.object3D.quaternion.copy(markerWorldQuat);
 
-                const offsetPosition = markerWorldPos.clone().add(new THREE.Vector3(parseInt(markerPositionX), parseInt(markerPositionY), parseInt(markerPositionZ)));
-                videoPlane.object3D.position.copy(offsetPosition);
-                videoPlane.setAttribute("visible", "true");  // ← マーカー検出時に表示
-            }
-        }, 100);
+            update6DoFFrameId = requestAnimationFrame(update6DoF);
+            videoPlane.setAttribute("visible", "true");  // ← マーカー検出時に表示
+        };
+        update6DoF();
     }
 });
 videoPlane.addEventListener('loaded', () => {
@@ -108,37 +114,11 @@ videoPlane.addEventListener('loaded', () => {
     }
 });
 
-// barcodeMarker.addEventListener("markerFound", () => {
-//     if (!markerVisible) {
-//         markerVisible = true;
-//         videoPlane.setAttribute("visible", "true");
-//         startPlayback();
-
-//         // カメラ視点のリセット（look-controlsを一時有効化）
-//         camera.setAttribute("look-controls", {
-//             enabled: true,
-//             magicWindowTrackingEnabled: true
-//         });
-
-//         markerTimer = setTimeout(() => {
-//             if (markerVisible) {
-//                 const markerWorldPos = new THREE.Vector3();
-//                 barcodeMarker.object3D.updateMatrixWorld(true);
-//                 barcodeMarker.object3D.getWorldPosition(markerWorldPos);
-
-//                 const offsetPosition = markerWorldPos.clone().add(new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ));
-//                 videoPlane.object3D.position.copy(offsetPosition);
-//                 videoPlane.setAttribute("visible", "true");  // ← マーカー検出時に表示
-//             }
-//         }, 100);
-//     }
-// });
-
 barcodeMarker.addEventListener("markerLost", () => {
     markerVisible = false;
-    if (markerTimer) {
-        clearTimeout(markerTimer);
-        markerTimer = null;
+    if (update6DoFFrameId) {
+        cancelAnimationFrame(update6DoFFrameId);
+        update6DoFFrameId = null;
     }
 });
 
