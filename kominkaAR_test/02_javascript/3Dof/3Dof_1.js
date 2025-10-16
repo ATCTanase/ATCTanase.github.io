@@ -6,7 +6,7 @@ let subCamera = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     const mainCamera = document.getElementById('mainCamera');
-    const secondaryCamera = document.getElementById('secondaryCamera');
+    const subCamera = document.getElementById('subCamera');
 });
 
 let markerTimer = null;
