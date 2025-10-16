@@ -98,7 +98,13 @@ AFRAME.registerComponent("tracking-switcher", {
     tick: function () {
         const obj = videoPlane.object3D;
         if (trackingMode === "6dof") {
-            // 何もしない（AR.jsが自動で位置を更新）
+                const pos = new THREE.Vector3();
+                const quat = new THREE.Quaternion();
+                marker.object3D.getWorldPosition(pos);
+                marker.object3D.getWorldQuaternion(quat);
+
+                fixedMesh.position.copy(pos);
+                fixedMesh.quaternion.copy(quat);
         } else if (trackingMode === "3dof") {
             // 位置は固定（マーカーが最後にあった場所）
             obj.position.copy(lastPosition);
