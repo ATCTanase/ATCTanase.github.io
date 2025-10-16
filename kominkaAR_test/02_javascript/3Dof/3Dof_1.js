@@ -80,9 +80,6 @@ function update6DoF() {
     if (!markerVisible) return;
     const markerWorldPos = new THREE.Vector3();
     const quat = new THREE.Quaternion();
-    barcodeMarker.object3D.updateMatrixWorld(true); // ワールド行列を更新
-    barcodeMarker.object3D.getWorldPosition(barcodeMarkerWorldPos);
-    
     markerPos.object3D.updateMatrixWorld(true); // ワールド行列を更新
     markerPos.object3D.getWorldPosition(markerWorldPos);
     markerPos.object3D.getWorldQuaternion(quat);
@@ -94,11 +91,9 @@ function update6DoF() {
 };
 
 barcodeMarker.addEventListener("markerFound", () => {
-    barcodeMarker.setAttribute("axes-helper", "size: 1");
-    barcodeMarker.setAttribute("smooth", "true");
     markerPos.setAttribute("axes-helper", "size: 2");
     
-    // カメラ視点のリセット（look-controlsを無効化）
+    // look-controlsを無効化
     camera.setAttribute("look-controls", {
         enabled: false,
         magicWindowTrackingEnabled: false
@@ -107,10 +102,8 @@ barcodeMarker.addEventListener("markerFound", () => {
 
     if(cameraFrag) {
         videoPlane.setAttribute("visible", "true");
-        cameraFrag = false;
-        
+        cameraFrag = false;        
         videoPlane.object3D.position.set(markerPositionX, markerPositionY, markerPositionZ);
- 
     }
     
     startPlayback();
@@ -124,8 +117,6 @@ barcodeMarker.addEventListener("markerFound", () => {
 // });
 
 barcodeMarker.addEventListener("markerLost", () => {
-    barcodeMarker.removeAttribute("axes-helper");
-    barcodeMarker.setAttribute("smooth", "false");
     markerPos.removeAttribute("axes-helper");
     markerVisible = false;
 
@@ -133,14 +124,11 @@ barcodeMarker.addEventListener("markerLost", () => {
     if (update6DoFFrameId) { 
         cancelAnimationFrame(update6DoFFrameId);
 
-        // カメラ視点のリセット（look-controlsを一時有効化）
+        //look-controlsを有効化
         camera.setAttribute("look-controls", {
             enabled: true,
             magicWindowTrackingEnabled: true
         });
-        
-        videoGroup.object3D.position.copy(barcodeMarkerWorldPos);
-
         update6DoFFrameId = null;
     }
 });
