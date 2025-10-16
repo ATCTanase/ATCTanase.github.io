@@ -86,7 +86,8 @@ function update6DoF() {
 
     videoGroup.object3D.position.copy(markerWorldPos);  
     videoPlane.object3D.quaternion.copy(quat);
-    
+
+    videoPlane.object3D.position.set(markerPositionX, markerPositionY, markerPositionZ);
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
@@ -102,8 +103,7 @@ barcodeMarker.addEventListener("markerFound", () => {
 
     if(cameraFrag) {
         videoPlane.setAttribute("visible", "true");
-        cameraFrag = false;        
-        videoPlane.object3D.position.set(markerPositionX, markerPositionY, markerPositionZ);
+        cameraFrag = false;
     }
     
     startPlayback();
