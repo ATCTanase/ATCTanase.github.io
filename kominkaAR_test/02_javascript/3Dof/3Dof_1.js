@@ -77,8 +77,8 @@ let update6DoFFrameId = null;
 
 barcodeMarker.addEventListener("markerFound", () => {
     markerPos.setAttribute("axes-helper", "size: 3");
+    markerVisible = true;
     if(!cameraFrag && !markerVisible) {
-        markerVisible = true;
         videoPlane.setAttribute("visible", "true");
         startPlayback();
         cameraFrag = false;
