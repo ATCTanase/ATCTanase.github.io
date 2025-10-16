@@ -76,9 +76,8 @@ let cameraFrag = true;
 let update6DoFFrameId = null;
 
 barcodeMarker.addEventListener("markerFound", () => {
-    if(!cameraFrag) return;
     markerPos.setAttribute("axes-helper", "size: 3");
-    if (!markerVisible) {
+    if(!cameraFrag && !markerVisible) {
         markerVisible = true;
         videoPlane.setAttribute("visible", "true");
         startPlayback();
@@ -109,8 +108,8 @@ barcodeMarker.addEventListener("markerFound", () => {
             update6DoFFrameId = requestAnimationFrame(update6DoF);
             videoPlane.setAttribute("visible", "true");  // ← マーカー検出時に表示
         };
-        update6DoF();
     }
+    update6DoF();
 });
 // videoPlane.addEventListener('loaded', () => {
 //     const planeMesh = videoPlane.getObject3D("mesh");
