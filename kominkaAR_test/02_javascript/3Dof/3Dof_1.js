@@ -1,7 +1,6 @@
 const barcodeMarker = document.getElementById("barcodeMarker");
 const videoPlane    = document.getElementById("videoPlane");
 const videoGroup    = document.getElementById("videoGroup");
-const markerPos    = document.getElementById("markerPos");
 const camera        = document.querySelector("#mainCamera");
 
 let markerTimer = null;
@@ -80,9 +79,9 @@ function update6DoF() {
     if (!markerVisible) return;
     const markerWorldPos = new THREE.Vector3();
     const quat = new THREE.Quaternion();
-    markerPos.object3D.updateMatrixWorld(true); // ワールド行列を更新
-    markerPos.object3D.getWorldPosition(markerWorldPos);
-    marker.object3D.getWorldQuaternion(quat);
+    barcodeMarker.object3D.updateMatrixWorld(true); // ワールド行列を更新
+    barcodeMarker.object3D.getWorldPosition(barcodeMarkerWorldPos);
+    barcodeMarker.object3D.getWorldQuaternion(quat);
     
     videoGroup.object3D.position.copy(markerWorldPos);
     
@@ -98,13 +97,10 @@ function update6DoF() {
 };
 
 barcodeMarker.addEventListener("markerFound", () => {
-    markerPos.setAttribute("axes-helper", "size: 4");
+    barcodeMarker.setAttribute("axes-helper", "size: 4");
     barcodeMarker.setAttribute("smooth", "true");
     markerVisible = true;
-    
-    barcodeMarker.object3D.updateMatrixWorld(true);
-    barcodeMarker.object3D.getWorldPosition(barcodeMarkerWorldPos);
-    
+        
     if(!cameraFrag) {
         videoPlane.setAttribute("visible", "true");
         cameraFrag = false;
@@ -128,7 +124,7 @@ barcodeMarker.addEventListener("markerFound", () => {
 // });
 
 barcodeMarker.addEventListener("markerLost", () => {
-    markerPos.removeAttribute("axes-helper");
+    barcodeMarker.removeAttribute("axes-helper");
     markerVisible = false;
     barcodeMarker.setAttribute("smooth", "false");
 
