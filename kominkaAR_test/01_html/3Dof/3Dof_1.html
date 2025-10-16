@@ -41,18 +41,19 @@
         smoothCount="10"
         smoothTolerance="0.01"
         smoothThreshold="5">
+        <a-entity id="markerPos" ></a-entity>
         </a-marker>   
-            <a-entity id="videoGroup" >
-                <a-plane 
-                    id="videoPlane" 
-                    position="0 0 0" 
-                    rotation="0 0 0" 
-                    width="1" 
-                    height="1" 
-                    visible="false"
-                    material="shader: flat; side: double; transparent: true; alphaTest: 0.01;">
-                </a-plane>
-            </a-entity>
+        <a-entity id="videoGroup" >
+           <a-plane 
+                id="videoPlane" 
+                position="0 0 0" 
+                rotation="0 0 0" 
+                width="1" 
+                height="1" 
+                visible="false"
+                material="shader: flat; side: double; transparent: true; alphaTest: 0.01;">
+            </a-plane>
+        </a-entity>
         <a-camera 
             position="0 0 0" 
             id="mainCamera"

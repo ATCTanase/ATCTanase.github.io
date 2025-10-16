@@ -1,6 +1,7 @@
 const barcodeMarker = document.getElementById("barcodeMarker");
 const videoPlane    = document.getElementById("videoPlane");
-const videoGroup = document.getElementById("videoGroup");
+const videoGroup    = document.getElementById("videoGroup");
+const markerPos    = document.getElementById("markerPos");
 const camera        = document.querySelector("#mainCamera");
 
 let markerTimer = null;
@@ -95,8 +96,9 @@ barcodeMarker.addEventListener("markerFound", () => {
             const markerWorldPos = new THREE.Vector3();
             const markerWorldQuat = new THREE.Quaternion();
             barcodeMarker.object3D.updateMatrixWorld(true);
-            barcodeMarker.object3D.getWorldPosition(markerWorldPos);
-            barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
+            markerPos.object3D.updateMatrixWorld(true); // ワールド行列を更新
+            markerPos.object3D.getWorldPosition(markerWorldPos);
+            markerPos.object3D.getWorldQuaternion(markerWorldQuat);
             
             videoGroup.object3D.position.copy(markerWorldPos);
             videoGroup.object3D.quaternion.copy(markerWorldQuat);
