@@ -57,6 +57,8 @@ let baselineRotation = new THREE.Quaternion();
 let baselineEuler = new THREE.Euler('ZXY');
 let currentEuler = new THREE.Euler('ZXY');
 
+let lastPosition = new THREE.Vector3();
+
 let initialBeta  = 0;
 let initialGamma = 0;
 const moveScale = 1;
@@ -107,6 +109,7 @@ function updateFixedMesh(){
         const invOriginQuat = originGroup.getWorldQuaternion(new THREE.Quaternion()).invert();
         quat.premultiply(invOriginQuat);
 
+        lastPosition = pos;
         fixedMesh.position.copy(pos);
         fixedMesh.quaternion.copy(quat);
     } else {
@@ -131,7 +134,7 @@ function updateFixedMesh(){
             "deltaGamma:", THREE.MathUtils.radToDeg(deltaGamma).toFixed(2));
         console.log("cameraRight:", cameraRight);
 
-
+        fixedMesh.position.copy(lastPosition);
         fixedMesh.position.addScaledVector(cameraRight, moveAmount);
     }
 }
