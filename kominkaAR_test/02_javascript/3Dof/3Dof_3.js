@@ -90,11 +90,15 @@ barcodeMarker.addEventListener("markerFound", () => {
             barcodeMarker.object3D.updateMatrixWorld(true);
             barcodeMarker.object3D.getWorldPosition(markerWorldPos);
             barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
-
-            videoPlane.object3D.position.copy(markerWorldPos);
+            
+            const offsetPosition = markerWorldPos.clone().add(new THREE.Vector3(parseInt(markerPositionX), parseInt(markerPositionY), parseInt(markerPositionZ)));
+       
+            videoPlane.object3D.position.copy(offsetPosition);
             videoPlane.object3D.quaternion.copy(markerWorldQuat);
 
             update6DoFFrameId = requestAnimationFrame(update6DoF);
+            videoPlane.setAttribute("visible", "true");  // ← マーカー検出時に表示
+       
         };
         update6DoF();
     }
@@ -106,10 +110,6 @@ barcodeMarker.addEventListener("markerLost", () => {
         cancelAnimationFrame(update6DoFFrameId);
         update6DoFFrameId = null;
     }
-
-    // マーカー喪失後は3DoF風に固定する場合
-       const offsetPosition = markerWorldPos.clone().add(new THREE.Vector3(parseInt(markerPositionX), parseInt(markerPositionY), parseInt(markerPositionZ)));
-       videoPlane.object3D.position.copy(offsetPosition);
 });
 
 
