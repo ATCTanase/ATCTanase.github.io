@@ -74,19 +74,15 @@ let markerPositionY = -1.2;
 let markerPositionZ = -2;
 let cameraFrag = true;
 let update6DoFFrameId = null;
-let barcodeMarkerWorldPos = null;
-let barcodeMarkerWorldQuat = null;
+let barcodeMarkerWorldPos = new THREE.Vector3();
+
 function update6DoF() {
     if (!markerVisible) return;
     const markerWorldPos = new THREE.Vector3();
-    const markerWorldQuat = new THREE.Quaternion();
     barcodeMarker.object3D.updateMatrixWorld(true);
     barcodeMarker.object3D.getWorldPosition(barcodeMarkerWorldPos);
-    barcodeMarker.object3D.getWorldQuaternion(barcodeMarkerWorldQuat);
-    markerPos.object3D.updateMatrixWorld(true); // ワールド行列を更新
     markerPos.object3D.updateMatrixWorld(true); // ワールド行列を更新
     markerPos.object3D.getWorldPosition(markerWorldPos);
-    markerPos.object3D.getWorldQuaternion(markerWorldQuat);
     
     videoGroup.object3D.position.copy(markerWorldPos);
 
