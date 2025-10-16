@@ -78,7 +78,6 @@ let update6DoFFrameId = null;
 let lastMarkerPos = new THREE.Vector3();
 let lastMarkerQuat = new THREE.Quaternion();
 
-let is6DoF = false;
 
 function update6DoF() {
     if (!markerVisible) return;
@@ -102,18 +101,24 @@ function update6DoF() {
 
 barcodeMarker.addEventListener("markerFound", () => {
     barcodeMarker.setAttribute("axes-helper", "size: 2");
-    
-    // 6DoFに切り替え
-    if (!is6DoF) {
-        scene.appendChild(videoGroup); // シーン直下に戻す
-        barcodeMarker.appendChild(videoGroup); // マーカーに追従
-        is6DoF = true;
-    }
+    barcodeMarker.object3D.set(0,0,0);
+    // look-controlsを無効化
+    camera.setAttribute("look-controls", {
+        enabled: false,
+        magicWindowTrackingEnabled: false
+    });
+    markerVisible = true;
 
-    videoPlane.setAttribute("visible", "true");
+    if(cameraFrag) {
+        videoPlane.setAttribute("visible", "true");
+        cameraFrag = false;
+    }
     
     startPlayback();
     
+    setTimeout(() => {
+       update6DoF();
+    }, 200);
 });
 // videoPlane.addEventListener('loaded', () => {
 //     const planeMesh = videoPlane.getObject3D("mesh");
@@ -124,24 +129,21 @@ barcodeMarker.addEventListener("markerFound", () => {
 
 barcodeMarker.addEventListener("markerLost", () => {
 //    barcodeMarker.removeAttribute("axes-helper");
+    barcodeMarker.object3D.set(0,0,0);
     markerVisible = false;
 
+    videoGroup.object3D.position.copy(lastMarkerPos);
+    videoPlane.object3D.quaternion.copy(lastMarkerQuat);
+
     stopPlayback();
-
-    // 3DoFに切り替え
-    if (is6DoF) {
-        // 現在のワールド座標を取得
-        const worldPos = new THREE.Vector3();
-        const worldQuat = new THREE.Quaternion();
-        videoGroup.object3D.getWorldPosition(worldPos);
-        videoGroup.object3D.getWorldQuaternion(worldQuat);
-
-        scene.appendChild(videoGroup); // シーン直下に戻す
-        videoGroup.object3D.position.copy(worldPos);
-        videoGroup.object3D.quaternion.copy(worldQuat);
-
-        is6DoF = false;
+    if (update6DoFFrameId) { 
+        cancelAnimationFrame(update6DoFFrameId);
+        update6DoFFrameId = null;
     }
+    camera.setAttribute("look-controls", {
+        enabled: true,
+        magicWindowTrackingEnabled: true
+    });
 });
 
 // 🔹 まずフレームを読み込み開始
