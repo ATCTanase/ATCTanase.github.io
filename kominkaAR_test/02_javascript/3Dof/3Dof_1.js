@@ -1,9 +1,13 @@
 const barcodeMarker = document.getElementById("barcodeMarker");
 const videoPlane    = document.getElementById("videoPlane");
 const videoGroup    = document.getElementById("videoGroup");
-const camera        = document.querySelector("#mainCamera");
-const subCamera        = document.querySelector("#subCamera");
+let camera  = null;
+let subCamera = null;
 
+document.addEventListener('DOMContentLoaded', () => {
+    const mainCamera = document.getElementById('mainCamera');
+    const secondaryCamera = document.getElementById('secondaryCamera');
+});
 
 let markerTimer = null;
 let markerVisible = false;
@@ -104,11 +108,6 @@ barcodeMarker.addEventListener("markerFound", () => {
     barcodeMarker.setAttribute("axes-helper", "size: 2");
     barcodeMarker.setAttribute("visible", "true"); // visible を true に設定
     barcodeMarker.setAttribute("position", "0 0 0");
-    // look-controlsを無効化
-    camera.setAttribute("look-controls", {
-        enabled: false,
-        magicWindowTrackingEnabled: false
-    });
     markerVisible = true;
     
     if(cameraFrag)
