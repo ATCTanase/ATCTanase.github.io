@@ -90,7 +90,6 @@ function update6DoF() {
     videoPlane.object3D.position.set(markerPositionX, markerPositionY, markerPositionZ);
 
     update6DoFFrameId = requestAnimationFrame(update6DoF);
-    videoPlane.setAttribute("visible", "true");  // ← マーカー検出時に表示
 };
 
 barcodeMarker.addEventListener("markerFound", () => {
