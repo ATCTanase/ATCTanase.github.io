@@ -85,14 +85,12 @@ function update6DoF() {
     
     videoGroup.object3D.position.copy(markerWorldPos);
     
-    const invOriginQuat = originGroup.getWorldQuaternion(new THREE.Quaternion()).invert();
+    const invOriginQuat = videoPlane.getWorldQuaternion(new THREE.Quaternion()).invert();
     quat.premultiply(invOriginQuat);
     videoPlane.quaternion.copy(quat);
 
     videoPlane.setAttribute("visible", "true");
     
-
-
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
@@ -100,7 +98,7 @@ barcodeMarker.addEventListener("markerFound", () => {
     barcodeMarker.setAttribute("axes-helper", "size: 4");
     barcodeMarker.setAttribute("smooth", "true");
     markerVisible = true;
-        
+
     if(!cameraFrag) {
         videoPlane.setAttribute("visible", "true");
         cameraFrag = false;
