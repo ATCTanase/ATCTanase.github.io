@@ -79,26 +79,25 @@ let barcodeMarkerWorldPos = new THREE.Vector3();
 function update6DoF() {
     if (!markerVisible) return;
     const markerWorldPos = new THREE.Vector3();
-    barcodeMarker.object3D.updateMatrixWorld(true);
-    barcodeMarker.object3D.getWorldPosition(barcodeMarkerWorldPos);
     markerPos.object3D.updateMatrixWorld(true); // ワールド行列を更新
     markerPos.object3D.getWorldPosition(markerWorldPos);
     
     videoGroup.object3D.position.copy(markerWorldPos);
-
-
     videoPlane.setAttribute("visible", "true");
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
-barcodeMarker.addEventListener("markerFound", () => {
+    barcodeMarker.addEventListener("markerFound", () => {
     markerPos.setAttribute("axes-helper", "size: 3");
     markerVisible = true;
+    
+    barcodeMarker.object3D.updateMatrixWorld(true);
+    barcodeMarker.object3D.getWorldPosition(barcodeMarkerWorldPos);
+    
     if(!cameraFrag) {
         videoPlane.setAttribute("visible", "true");
         cameraFrag = false;
         
-        // グループのローカル座標でオフセットを反映
         videoPlane.object3D.position.set(markerPositionX, markerPositionY, markerPositionZ);
         // カメラ視点のリセット（look-controlsを一時有効化）
         camera.setAttribute("look-controls", {
