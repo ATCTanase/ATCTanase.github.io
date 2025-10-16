@@ -81,23 +81,19 @@ let lastMarkerQuat = new THREE.Quaternion();
 
 function update6DoF() {
     if (!markerVisible) return;
-    const markerWorldPos = new THREE.Vector3();
-    const quat = new THREE.Quaternion();
-    
-    const markerObj = barcodeMarker.object3D;
-    markerObj.updateMatrixWorld(true);
-    tempMatrix.multiplyMatrices(markerObj.matrixWorld, camera.object3D.matrixWorld);
+    barcodeMarker.object3D.updateMatrixWorld(true);
+    barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+    barcodeMarker.object3D.getWorldQuaternion(quat);
 
-    markerObj.getWorldPosition(markerWorldPos);
-    markerObj.getWorldQuaternion(quat);
-    
-    lastMarkerPos.copy(markerWorldPos);
-    lastMarkerQuat.copy(quat);
-
+    // videoGroup を追従させる
     videoGroup.object3D.position.copy(markerWorldPos);  
 
     videoPlane.object3D.position.set(markerPositionX, markerPositionY, markerPositionZ);
     videoPlane.object3D.quaternion.copy(quat);
+    
+    lastMarkerPos.copy(markerWorldPos);
+    lastMarkerQuat.copy(quat);
+    
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
