@@ -81,6 +81,8 @@ let lastMarkerQuat = new THREE.Quaternion();
 
 function update6DoF() {
     if (!markerVisible) return;
+    const markerWorldPos = new THREE.Vector3();
+    const quat = new THREE.Quaternion();
     barcodeMarker.object3D.updateMatrixWorld(true);
     barcodeMarker.object3D.getWorldPosition(markerWorldPos);
     barcodeMarker.object3D.getWorldQuaternion(quat);
@@ -93,7 +95,7 @@ function update6DoF() {
     
     lastMarkerPos.copy(markerWorldPos);
     lastMarkerQuat.copy(quat);
-    
+
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
