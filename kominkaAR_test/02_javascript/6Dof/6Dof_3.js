@@ -95,14 +95,11 @@ marker.addEventListener("markerLost", () => {
     scene.object3D.add(videoPlane.object3D);
     videoPlane.object3D.position.copy(lastPosition);
     videoPlane.object3D.quaternion.copy(lastQuaternion);
-
-    // 3DoF更新ループ
-    const camera = document.querySelector("[camera]").object3D;
+    // 3DoF更新ループ（位置固定・回転は任意で微調整）
     const update3DoF = () => {
-        // マーカーが再認識されたら停止
         if(marker.object3D.children.includes(videoPlane.object3D)) return;
-
-        videoPlane.object3D.quaternion.copy(camera.quaternion);
+        // 回転も固定したい場合はコメントアウト
+        // videoPlane.object3D.quaternion.copy(lastQuaternion);
         update3DoFFrameId = requestAnimationFrame(update3DoF);
     };
     update3DoF();
