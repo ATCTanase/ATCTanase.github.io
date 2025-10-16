@@ -89,7 +89,7 @@ function update6DoF() {
     markerPos.object3D.getWorldQuaternion(markerWorldQuat);
     
     videoGroup.object3D.position.copy(markerWorldPos);
-    videoGroup.object3D.quaternion.copy(markerWorldQuat);
+
 
     videoPlane.setAttribute("visible", "true");
     update6DoFFrameId = requestAnimationFrame(update6DoF);
@@ -129,7 +129,6 @@ barcodeMarker.addEventListener("markerLost", () => {
     if (update6DoFFrameId) {
         
         videoGroup.object3D.position.copy(barcodeMarkerWorldPos);
-        videoGroup.object3D.quaternion.copy(barcodeMarkerWorldQuat);
         cancelAnimationFrame(update6DoFFrameId);
         update6DoFFrameId = null;
     }
