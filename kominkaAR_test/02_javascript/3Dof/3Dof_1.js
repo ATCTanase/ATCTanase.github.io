@@ -87,19 +87,22 @@ function update6DoF() {
     markerPos.object3D.getWorldPosition(markerWorldPos);
     markerPos.object3D.getWorldQuaternion(quat);
 
-    videoGroup.object3D.position.copy(markerWorldPos);
-    
-    const invOriginQuat = videoPlane.getWorldQuaternion(new THREE.Quaternion()).invert();
-    quat.premultiply(invOriginQuat);
-    videoPlane.quaternion.copy(quat);
+    videoGroup.object3D.position.copy(markerWorldPos);  
+    videoPlane.object3D.quaternion.copy(quat);
     
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
 barcodeMarker.addEventListener("markerFound", () => {
-    barcodeMarker.setAttribute("axes-helper", "size: 4");
+    barcodeMarker.setAttribute("axes-helper", "size: 1");
     barcodeMarker.setAttribute("smooth", "true");
+    markerPos.setAttribute("axes-helper", "size: 2");
     
+    // カメラ視点のリセット（look-controlsを無効化）
+    camera.setAttribute("look-controls", {
+        enabled: false,
+        magicWindowTrackingEnabled: false
+    });
     markerVisible = true;
 
     if(cameraFrag) {
@@ -107,11 +110,7 @@ barcodeMarker.addEventListener("markerFound", () => {
         cameraFrag = false;
         
         videoPlane.object3D.position.set(markerPositionX, markerPositionY, markerPositionZ);
-        // カメラ視点のリセット（look-controlsを一時有効化）
-        camera.setAttribute("look-controls", {
-            enabled: true,
-            magicWindowTrackingEnabled: true
-        });
+ 
     }
     
     startPlayback();
@@ -126,14 +125,15 @@ barcodeMarker.addEventListener("markerFound", () => {
 
 barcodeMarker.addEventListener("markerLost", () => {
     barcodeMarker.removeAttribute("axes-helper");
-    markerVisible = false;
     barcodeMarker.setAttribute("smooth", "false");
+    markerPos.removeAttribute("axes-helper");
+    markerVisible = false;
 
     stopPlayback();
     if (update6DoFFrameId) { 
         cancelAnimationFrame(update6DoFFrameId);
 
-                // カメラ視点のリセット（look-controlsを一時有効化）
+        // カメラ視点のリセット（look-controlsを一時有効化）
         camera.setAttribute("look-controls", {
             enabled: true,
             magicWindowTrackingEnabled: true
