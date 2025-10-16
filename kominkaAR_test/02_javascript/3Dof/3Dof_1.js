@@ -89,10 +89,13 @@ function update6DoF() {
 
     barcodeMarker.addEventListener("markerFound", () => {
     markerPos.setAttribute("axes-helper", "size: 3");
+    barcodeMarker.setAttribute("smooth-count", 10);
+    barcodeMarker.setAttribute("smooth-tolerance", 0.01);
+    barcodeMarker.setAttribute("smooth-threshold", 5);
     markerVisible = true;
     
-    barcodeMarker.object3D.updateMatrixWorld(true);
-    barcodeMarker.object3D.getWorldPosition(barcodeMarkerWorldPos);
+    //barcodeMarker.object3D.updateMatrixWorld(true);
+    //barcodeMarker.object3D.getWorldPosition(barcodeMarkerWorldPos);
     
     if(!cameraFrag) {
         videoPlane.setAttribute("visible", "true");
@@ -120,10 +123,11 @@ barcodeMarker.addEventListener("markerLost", () => {
     markerPos.removeAttribute("axes-helper");
     markerVisible = false;
     
+    barcodeMarker.removeAttribute("smooth-count");
+    barcodeMarker.removeAttribute("smooth-tolerance");
+    barcodeMarker.removeAttribute("smooth-threshold");
     stopPlayback();
     if (update6DoFFrameId) {
-        
-        videoGroup.object3D.position.copy(barcodeMarkerWorldPos);
         cancelAnimationFrame(update6DoFFrameId);
         update6DoFFrameId = null;
     }
