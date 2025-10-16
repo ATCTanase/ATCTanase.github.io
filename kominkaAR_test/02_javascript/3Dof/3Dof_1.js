@@ -137,10 +137,10 @@ barcodeMarker.addEventListener("markerLost", () => {
         
     }
     update6DoFFrameId = null;
-    
-    setTimeout(() => {
-        camera.setAttribute("look-controls", { enabled: true });
-    }, 200);
+    camera.setAttribute("look-controls", {
+        enabled: true,
+        magicWindowTrackingEnabled: true
+    });
 });
 
 // 🔹 まずフレームを読み込み開始
