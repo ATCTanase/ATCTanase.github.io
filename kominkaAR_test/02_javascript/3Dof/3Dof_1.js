@@ -1,5 +1,6 @@
 const barcodeMarker = document.getElementById("barcodeMarker");
 const videoPlane    = document.getElementById("videoPlane");
+const videoGroup = document.getElementById("videoGroup");
 const camera        = document.querySelector("#mainCamera");
 
 let markerTimer = null;
@@ -98,8 +99,12 @@ barcodeMarker.addEventListener("markerFound", () => {
             barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
   
             const offsetPosition = markerWorldPos.clone().add(new THREE.Vector3(parseInt(markerPositionX), parseInt(markerPositionY), parseInt(markerPositionZ)));
-            videoPlane.object3D.position.copy(offsetPosition);
-            videoPlane.object3D.quaternion.copy(markerWorldQuat);
+            videoGroup.object3D.position.copy(offsetPosition);
+            videoGroup.object3D.quaternion.copy(markerWorldQuat);
+
+             // グループのローカル座標でオフセットを反映
+            videoPlane.object3D.position.set(markerPositionX, markerPositionY, markerPositionZ);
+
 
             update6DoFFrameId = requestAnimationFrame(update6DoF);
             videoPlane.setAttribute("visible", "true");  // ← マーカー検出時に表示

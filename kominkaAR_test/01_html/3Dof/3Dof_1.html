@@ -41,17 +41,18 @@
         smoothCount="10"
         smoothTolerance="0.01"
         smoothThreshold="5">
-        </a-marker>
-        <a-plane 
-            id="videoPlane" 
-            position="0 0 0" 
-            rotation="0 0 0" 
-            width="1" 
-            height="1" 
-            visible="false"
-            material="shader: flat; side: double; transparent: true; alphaTest: 0.01;">
-        </a-plane>
-
+        </a-marker>   
+            <a-entity id="videoGroup" >
+                <a-plane 
+                    id="videoPlane" 
+                    position="0 0 0" 
+                    rotation="0 0 0" 
+                    width="1" 
+                    height="1" 
+                    visible="false"
+                    material="shader: flat; side: double; transparent: true; alphaTest: 0.01;">
+                </a-plane>
+            </a-entity>
         <a-camera 
             position="0 0 0" 
             id="mainCamera"
@@ -132,11 +133,14 @@
 
         function onOff(){
             if(guidemarkerOnOff){
+                document.querySelector("#videoGroup").removeAttribute("axes-helper");
+
                 document.querySelector("#videoPlane").removeAttribute("axes-helper");
 
                 guidemarkerOnOff = false;
             }else{
                 document.querySelector("#videoPlane").setAttribute("axes-helper", "size: 3");
+                document.querySelector("#videoGroup").setAttribute("axes-helper", "size: 3");
 
                 guidemarkerOnOff = true;
             }
