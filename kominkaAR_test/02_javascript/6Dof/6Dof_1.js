@@ -32,7 +32,9 @@ const material = new THREE.MeshBasicMaterial({ map: texture, transparent:true, s
 // -----------------------------
 // A-Frameシーン & originGroup
 // -----------------------------
-const scene = document.querySelector('a-scene').object3D;
+const sceneEl = document.querySelector('a-scene');
+const camera = sceneEl.camera;
+const scene = sceneEl.object3D;
 const originGroup = new THREE.Group();
 scene.add(originGroup);
 
@@ -109,21 +111,21 @@ function updateFixedMesh(){
         const deltaBeta  = currentEuler.x - initialBeta;   // 前後傾き → Y移動
         const deltaGamma = currentEuler.y - initialGamma;  // 左右傾き → X移動
 
-        // 移動量（度換算 & スケール）
-        const moveY = -THREE.MathUtils.radToDeg(deltaBeta) * moveScale;   // 上に傾けると下に
-        const moveX = -THREE.MathUtils.radToDeg(deltaGamma) * moveScale;
+        const moveAmount = -deltaGamma * moveScale * 0.1;
+        
+        // カメラから見た各方向ベクトルを取得
+        const cameraRight = new THREE.Vector3();   // 右方向 (+X)
+        const cameraUp = new THREE.Vector3();      // 上方向 (+Y)
+        const cameraForward = new THREE.Vector3(); // 前方向 (-Z)
+        camera.matrix.extractBasis(cameraRight, cameraUp, cameraForward);
+        cameraForward.negate(); // 前方向は -Z
 
         console.log("deltaBeta:", THREE.MathUtils.radToDeg(deltaBeta).toFixed(2),
             "deltaGamma:", THREE.MathUtils.radToDeg(deltaGamma).toFixed(2));
-        console.log("moveX:", moveX,
-            "moveY:", moveY);
+        console.log("cameraRight:", cameraRight);
 
-        // YとXにのみ加算
-        fixedMesh.position.set(
-            baselinePosition.x + moveX,
-            baselinePosition.y + moveY,
-            baselinePosition.z
-);
+
+        fixedMesh.position.addScaledVector(cameraRight, moveAmount);
     }
 }
 
