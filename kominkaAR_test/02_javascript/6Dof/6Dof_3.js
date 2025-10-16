@@ -20,6 +20,13 @@ let playTimer = null;
 const loadingOverlay = document.getElementById("loadingOverlay");
 const progressText   = document.getElementById("progress");
 
+let trackingMode = "6dof";
+let lastKnownPosition = new THREE.Vector3();
+let lastKnownQuaternion = new THREE.Quaternion();
+
+// DeviceOrientationデータ
+let alpha = 0, beta = 0, gamma = 0;
+
 // 🔹 全フレームをロード
 function preloadFrames(callback) {
     let loaded = 0;
@@ -66,13 +73,41 @@ function stopPlayback() {
 
 // マーカーイベント
 marker.addEventListener("markerFound", () => {
+    trackingMode = "6dof";
     videoPlane.setAttribute("visible", true);
     videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
     startPlayback();
 });
 marker.addEventListener("markerLost", () => {
-    videoPlane.setAttribute("visible", false);
+    
+    trackingMode = "3dof";
+    const obj = videoPlane.object3D;
+    lastPosition.copy(obj.position);
+    lastQuaternion.copy(obj.quaternion);
     stopPlayback();
+});
+let deviceEuler = new THREE.Euler(0, 0, 0, "YXZ");
+
+window.addEventListener("deviceorientation", (event) => {
+    const alpha = THREE.MathUtils.degToRad(event.alpha || 0); // Yaw
+    const beta  = THREE.MathUtils.degToRad(event.beta  || 0); // Pitch
+    const gamma = THREE.MathUtils.degToRad(event.gamma || 0); // Roll
+    deviceEuler.set(beta, alpha, -gamma);
+});
+AFRAME.registerComponent("tracking-switcher", {
+    tick: function () {
+        const obj = videoPlane.object3D;
+        if (trackingMode === "6dof") {
+            // 何もしない（AR.jsが自動で位置を更新）
+        } else if (trackingMode === "3dof") {
+            // 位置は固定（マーカーが最後にあった場所）
+            obj.position.copy(lastPosition);
+
+            // 向きだけデバイス回転を適用
+            const q = new THREE.Quaternion().setFromEuler(deviceEuler);
+            obj.quaternion.copy(lastQuaternion.clone().multiply(q));
+        }
+    },
 });
 
 // 🔹 まずフレームを読み込み開始
