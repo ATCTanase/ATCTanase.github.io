@@ -33,10 +33,16 @@ const material = new THREE.MeshBasicMaterial({ map: texture, transparent:true, s
 // A-Frameシーン & originGroup
 // -----------------------------
 const sceneEl = document.querySelector('a-scene');
-const camera = sceneEl.camera;
+let camera = null;
 const scene = sceneEl.object3D;
 const originGroup = new THREE.Group();
 scene.add(originGroup);
+// シーンの初期化完了後にカメラを取得
+sceneEl.addEventListener('loaded', () => {
+    camera = sceneEl.camera;
+    console.log("✅ A-Frame camera ready:", camera);
+});
+
 
 const fixedMesh = new THREE.Mesh(geometry, material);
 fixedMesh.visible = false;
@@ -104,6 +110,7 @@ function updateFixedMesh(){
         fixedMesh.position.copy(pos);
         fixedMesh.quaternion.copy(quat);
     } else {
+        if (!camera) return;
         // マーカー消失中: 回転は固定
         fixedMesh.quaternion.copy(baselineRotation);
 
@@ -112,7 +119,7 @@ function updateFixedMesh(){
         const deltaGamma = currentEuler.y - initialGamma;  // 左右傾き → X移動
 
         const moveAmount = -deltaGamma * moveScale * 0.1;
-        
+
         // カメラから見た各方向ベクトルを取得
         const cameraRight = new THREE.Vector3();   // 右方向 (+X)
         const cameraUp = new THREE.Vector3();      // 上方向 (+Y)
