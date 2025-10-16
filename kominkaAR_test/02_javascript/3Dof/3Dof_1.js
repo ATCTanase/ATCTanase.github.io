@@ -101,6 +101,8 @@ function update6DoF() {
 
 barcodeMarker.addEventListener("markerFound", () => {
     barcodeMarker.setAttribute("axes-helper", "size: 2");
+    barcodeMarker.setAttribute("visible", "true"); // visible を true に設定
+    barcodeMarker.setAttribute("position", "0 0 0");
     // look-controlsを無効化
     camera.setAttribute("look-controls", {
         enabled: false,
@@ -127,12 +129,9 @@ barcodeMarker.addEventListener("markerFound", () => {
 // });
 
 barcodeMarker.addEventListener("markerLost", () => {
+    
+    barcodeMarker.setAttribute("visible", "false");
     markerVisible = false;
-
-    const parentEl = barcodeMarker.parentNode;
-    parentEl.removeChild(barcodeMarker);
-    parentEl.appendChild(barcodeMarker);
-
     stopPlayback();
     if (update6DoFFrameId) { 
         cancelAnimationFrame(update6DoFFrameId);
