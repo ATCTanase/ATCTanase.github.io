@@ -1,6 +1,7 @@
 const barcodeMarker = document.getElementById("barcodeMarker");
 const videoPlane    = document.getElementById("videoPlane");
 const videoGroup    = document.getElementById("videoGroup");
+const markerPos    = document.getElementById("markerPos");
 const camera        = document.querySelector("#mainCamera");
 
 let markerTimer = null;
@@ -81,8 +82,11 @@ function update6DoF() {
     const quat = new THREE.Quaternion();
     barcodeMarker.object3D.updateMatrixWorld(true); // ワールド行列を更新
     barcodeMarker.object3D.getWorldPosition(barcodeMarkerWorldPos);
-    barcodeMarker.object3D.getWorldQuaternion(quat);
     
+    markerPos.object3D.updateMatrixWorld(true); // ワールド行列を更新
+    markerPos.object3D.getWorldPosition(markerWorldPos);
+    markerPos.object3D.getWorldQuaternion(quat);
+
     videoGroup.object3D.position.copy(markerWorldPos);
     
     const invOriginQuat = videoPlane.getWorldQuaternion(new THREE.Quaternion()).invert();
@@ -95,6 +99,7 @@ function update6DoF() {
 barcodeMarker.addEventListener("markerFound", () => {
     barcodeMarker.setAttribute("axes-helper", "size: 4");
     barcodeMarker.setAttribute("smooth", "true");
+    
     markerVisible = true;
 
     if(cameraFrag) {
@@ -125,8 +130,17 @@ barcodeMarker.addEventListener("markerLost", () => {
     barcodeMarker.setAttribute("smooth", "false");
 
     stopPlayback();
-    if (update6DoFFrameId) {
+    if (update6DoFFrameId) { 
         cancelAnimationFrame(update6DoFFrameId);
+
+                // カメラ視点のリセット（look-controlsを一時有効化）
+        camera.setAttribute("look-controls", {
+            enabled: true,
+            magicWindowTrackingEnabled: true
+        });
+        
+        videoGroup.object3D.position.copy(barcodeMarkerWorldPos);
+
         update6DoFFrameId = null;
     }
 });
