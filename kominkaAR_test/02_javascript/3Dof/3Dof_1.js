@@ -74,6 +74,7 @@ let markerPositionY = -1.2;
 let markerPositionZ = -2;
 let cameraFrag = true;
 let update6DoFFrameId = null;
+
 function update6DoF() {
     if (!markerVisible) return;
     const markerWorldPos = new THREE.Vector3();
@@ -89,6 +90,7 @@ function update6DoF() {
     // グループのローカル座標でオフセットを反映
     videoPlane.object3D.position.set(markerPositionX, markerPositionY, markerPositionZ);
 
+    videoPlane.setAttribute("visible", "true");
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
