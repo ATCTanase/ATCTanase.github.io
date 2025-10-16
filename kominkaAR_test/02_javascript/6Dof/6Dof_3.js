@@ -1,5 +1,6 @@
 const videoPlane = document.getElementById("videoPlane");
 const marker     = document.getElementById("barcodeMarker");
+const scene      = document.querySelector("a-scene");
 
 // Canvasを作成
 const canvas = document.createElement("canvas");
@@ -19,13 +20,6 @@ let playTimer = null;
 
 const loadingOverlay = document.getElementById("loadingOverlay");
 const progressText   = document.getElementById("progress");
-
-let trackingMode = "6dof";
-let lastKnownPosition = new THREE.Vector3();
-let lastKnownQuaternion = new THREE.Quaternion();
-
-// DeviceOrientationデータ
-let alpha = 0, beta = 0, gamma = 0;
 
 // 🔹 全フレームをロード
 function preloadFrames(callback) {
@@ -71,49 +65,47 @@ function stopPlayback() {
     }
 }
 
-// マーカーイベント
+
+let lastPosition = new THREE.Vector3();
+let lastQuaternion = new THREE.Quaternion();
+let update3DoFFrameId = null;
+
 marker.addEventListener("markerFound", () => {
-    trackingMode = "6dof";
+    // 6DoFに戻す
+    if(update3DoFFrameId) {
+        cancelAnimationFrame(update3DoFFrameId);
+        update3DoFFrameId = null;
+    }
+    // 親をマーカーに戻す
+    marker.object3D.add(videoPlane.object3D);
+
     videoPlane.setAttribute("visible", true);
     videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
     startPlayback();
 });
+
 marker.addEventListener("markerLost", () => {
-    
-    trackingMode = "3dof";
-    const obj = videoPlane.object3D;
-    lastPosition.copy(obj.position);
-    lastQuaternion.copy(obj.quaternion);
     stopPlayback();
-});
-let deviceEuler = new THREE.Euler(0, 0, 0, "YXZ");
 
-window.addEventListener("deviceorientation", (event) => {
-    const alpha = THREE.MathUtils.degToRad(event.alpha || 0); // Yaw
-    const beta  = THREE.MathUtils.degToRad(event.beta  || 0); // Pitch
-    const gamma = THREE.MathUtils.degToRad(event.gamma || 0); // Roll
-    deviceEuler.set(beta, alpha, -gamma);
-});
-AFRAME.registerComponent("tracking-switcher", {
-    tick: function () {
-        const obj = videoPlane.object3D;
-        if (trackingMode === "6dof") {
-                const pos = new THREE.Vector3();
-                const quat = new THREE.Quaternion();
-                marker.object3D.getWorldPosition(pos);
-                marker.object3D.getWorldQuaternion(quat);
+    // 現在のワールドTransformを保持
+    videoPlane.object3D.getWorldPosition(lastPosition);
+    videoPlane.object3D.getWorldQuaternion(lastQuaternion);
 
-                fixedMesh.position.copy(pos);
-                fixedMesh.quaternion.copy(quat);
-        } else if (trackingMode === "3dof") {
-            // 位置は固定（マーカーが最後にあった場所）
-            obj.position.copy(lastPosition);
+    // マーカーから外してシーン直下に置く
+    scene.object3D.add(videoPlane.object3D);
+    videoPlane.object3D.position.copy(lastPosition);
+    videoPlane.object3D.quaternion.copy(lastQuaternion);
 
-            // 向きだけデバイス回転を適用
-            const q = new THREE.Quaternion().setFromEuler(deviceEuler);
-            obj.quaternion.copy(lastQuaternion.clone().multiply(q));
-        }
-    },
+    // 3DoF更新ループ
+    const camera = document.querySelector("[camera]").object3D;
+    const update3DoF = () => {
+        // マーカーが再認識されたら停止
+        if(marker.object3D.children.includes(videoPlane.object3D)) return;
+
+        videoPlane.object3D.quaternion.copy(camera.quaternion);
+        update3DoFFrameId = requestAnimationFrame(update3DoF);
+    };
+    update3DoF();
 });
 
 // 🔹 まずフレームを読み込み開始
