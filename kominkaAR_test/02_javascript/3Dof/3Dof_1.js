@@ -86,7 +86,7 @@ function update6DoF() {
     barcodeMarker.object3D.updateMatrixWorld(true);
     barcodeMarker.object3D.getWorldPosition(markerWorldPos);
     barcodeMarker.object3D.getWorldQuaternion(quat);
-    console.log("markerWorldPos",markerWorldPos);
+    
     // videoGroup を追従させる
     videoGroup.object3D.position.copy(markerWorldPos);  
 
@@ -96,15 +96,11 @@ function update6DoF() {
     lastMarkerPos.copy(markerWorldPos);
     lastMarkerQuat.copy(quat);
     
-    const videoPlaneWroldPos = new THREE.Vector3();
-    videoPlane.object3D.getWorldPosition(videoPlaneWroldPos)
-    console.log("videoPlaneWroldPos",videoPlaneWroldPos);
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
 barcodeMarker.addEventListener("markerFound", () => {
     barcodeMarker.setAttribute("axes-helper", "size: 2");
-    barcodeMarker.object3D.position.set(0,0,0);
     // look-controlsを無効化
     camera.setAttribute("look-controls", {
         enabled: false,
@@ -131,16 +127,11 @@ barcodeMarker.addEventListener("markerFound", () => {
 // });
 
 barcodeMarker.addEventListener("markerLost", () => {
-//    barcodeMarker.removeAttribute("axes-helper");
-    barcodeMarker.object3D.position.set(0,0,0);
     markerVisible = false;
 
-    videoGroup.object3D.position.copy(lastMarkerPos);
-    videoPlane.object3D.quaternion.copy(lastMarkerQuat);
-
-    const videoPlaneWroldPos = new THREE.QuateVector3rnion();
-    videoPlane.object3D.getWorldPosition(videoPlaneWroldPos)
-    console.log("videoPlaneWroldPos",videoPlaneWroldPos);
+    const parentEl = barcodeMarker.parentNode;
+    parentEl.removeChild(barcodeMarker);
+    parentEl.appendChild(barcodeMarker);
 
     stopPlayback();
     if (update6DoFFrameId) { 
