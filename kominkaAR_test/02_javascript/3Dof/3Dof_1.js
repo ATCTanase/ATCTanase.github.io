@@ -97,9 +97,8 @@ barcodeMarker.addEventListener("markerFound", () => {
             barcodeMarker.object3D.updateMatrixWorld(true);
             barcodeMarker.object3D.getWorldPosition(markerWorldPos);
             barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
-  
-            const offsetPosition = markerWorldPos.clone().add(new THREE.Vector3(parseInt(markerPositionX), parseInt(markerPositionY), parseInt(markerPositionZ)));
-            videoGroup.object3D.position.copy(offsetPosition);
+            
+            videoGroup.object3D.position.copy(markerWorldPos);
             videoGroup.object3D.quaternion.copy(markerWorldQuat);
 
              // グループのローカル座標でオフセットを反映
