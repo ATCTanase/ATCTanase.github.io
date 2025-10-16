@@ -24,8 +24,10 @@ const progressText   = document.getElementById("progress");
 const aframeScene = document.querySelector("a-scene");
 const threeScene = aframeScene.object3D;
 
-const camera = new THREE.PerspectiveCamera();
-scene.add(camera);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.xr.enabled = true;  // XR対応
+
+document.body.appendChild(renderer.domElement);
 
 
 // 固定オブジェクト用の Three.js Mesh を作成
@@ -37,6 +39,15 @@ const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, 
 const fixedMesh = new THREE.Mesh(geometry, material);
 fixedMesh.visible = false;
 threeScene.add(fixedMesh);
+const camera = new THREE.PerspectiveCamera();
+threeScene.add(camera);
+
+function render() {
+    renderer.setAnimationLoop(() => {
+        renderer.render(threeScene, camera); // camera は自動で端末トラッキングに従う
+    });
+}
+render();
 
 // === アニメーション処理 ===
 function preloadFrames(callback) {
@@ -97,12 +108,21 @@ marker.addEventListener("markerFound", () => {
 
     fixedMesh.visible = true;
 
+    
+    camera.setAttribute("look-controls", {
+        enabled: false,
+        magicWindowTrackingEnabled: false
+    });
     console.log("🎯 マーカー位置に固定配置完了");
 });
 
 marker.addEventListener("markerLost", () => {
     // マーカーを失っても非表示にしない
     console.log("ℹ️ マーカー見失ったがオブジェクトは保持");
+    camera.setAttribute("look-controls", {
+        enabled: true,
+        magicWindowTrackingEnabled: true
+    });
 });
 
 // === フレーム読み込み開始 ===
