@@ -80,8 +80,12 @@ let markerPositionZ = -2;
 let cameraFrag = true;
 let update6DoFFrameId = null;
 
+
 let lastMarkerPos = new THREE.Vector3();
 let lastMarkerQuat = new THREE.Quaternion();
+
+let lastCamPos = new THREE.Vector3();
+let lastCamQuat = new THREE.Quaternion();
 
 
 function update6DoF() {
@@ -100,6 +104,10 @@ function update6DoF() {
     
     lastMarkerPos.copy(markerWorldPos);
     lastMarkerQuat.copy(quat);
+    
+    mainCamera.object3D.updateMatrixWorld(true);
+    mainCamera.object3D.getWorldPosition(lastCamPos);
+    mainCamera.object3D.getWorldQuaternion(lastCamQuat);
     
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
@@ -151,16 +159,10 @@ barcodeMarker.addEventListener("markerLost", () => {
         cancelAnimationFrame(update6DoFFrameId);
         update6DoFFrameId = null;
     }
-        const pos = new THREE.Vector3();
-    const quat = new THREE.Quaternion();
-
-    mainCamera.object3D.updateMatrixWorld(true);
-    mainCamera.object3D.getWorldPosition(pos);
-    mainCamera.object3D.getWorldQuaternion(quat);
-        
+            
     // 切り替え後のカメラに座標と回転を適用
-    subCamera.object3D.position.copy(pos);
-    subCamera.object3D.quaternion.copy(quat);
+    subCamera.object3D.position.copy(lastCamPos);
+    subCamera.object3D.quaternion.copy(lastCamQuat);
 
     mainCamera.setAttribute('camera', 'active', false);
     subCamera.setAttribute('camera', 'active', true);
