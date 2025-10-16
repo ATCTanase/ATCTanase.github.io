@@ -86,7 +86,7 @@ function update6DoF() {
     barcodeMarker.object3D.updateMatrixWorld(true);
     barcodeMarker.object3D.getWorldPosition(markerWorldPos);
     barcodeMarker.object3D.getWorldQuaternion(quat);
-
+    console.log("markerWorldPos",markerWorldPos);
     // videoGroup を追従させる
     videoGroup.object3D.position.copy(markerWorldPos);  
 
