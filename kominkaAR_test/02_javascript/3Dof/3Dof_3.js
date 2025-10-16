@@ -72,7 +72,6 @@ let markerPositionY = -3.5;
 let markerPositionZ = 1;
 let cameraFrag = true;
 let update6DoFFrameId = null;
-let update6DoFFrameId = null;
 
 barcodeMarker.addEventListener("markerFound", () => {
     if (!markerVisible) {
