@@ -126,15 +126,14 @@ barcodeMarker.addEventListener("markerFound", () => {
         mainCamera.object3D.position.copy(pos);
         mainCamera.object3D.quaternion.copy(quat);
 
-        mainCamera.setAttribute('camera', 'active', true);
-        subCamera.setAttribute('camera', 'active', false);
+        mainCamera.setAttribute('active', true);
+        subCamera.setAttribute('active', false);
     }
 
     startPlayback();
     
-    setTimeout(() => {
-       update6DoF();
-    }, 200);
+    update6DoF();
+    
 });
 // videoPlane.addEventListener('loaded', () => {
 //     const planeMesh = videoPlane.getObject3D("mesh");
@@ -162,8 +161,8 @@ barcodeMarker.addEventListener("markerLost", () => {
     subCamera.object3D.position.copy(pos);
     subCamera.object3D.quaternion.copy(quat);
 
-    mainCamera.setAttribute('camera', 'active', false);
-    subCamera.setAttribute('camera', 'active', true);
+    mainCamera.setAttribute('active', false);
+    subCamera.setAttribute('active', true);
 });
 
 // 🔹 まずフレームを読み込み開始
