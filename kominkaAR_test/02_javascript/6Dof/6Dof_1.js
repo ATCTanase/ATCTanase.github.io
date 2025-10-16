@@ -5,21 +5,12 @@ const sceneEl    = document.querySelector("a-scene"); // A-Frameシーン要素
 let threeScene; // Three.jsのシーン
 let threeCamera; // Three.jsのカメラ
 let videoMesh; // Three.jsで作成する平面メッシュ
+let textureImage; // ロードする画像オブジェクト
 
-// Canvasを作成 (これは以前と同じ)
-const canvas = document.createElement("canvas");
-canvas.width  = window.innerWidth;
-canvas.height = window.innerHeight;
-const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
 let offset; // 画像のアスペクト比
 
-const ARImage = "../../04_image/ARImage/AR1_日向椎葉の舞手";
-const frameCount = 1;
-const frameExt = ".png";
-const frames = [];
-let currentFrame = 0;
-const fps = 20;
-let playTimer = null; // アニメーションタイマー
+const ARImageSrc = "../../04_image/ARImage/AR1_日向椎葉の舞手.png"; // 単一の画像パスに修正
 
 const loadingOverlay = document.getElementById("loadingOverlay");
 const progressText   = document.getElementById("progress");
@@ -27,63 +18,39 @@ const progressText   = document.getElementById("progress");
 let isMarkerVisible = false; // マーカーが現在見えているかどうかのフラグ
 let objectFixed = false; // オブジェクトがワールド座標に固定されたかどうかのフラグ
 
-// 🔹 全フレームをロード
-function preloadFrames(callback) {
-    let loaded = 0;
-    for (let i = 1; i <= frameCount; i++) {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        // img.src = `${ARImage}${String(i).padStart(3, "0")}${frameExt}`;
-        img.src = `${ARImage}${frameExt}`;
-        img.onload = () => {
-            loaded++;
-            progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
-            if (loaded === frameCount) {
-                console.log("✅ 全フレームロード完了");
-                loadingOverlay.style.display = "none";
-                callback();
-                offset = img.height / img.width; // 画像のアスペクト比を設定
-            }
-        };
-        frames.push(img);
-    }
-}
+// 🔹 単一の画像をロード
+function loadImage(callback) {
+    textureImage = new Image();
+    textureImage.crossOrigin = "anonymous";
+    textureImage.src = ARImageSrc;
+    textureImage.onload = () => {
+        console.log("✅ 画像ロード完了");
+        progressText.textContent = "100%";
+        loadingOverlay.style.display = "none"; // ローディング画面を隠す
 
-// Canvasにフレームを描画
-function drawNextFrame() {
-    if (!videoMesh || !videoMesh.material.map) return;
-
-    const img = frames[currentFrame];
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-    videoMesh.material.map.needsUpdate = true; // Three.jsテクスチャの更新
-    currentFrame = (currentFrame + 1) % frameCount;
-}
-
-function startPlayback() {
-    if (!playTimer) {
-        drawNextFrame(); // 初回描画
-        playTimer = setInterval(drawNextFrame, 1000 / fps);
-    }
-}
-function stopPlayback() {
-    if (playTimer) {
-        clearInterval(playTimer);
-        playTimer = null;
-    }
+        offset = textureImage.height / textureImage.width; // 画像のアスペクト比を設定
+        callback();
+    };
+    textureImage.onerror = () => {
+        console.error("❌ 画像のロードに失敗しました:", ARImageSrc);
+        loadingOverlay.innerHTML = "画像のロードに失敗しました。";
+    };
+    // 進捗は単純に0% -> 100%
+    progressText.textContent = "0%";
 }
 
 // A-Frameシーンが完全にロードされた後にThree.jsオブジェクトを作成
 sceneEl.addEventListener('loaded', () => {
     threeScene = sceneEl.object3D;
-    threeCamera = sceneEl.camera;
+    threeCamera = sceneEl.camera; // カメラへのアクセスが必要なら
 
     // Three.jsでジオメトリとマテリアルを作成
     const geometry = new THREE.PlaneGeometry(1, 1); // デフォルトサイズ
-    const texture = new THREE.CanvasTexture(canvas);
+    
+    // 画像がロードされるまでプレースホルダーテクスチャを設定
+    const placeholderTexture = new THREE.Texture();
     const material = new THREE.MeshBasicMaterial({
-        map: texture,
+        map: placeholderTexture, // 初期は空のテクスチャ
         transparent: true,
         side: THREE.DoubleSide,
         alphaTest: 0.01 // 透明部分を完全に抜く
@@ -92,15 +59,22 @@ sceneEl.addEventListener('loaded', () => {
     videoMesh = new THREE.Mesh(geometry, material);
     videoMesh.rotation.x = -Math.PI / 2; // X軸に-90度回転させて水平にする
     videoMesh.visible = false; // 最初は非表示
-    videoMesh.scale.y = offset; // アスペクト比に合わせて高さを調整
 
     threeScene.add(videoMesh); // シーンにメッシュを追加
     console.log("Three.js videoMesh created and added to scene.");
 
-    // 初期アスペクト比の設定
-    if (offset) {
-        videoMesh.scale.y = videoMesh.scale.x * offset;
-    }
+    // 画像がロードされた後にテクスチャを更新
+    loadImage(() => {
+        // ロードされた画像でテクスチャを更新
+        videoMesh.material.map = new THREE.Texture(textureImage);
+        videoMesh.material.map.needsUpdate = true; // テクスチャの更新をThree.jsに通知
+
+        // ロードされた画像のアスペクト比に合わせて高さを調整
+        if (offset) {
+            videoMesh.scale.y = videoMesh.scale.x * offset; // 基準の幅(1)に対して高さを調整
+        }
+        console.log("videoMesh material updated with loaded image.");
+    });
 });
 
 
@@ -111,9 +85,8 @@ marker.addEventListener("markerFound", () => {
         isMarkerVisible = true;
         objectFixed = false; // マーカー検出中は固定を解除し、追従させる
 
-        if (videoMesh) {
+        if (videoMesh && textureImage.complete) { // 画像が完全にロードされていることを確認
             videoMesh.visible = true; // オブジェクトを表示
-            startPlayback(); // アニメーション開始
         }
     }
 });
@@ -125,25 +98,21 @@ marker.addEventListener("markerLost", () => {
         objectFixed = true; // マーカーロスト時はオブジェクトを固定
 
         if (videoMesh) {
-            // videoMesh.visible = false; // 固定した状態で非表示にする場合はコメントアウト解除
-            stopPlayback(); // アニメーション停止
         }
     }
 });
 
 // A-Frameのtickイベントで毎フレームの更新処理
 sceneEl.addEventListener('tick', () => {
-    if (!videoMesh || !marker.object3D) return;
+    if (!videoMesh || !marker.object3D || !textureImage || !textureImage.complete) return; // 画像がロードされていない場合はスキップ
 
     if (isMarkerVisible && !objectFixed) {
         // マーカーが見えていて、まだ固定されていない場合、マーカーの姿勢に追従
-        // マーカーのワールド行列を取得
         const markerMatrix = marker.object3D.matrixWorld;
 
         // videoMeshのmatrixを直接更新
         videoMesh.matrix.copy(markerMatrix);
         
-        // 回転のオフセット（-90度）を適用するため、個別に設定
         // Three.jsのMatrixからPosition/Quaternion/Scaleを抽出し、回転だけ修正
         const position = new THREE.Vector3();
         const quaternion = new THREE.Quaternion();
@@ -163,16 +132,6 @@ sceneEl.addEventListener('tick', () => {
         
         videoMesh.updateMatrix(); // Three.jsのObject3Dのmatrixを更新
         videoMesh.updateMatrixWorld(true); // ワールド行列も更新
-    }
-    // else if (objectFixed) {
-    //     // マーカーロストでオブジェクトが固定された場合、ここでは何もしない
-    //     // ただし、非表示にする場合はmarkerLostイベントで処理済み
-    // }
-});
 
-
-// 🔹 まずフレームを読み込み開始
-preloadFrames(() => {
-    console.log("アニメーション準備完了");
-    // ここでvideoMeshの初期化を行う場合もあるが、loadedイベントで実施済み
+    } 
 });
