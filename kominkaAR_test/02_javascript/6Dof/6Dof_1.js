@@ -65,10 +65,13 @@ function stopPlayback() {
         playTimer = null;
     }
 }
-
+let axesAdded = false;
 // マーカーイベント
-marker.addEventListener("markerFound", () => {
-    marker.setAttribute("axes-helper", "size: 2");
+marker.addEventListener("markerFound", () => {  
+      if (!axesAdded) {
+        marker.setAttribute("axes-helper", "size: 2");
+        axesAdded = true;
+    }
     console.log("markerFound");
     if(cameraEl == null)
     {
