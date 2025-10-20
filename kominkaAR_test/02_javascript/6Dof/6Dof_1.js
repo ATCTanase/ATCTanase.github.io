@@ -76,7 +76,13 @@ marker.addEventListener("markerFound", () => {
     videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
     startPlayback();
 
-        // 既存の clone があれば削除
+    
+    cameraEl.setAttribute("look-controls", {
+        enabled: false,
+        magicWindowTrackingEnabled: false
+    });
+
+    // 既存の clone があれば削除
     if (clone) {
         scene.removeChild(clone);
         clone = null;
@@ -89,6 +95,11 @@ marker.addEventListener("markerFound", () => {
     clone.setAttribute("visible", false);
 });
 marker.addEventListener("markerLost", () => {
+    
+    cameraEl.setAttribute("look-controls", {
+        enabled: true,
+        magicWindowTrackingEnabled: true
+    });
 
     const srcObj = videoPlane.object3D;
     const dstObj = clone.object3D;
