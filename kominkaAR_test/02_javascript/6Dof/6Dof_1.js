@@ -65,41 +65,11 @@ function stopPlayback() {
         playTimer = null;
     }
 }
+
+let update6DoFFrameId = null;
 let clone = null;
-// マーカーイベント
-marker.addEventListener("markerFound", () => {
-    if(cameraEl == null)
-    {
-        cameraEl = scene.camera.el;
-    }
-    videoPlane.setAttribute("visible", true);
-    videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
-    startPlayback();
-
-    
-    cameraEl.setAttribute("look-controls", {
-        enabled: false,
-        magicWindowTrackingEnabled: false
-    });
-
-    // 既存の clone があれば削除
-    if (clone) {
-        scene.removeChild(clone);
-        clone = null;
-    }
-    // videoPlaneの複製を作成
-    clone = videoPlane.cloneNode(true);
-    clone.setAttribute("id", "videoPlaneClone");
-
-    cameraEl.appendChild(clone);
-    clone.setAttribute("visible", false);
-});
-marker.addEventListener("markerLost", () => {
-    
-    cameraEl.setAttribute("look-controls", {
-        enabled: true,
-        magicWindowTrackingEnabled: true
-    });
+function update6DoF() {
+    if (!markerVisible) return;
 
     const srcObj = videoPlane.object3D;
     const dstObj = clone.object3D;
@@ -116,9 +86,47 @@ marker.addEventListener("markerLost", () => {
     dstObj.quaternion.copy(quat);
     dstObj.scale.copy(scale);
 
-    // 見えるように設定
-    clone.setAttribute("visible", true);
-    clone.setAttribute("material", "src", canvas);
+    update6DoFFrameId = requestAnimationFrame(update6DoF);
+};
+// マーカーイベント
+marker.addEventListener("markerFound", () => {
+    markerVisible = true;
+    if(cameraEl == null)
+    {
+        cameraEl = scene.camera.el;
+    }
+    videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
+    startPlayback();
+
+    
+    cameraEl.setAttribute("look-controls", {
+        enabled: false,
+        magicWindowTrackingEnabled: false
+    });
+
+    // 既存の clone があれば削除
+    if (!clone) {
+        // videoPlaneの複製を作成
+        clone = videoPlane.cloneNode(true);
+        clone.setAttribute("id", "videoPlaneClone");
+        cameraEl.appendChild(clone);
+        clone.setAttribute("visible", true);
+        clone.setAttribute("material", "src", canvas);
+    }
+    update6DoFFrameId = requestAnimationFrame(update6DoF);
+});
+
+marker.addEventListener("markerLost", () => {
+    markerVisible = false;
+    if (update6DoFFrameId) { 
+        cancelAnimationFrame(update6DoFFrameId);
+        update6DoFFrameId = null;
+    }
+    cameraEl.setAttribute("look-controls", {
+        enabled: true,
+        magicWindowTrackingEnabled: true
+    });
+
 });
 
 // 🔹 まずフレームを読み込み開始
