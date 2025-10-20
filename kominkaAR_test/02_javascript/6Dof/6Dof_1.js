@@ -1,6 +1,7 @@
+const scene = document.querySelector("a-scene");
 const videoPlane = document.getElementById("videoPlane");
 const marker     = document.getElementById("barcodeMarker");
-const camera     = document.querySelector("#mainCamera");
+const cameraEl  = null;
 
 // Canvasを作成
 const canvas = document.createElement("canvas");
@@ -67,17 +68,38 @@ function stopPlayback() {
 
 // マーカーイベント
 marker.addEventListener("markerFound", () => {
+    if(cameraEl == null)
+    {
+        cameraEl = scene.camera.el;
+    }
     videoPlane.setAttribute("visible", true);
     videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
     startPlayback();
-    camera.setAttribute("look-controls", {
+    cameraEl.setAttribute("look-controls", {
         enabled: false,
         magicWindowTrackingEnabled: false
     });
 });
 marker.addEventListener("markerLost", () => {
-    videoPlane.setAttribute("visible", true);
-    camera.setAttribute("look-controls", {
+        // videoPlaneのコピーを作成
+    const clone = videoPlane.cloneNode(true);
+
+    // videoPlane のワールド座標・回転・スケールを取得してコピーに適用
+    const originalObj = videoPlane.object3D;
+    const cloneObj = clone.object3D;
+    cloneObj.position.copy(originalObj.getWorldPosition(new THREE.Vector3()));
+    cloneObj.quaternion.copy(originalObj.getWorldQuaternion(new THREE.Quaternion()));
+    cloneObj.scale.copy(originalObj.scale);
+
+    // scene直下に追加
+    document.querySelector("a-scene").appendChild(clone);
+
+    // そのままアニメーション再生も維持したいなら、cloneにもcanvasを設定
+    clone.setAttribute("material", "src", canvas);
+    clone.setAttribute("visible", true);
+
+
+    cameraEl.setAttribute("look-controls", {
         enabled: true,
         magicWindowTrackingEnabled: true
     });
