@@ -1,5 +1,6 @@
 const videoPlane = document.getElementById("videoPlane");
 const marker     = document.getElementById("barcodeMarker");
+const camera     = document.querySelector("#mainCamera");
 
 // Canvasを作成
 const canvas = document.createElement("canvas");
@@ -75,8 +76,8 @@ marker.addEventListener("markerFound", () => {
     });
 });
 marker.addEventListener("markerLost", () => {
-    stopPlayback();
-   camera.setAttribute("look-controls", {
+    videoPlane.setAttribute("visible", true);
+    camera.setAttribute("look-controls", {
         enabled: true,
         magicWindowTrackingEnabled: true
     });
