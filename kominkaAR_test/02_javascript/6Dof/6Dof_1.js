@@ -81,28 +81,13 @@ marker.addEventListener("markerFound", () => {
     });
 });
 marker.addEventListener("markerLost", () => {
-        // videoPlaneのコピーを作成
-    const clone = videoPlane.cloneNode(true);
-
-    // videoPlane のワールド座標・回転・スケールを取得してコピーに適用
-    const originalObj = videoPlane.object3D;
-    const cloneObj = clone.object3D;
-    cloneObj.position.copy(originalObj.getWorldPosition(new THREE.Vector3()));
-    cloneObj.quaternion.copy(originalObj.getWorldQuaternion(new THREE.Quaternion()));
-    cloneObj.scale.copy(originalObj.scale);
-
-    // scene直下に追加
-    document.querySelector("a-scene").appendChild(clone);
-
-    // そのままアニメーション再生も維持したいなら、cloneにもcanvasを設定
-    clone.setAttribute("material", "src", canvas);
-    clone.setAttribute("visible", true);
-
-
     cameraEl.setAttribute("look-controls", {
         enabled: true,
         magicWindowTrackingEnabled: true
     });
+    // setTimeout(() => {
+    //     videoPlane.setAttribute("visible", true);
+    // }, 100);
 });
 
 // 🔹 まずフレームを読み込み開始
