@@ -104,13 +104,16 @@ barcodeMarker.addEventListener("markerFound", () => {
     barcodeMarker.setAttribute("axes-helper", "size: 2");
 
     // look-controlsを無効化
-    camera.setAttribute("look-controls", {
-        magicWindowTrackingEnabled: false
-    });
-    markerVisible = true;
 
     const lookControls = camera.components["look-controls"];
     lookControls.magicWindowTrackingEnabled = false;
+
+    markerVisible = true;
+
+    if(cameraFrag) {
+        videoPlane.setAttribute("visible", "true");
+        cameraFrag = false;
+    }
     
     startPlayback();
     
@@ -118,12 +121,6 @@ barcodeMarker.addEventListener("markerFound", () => {
        update6DoF();
     }, 200);
 });
-// videoPlane.addEventListener('loaded', () => {
-//     const planeMesh = videoPlane.getObject3D("mesh");
-//     if (planeMesh) {
-//         planeMesh.geometry.translate(0, planeMesh.geometry.parameters.height / 2, 0);
-//     }
-// });
 
 barcodeMarker.addEventListener("markerLost", () => {
     markerVisible = false;
