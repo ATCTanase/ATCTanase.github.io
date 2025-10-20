@@ -90,8 +90,8 @@ marker.addEventListener("markerFound", () => {
     // videoPlaneの複製を作成
     clone = videoPlane.cloneNode(true);
     clone.setAttribute("id", "videoPlaneClone");
-    // シーン直下に追加
-    scene.appendChild(clone);
+
+    cameraEl.appendChild(clone);
     clone.setAttribute("visible", false);
 });
 marker.addEventListener("markerLost", () => {
