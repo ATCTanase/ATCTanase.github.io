@@ -21,26 +21,22 @@
 
   <div id="title" style="top:2px; left:2px; position:fixed; font-size: 30px;">6DOF1</div>
 
-  <a-scene 
-    embedded 
-    vr-mode-ui="enabled: false" 
-    renderer="logarithmicDepthBuffer: true; alpha: true;"
-    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+<a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
 
     <a-marker type="pattern" value="5" id="barcodeMarker" url="../../04_image/patt/AR1.patt"
       smooth="true" smoothCount="100" smoothTolerance="10" smoothThreshold="5">
-      <a-plane 
-        id="videoPlane" 
-        position="0 0 0" 
-        rotation="0 0 0" 
-        width="1" 
-        height="1" 
+    </a-marker>
+    <a-plane
+        id="videoPlane"
+        position="0 0 0"
+        rotation="0 0 0"
+        width="1"
+        height="1"
         visible="false"
         material="shader: flat; side: double; transparent: true; alphaTest:0.01;">
-      </a-plane>
-    </a-marker>
-
-    <a-entity camera></a-entity>
+    </a-plane>
+    
+    <a-entity camera look-controls wasd-controls="enabled: false"></a-entity>
   </a-scene>
 
   <dialog id="kariModalDialog" class="dialog">

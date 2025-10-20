@@ -1,7 +1,8 @@
 const scene = document.querySelector("a-scene");
 const videoPlane = document.getElementById("videoPlane");
 const marker     = document.getElementById("barcodeMarker");
-let  cameraEl  = null;
+let  cameraEl  = null; // ユーザー操作用のカメラエンティティ
+let arjsCameraEl = null; // AR.jsが生成するカメラエンティティ
 
 // Canvasを作成
 const canvas = document.createElement("canvas");
@@ -65,59 +66,50 @@ function stopPlayback() {
         playTimer = null;
     }
 }
+// AR.jsがカメラを初期化した後に実行されるイベント
+scene.addEventListener('arjs-init', () => {
+    arjsCameraEl = scene.querySelector('.a-camera'); // AR.jsが生成するカメラ
+    cameraEl = scene.querySelector('[camera]'); 
+    if (cameraEl && arjsCameraEl) {
+        console.log("AR.js camera initialized:", arjsCameraEl);
+        console.log("User camera initialized:", cameraEl);
+    }
+});
+
+
 let axesAdded = false;
 // マーカーイベント
-marker.addEventListener("markerFound", () => {  
-      if (!axesAdded) {
-        marker.setAttribute("axes-helper", "size: 2");
-        axesAdded = true;
-    }
+marker.addEventListener("markerFound", () => {
     console.log("markerFound");
-    if(cameraEl == null)
-    {
-        cameraEl = scene.camera.el;
-    }
+    if (!cameraEl) cameraEl = scene.querySelector('[camera]');
+
     videoPlane.setAttribute("visible", true);
-    videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
     startPlayback();
-    cameraEl.setAttribute("look-controls", {
-        enabled: false,
-        magicWindowTrackingEnabled: false,
-        resetCamera: false
-    });
-    
-    const cameraObj = cameraEl.object3D;
-    const markerObj = marker.object3D;
 
-    markerObj.updateMatrixWorld(true);    
-    const helper = marker.object3D.children.find(c => c.type === "AxesHelper");
-    if (helper) helper.updateMatrixWorld(true);
+    // マーカーの位置と回転をvideoPlaneに適用
+    const markerObject = marker.object3D;
+    const markerPosition = new THREE.Vector3();
+    const markerRotation = new THREE.Quaternion();
+    markerObject.getWorldPosition(markerPosition);
+    markerObject.getWorldQuaternion(markerRotation);
+    videoPlane.object3D.position.copy(markerPosition);
+    videoPlane.object3D.quaternion.copy(markerRotation);
+    videoPlane.object3D.scale.set(1, offset, 1); // width=1の場合
 
-    // Vector3 でワールド座標を取得
-    const cameraPos = new THREE.Vector3();
-    const markerPos = new THREE.Vector3();
-    cameraObj.getWorldPosition(cameraPos);
-    markerObj.getWorldPosition(markerPos);
+    // 6DoFを有効に（WASD移動を有効に）
+    if (cameraEl) {
+        cameraEl.setAttribute("wasd-controls", "enabled: true");
+    }
 
-    // カメラ → マーカーへのベクトル
-    const vectorToMarker = new THREE.Vector3();
-    vectorToMarker.subVectors(markerPos, cameraPos); // marker - cameras
-    // 距離
-    const distance = vectorToMarker.length();
-
-    console.log("Marker position:", markerPos);          // Vector3(x, y, z)
-    console.log("markerObj.position:", markerObj.position);          // Vector3(x, y, z)
-    console.log("Vector to marker:", vectorToMarker);    // Vector3(x, y, z)
-    console.log("Distance to marker:", distance.toFixed(3));
-
+    markerFoundLastTime = true;
 });
 marker.addEventListener("markerLost", () => {
-    // scene直下に追加
-    cameraEl.setAttribute("look-controls", {
-        enabled: true,
-        magicWindowTrackingEnabled: true,
-        resetCamera: false
-    });
+    console.log("markerLost");
+    if (cameraEl) {
+        cameraEl.setAttribute("wasd-controls", "enabled: false");
+    }
+
+    markerFoundLastTime = false;
 });
 
 // 🔹 まずフレームを読み込み開始
