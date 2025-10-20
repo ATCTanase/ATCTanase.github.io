@@ -77,7 +77,6 @@ let update6DoFFrameId = null;
 
 let lastMarkerPos = new THREE.Vector3();
 let lastMarkerQuat = new THREE.Quaternion();
-let firstMarkerPos = new THREE.Vector3();
 
 function update6DoF() {
     if (!markerVisible) return;
@@ -114,7 +113,15 @@ barcodeMarker.addEventListener("markerFound", () => {
         videoPlane.setAttribute("visible", "true");
         cameraFrag = false;
     }
-    console.log("camera.Pos",camera.object3D.position);
+    
+    const pos = camera.object3D.position.clone();
+    const rot = camera.object3D.rotation.clone();
+    console.log("camera.Pos",pos);
+    console.log("camera.rot",rot);
+    setTimeout(() => {
+        camera.object3D.position.copy(pos);
+        camera.object3D.rotation.copy(rot);
+    }, 0);
     
     startPlayback();
     
@@ -132,23 +139,27 @@ barcodeMarker.addEventListener("markerFound", () => {
 barcodeMarker.addEventListener("markerLost", () => {
     markerVisible = false;
     console.log("markerLost",lastMarkerPos);
-    if(firstMarkerPos == new THREE.Vector3())
-    {
-        console.log("firstMarkerPos",lastMarkerPos);
-        firstMarkerPos = new THREE.Vector3(lastMarkerPos.X,lastMarkerPos.Y,0);
-    }
-    videoGroup.object3D.position.copy(lastMarkerPos - firstMarkerPos);
+
+    videoGroup.object3D.position.copy(lastMarkerPos);
     
     stopPlayback();
     if (update6DoFFrameId) { 
         cancelAnimationFrame(update6DoFFrameId);
         update6DoFFrameId = null;
     }
+    const pos = camera.object3D.position.clone();
+    const rot = camera.object3D.rotation.clone();
+    console.log("camera.Pos",pos);
+    console.log("camera.rot",rot);
     camera.setAttribute("look-controls", {
         enabled: true,
         magicWindowTrackingEnabled: true
     });
-    console.log("camera.Pos",camera.object3D.position);
+    
+    setTimeout(() => {
+        camera.object3D.position.copy(pos);
+        camera.object3D.rotation.copy(rot);
+    }, 0);
 });
 
 // 🔹 まずフレームを読み込み開始
