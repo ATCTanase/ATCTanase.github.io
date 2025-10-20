@@ -89,6 +89,10 @@ marker.addEventListener("markerFound", () => {
     const cameraObj = cameraEl.object3D;
     const markerObj = marker.object3D;
 
+    markerObj.updateMatrixWorld(true);    
+    const helper = marker.object3D.children.find(c => c.type === "AxesHelper");
+    if (helper) helper.updateMatrixWorld(true);
+
     // Vector3 でワールド座標を取得
     const cameraPos = new THREE.Vector3();
     const markerPos = new THREE.Vector3();
