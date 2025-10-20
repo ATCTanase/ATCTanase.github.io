@@ -81,10 +81,10 @@ marker.addEventListener("markerFound", () => {
     });
 });
 marker.addEventListener("markerLost", () => {
-    cameraEl.setAttribute("look-controls", {
-        enabled: true,
-        magicWindowTrackingEnabled: true
-    });
+    // cameraEl.setAttribute("look-controls", {
+    //     enabled: true,
+    //     magicWindowTrackingEnabled: true
+    // });
     setTimeout(() => {
         videoPlane.setAttribute("visible", true);
     }, 100);
