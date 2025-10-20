@@ -1,8 +1,8 @@
+
 const scene = document.querySelector("a-scene");
 const videoPlane = document.getElementById("videoPlane");
 const marker     = document.getElementById("barcodeMarker");
-let  cameraEl  = null; // ユーザー操作用のカメラエンティティ
-let arjsCameraEl = null; // AR.jsが生成するカメラエンティティ
+let cameraEl  = null; // ユーザー操作用のカメラエンティティ
 
 // Canvasを作成
 const canvas = document.createElement("canvas");
@@ -23,23 +23,25 @@ let playTimer = null;
 const loadingOverlay = document.getElementById("loadingOverlay");
 const progressText   = document.getElementById("progress");
 
+let isMarkerDetected = false; // マーカー検出状態を管理するフラグ
+let originalParent = null; // videoPlaneの元の親要素を保持
+
 // 🔹 全フレームをロード
 function preloadFrames(callback) {
     let loaded = 0;
     for (let i = 1; i <= frameCount; i++) {
         const img = new Image();
         img.crossOrigin = "anonymous";
-        // img.src = `${ARImage}${String(i).padStart(3, "0")}${frameExt}`;
-        img.src = `${ARImage}${frameExt}`;
+        img.src = `${ARImage}${frameExt}`; // フレームが1枚なのでこれでおk
         img.onload = () => {
             loaded++;
-            // 進捗を表示
             progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
             if (loaded === frameCount) {
                 console.log("✅ 全フレームロード完了");
-                loadingOverlay.style.display = "none"; // ローディング画面を隠す
+                loadingOverlay.style.display = "none";
                 callback();
-                offset =  img.height / img.width;
+                offset = img.height / img.width;
+                videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
             }
         };
         frames.push(img);
@@ -66,50 +68,61 @@ function stopPlayback() {
         playTimer = null;
     }
 }
-// AR.jsがカメラを初期化した後に実行されるイベント
-scene.addEventListener('arjs-init', () => {
-    arjsCameraEl = scene.querySelector('.a-camera'); // AR.jsが生成するカメラ
-    cameraEl = scene.querySelector('[camera]'); 
-    if (cameraEl && arjsCameraEl) {
-        console.log("AR.js camera initialized:", arjsCameraEl);
-        console.log("User camera initialized:", cameraEl);
-    }
-});
 
-
-let axesAdded = false;
-// マーカーイベント
+// マーカーが見つかった際の処理
 marker.addEventListener("markerFound", () => {
     console.log("markerFound");
     if (!cameraEl) cameraEl = scene.querySelector('[camera]');
 
-    videoPlane.setAttribute("visible", true);
-    startPlayback();
+    // マーカーが見つかった場合のみ処理
+    if (!isMarkerDetected) {
+        // videoPlaneが元の親 (marker) に戻っていることを確認
+        if (videoPlane.parentNode !== marker) {
+            originalParent = videoPlane.parentNode; // 現在の親を保存 (通常はa-scene)
+            marker.appendChild(videoPlane); // マーカーの子に戻す
+        }
+        videoPlane.setAttribute("visible", true);
+        startPlayback();
 
-    // マーカーの位置と回転をvideoPlaneに適用
-    const markerObject = marker.object3D;
-    const markerPosition = new THREE.Vector3();
-    const markerRotation = new THREE.Quaternion();
-    markerObject.getWorldPosition(markerPosition);
-    markerObject.getWorldQuaternion(markerRotation);
-    videoPlane.object3D.position.copy(markerPosition);
-    videoPlane.object3D.quaternion.copy(markerRotation);
-    videoPlane.object3D.scale.set(1, offset, 1); // width=1の場合
-
-    // 6DoFを有効に（WASD移動を有効に）
-    if (cameraEl) {
-        cameraEl.setAttribute("wasd-controls", "enabled: true");
+        // 6DoFを有効に（WASD移動を有効に）
+        if (cameraEl) {
+            cameraEl.setAttribute("wasd-controls", "enabled: true");
+        }
+        isMarkerDetected = true;
     }
-
-    markerFoundLastTime = true;
 });
+
+// マーカーが失われた際の処理
 marker.addEventListener("markerLost", () => {
     console.log("markerLost");
-    if (cameraEl) {
-        cameraEl.setAttribute("wasd-controls", "enabled: false");
-    }
 
-    markerFoundLastTime = false;
+    // マーカーが失われた場合のみ処理
+    if (isMarkerDetected) {
+        // videoPlaneの現在のワールド座標と回転を取得
+        const worldPosition = new THREE.Vector3();
+        const worldQuaternion = new THREE.Quaternion();
+        videoPlane.object3D.getWorldPosition(worldPosition);
+        videoPlane.object3D.getWorldQuaternion(worldQuaternion);
+
+        // videoPlaneをa-markerから切り離し、a-sceneの直下に追加
+        if (videoPlane.parentNode === marker) {
+            marker.removeChild(videoPlane);
+            scene.appendChild(videoPlane);
+        }
+
+        // a-scene直下での位置と回転をワールド座標で設定
+        videoPlane.object3D.position.copy(worldPosition);
+        videoPlane.object3D.quaternion.copy(worldQuaternion);
+
+        // アニメーションは停止
+        stopPlayback();
+
+        // 3DoFを有効に（WASD移動を無効に）
+        if (cameraEl) {
+            cameraEl.setAttribute("wasd-controls", "enabled: false");
+        }
+        isMarkerDetected = false;
+    }
 });
 
 // 🔹 まずフレームを読み込み開始
