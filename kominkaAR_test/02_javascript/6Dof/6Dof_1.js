@@ -68,6 +68,7 @@ function stopPlayback() {
 
 // マーカーイベント
 marker.addEventListener("markerFound", () => {
+    marker.setAttribute("axes-helper", "size: 2");
     console.log("markerFound");
     if(cameraEl == null)
     {
@@ -96,8 +97,8 @@ marker.addEventListener("markerFound", () => {
     // 距離
     const distance = vectorToMarker.length();
 
-    console.log("Camera position:", cameraPos);          // Vector3(x, y, z)
     console.log("Marker position:", markerPos);          // Vector3(x, y, z)
+    console.log("markerObj.position:", markerObj.position);          // Vector3(x, y, z)
     console.log("Vector to marker:", vectorToMarker);    // Vector3(x, y, z)
     console.log("Distance to marker:", distance.toFixed(3));
 
