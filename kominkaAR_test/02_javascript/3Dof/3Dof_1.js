@@ -77,6 +77,8 @@ let update6DoFFrameId = null;
 
 let lastMarkerPos = new THREE.Vector3();
 let lastMarkerQuat = new THREE.Quaternion();
+let firstMarkerPos = new THREE.Vector3();
+let firstMarkerQuat = new THREE.Quaternion();
 
 
 function update6DoF() {
@@ -86,7 +88,11 @@ function update6DoF() {
     barcodeMarker.object3D.updateMatrixWorld(true);
     barcodeMarker.object3D.getWorldPosition(markerWorldPos);
     barcodeMarker.object3D.getWorldQuaternion(quat);
-    
+    if(firstMarkerPos == new THREE.Vector3())
+    {
+        firstMarkerPos.copy(markerWorldPos);
+        firstMarkerQuat.copy(quat);
+    }
     // videoGroup を追従させる
     videoGroup.object3D.position.copy(markerWorldPos);  
 
@@ -117,9 +123,11 @@ barcodeMarker.addEventListener("markerFound", () => {
         }
     }
     
-    
     startPlayback();
     
+    
+    firstMarkerPos = new THREE.Vector3();
+    firstMarkerQuat = new THREE.Quaternion();
     setTimeout(() => {
        update6DoF();
     }, 200);
@@ -132,10 +140,13 @@ barcodeMarker.addEventListener("markerLost", () => {
         cancelAnimationFrame(update6DoFFrameId);
         update6DoFFrameId = null;
     }
+    
     camera.setAttribute("look-controls", {
         enabled: true,
         magicWindowTrackingEnabled: true
     });
+    videoGroup.object3D.position.copy(firstMarkerPos);    
+    videoPlane.object3D.quaternion.copy(firstMarkerQuat);
 });
 
 // 🔹 まずフレームを読み込み開始
