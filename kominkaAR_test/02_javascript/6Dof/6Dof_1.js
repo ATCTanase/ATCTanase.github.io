@@ -85,9 +85,9 @@ marker.addEventListener("markerLost", () => {
         enabled: true,
         magicWindowTrackingEnabled: true
     });
-    // setTimeout(() => {
-    //     videoPlane.setAttribute("visible", true);
-    // }, 100);
+    setTimeout(() => {
+        videoPlane.setAttribute("visible", true);
+    }, 100);
 });
 
 // 🔹 まずフレームを読み込み開始
