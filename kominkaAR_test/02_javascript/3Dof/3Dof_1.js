@@ -116,7 +116,8 @@ barcodeMarker.addEventListener("markerFound", () => {
 
     if(cameraFrag) {
         videoPlane.setAttribute("visible", "true");
-        cameraFrag = false;  const planeMesh = videoPlane.getObject3D("mesh");
+        cameraFrag = false;  
+    
         const planeMesh = videoPlane.getObject3D("mesh");
         if (planeMesh) {
             planeMesh.geometry.translate(0, planeMesh.geometry.parameters.height / 2, 0);
@@ -140,7 +141,7 @@ barcodeMarker.addEventListener("markerLost", () => {
         cancelAnimationFrame(update6DoFFrameId);
         update6DoFFrameId = null;
     }
-    
+
     camera.setAttribute("look-controls", {
         enabled: true,
         magicWindowTrackingEnabled: true
