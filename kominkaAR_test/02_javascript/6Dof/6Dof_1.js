@@ -82,7 +82,8 @@ marker.addEventListener("markerFound", () => {
     startPlayback();
     cameraEl.setAttribute("look-controls", {
         enabled: false,
-        magicWindowTrackingEnabled: false
+        magicWindowTrackingEnabled: false,
+        resetCamera: false
     });
     
     const cameraObj = cameraEl.object3D;
@@ -110,7 +111,8 @@ marker.addEventListener("markerLost", () => {
     // scene直下に追加
     cameraEl.setAttribute("look-controls", {
         enabled: true,
-        magicWindowTrackingEnabled: true
+        magicWindowTrackingEnabled: true,
+        resetCamera: false
     });
 });
 
