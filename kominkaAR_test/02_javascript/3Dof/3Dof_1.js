@@ -78,6 +78,7 @@ let update6DoFFrameId = null;
 let lastMarkerPos = new THREE.Vector3();
 let lastMarkerQuat = new THREE.Quaternion();
 
+
 function update6DoF() {
     if (!markerVisible) return;
     const markerWorldPos = new THREE.Vector3();
@@ -92,22 +93,19 @@ function update6DoF() {
     videoPlane.object3D.position.set(markerPositionX, markerPositionY, markerPositionZ);
     videoPlane.object3D.quaternion.copy(quat);
     
-    // lastMarkerQuat.copy(quat);
-    // const rot = camera.object3D.rotation.clone();
-    // console.log("camera.rot",rot);
- 
+    lastMarkerPos.copy(markerWorldPos);
+    lastMarkerQuat.copy(quat);
+    
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
 barcodeMarker.addEventListener("markerFound", () => {
-    console.log("markerFound",lastMarkerPos);
     barcodeMarker.setAttribute("axes-helper", "size: 2");
-
     // look-controlsを無効化
     camera.setAttribute("look-controls", {
-        enabled: false
+        enabled: false,
+        magicWindowTrackingEnabled: false
     });
-
     markerVisible = true;
 
     if(cameraFrag) {
@@ -115,18 +113,13 @@ barcodeMarker.addEventListener("markerFound", () => {
         cameraFrag = false;
     }
     
-    // const rot = camera.object3D.rotation.clone();
-    // console.log("camera.rot",rot);
-    // setTimeout(() => {
-    //     camera.object3D.rotation.copy(rot);
-    // }, 0);
-    
     startPlayback();
     
     setTimeout(() => {
        update6DoF();
     }, 200);
 });
+
 videoPlane.addEventListener('loaded', () => {
     const planeMesh = videoPlane.getObject3D("mesh");
     if (planeMesh) {
@@ -136,19 +129,15 @@ videoPlane.addEventListener('loaded', () => {
 
 barcodeMarker.addEventListener("markerLost", () => {
     markerVisible = false;
-    console.log("markerLost",lastMarkerPos);
-    
     stopPlayback();
     if (update6DoFFrameId) { 
         cancelAnimationFrame(update6DoFFrameId);
         update6DoFFrameId = null;
     }
-    
-
     camera.setAttribute("look-controls", {
-        enabled: true
+        enabled: true,
+        magicWindowTrackingEnabled: true
     });
-
 });
 
 // 🔹 まずフレームを読み込み開始
