@@ -127,12 +127,12 @@ barcodeMarker.addEventListener("markerFound", () => {
        update6DoF();
     }, 200);
 });
-// videoPlane.addEventListener('loaded', () => {
-//     const planeMesh = videoPlane.getObject3D("mesh");
-//     if (planeMesh) {
-//         planeMesh.geometry.translate(0, planeMesh.geometry.parameters.height / 2, 0);
-//     }
-// });
+videoPlane.addEventListener('loaded', () => {
+    const planeMesh = videoPlane.getObject3D("mesh");
+    if (planeMesh) {
+        planeMesh.geometry.translate(0, planeMesh.geometry.parameters.height / 2, 0);
+    }
+});
 
 barcodeMarker.addEventListener("markerLost", () => {
     markerVisible = false;
