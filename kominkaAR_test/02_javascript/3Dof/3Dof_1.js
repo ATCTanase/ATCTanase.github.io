@@ -80,6 +80,7 @@ let lastMarkerQuat = new THREE.Quaternion();
 
 function update6DoF() {
     if (!markerVisible) return;
+    console.log("update6DoF");
     const markerWorldPos = new THREE.Vector3();
     const quat = new THREE.Quaternion();
     barcodeMarker.object3D.updateMatrixWorld(true);
@@ -92,8 +93,9 @@ function update6DoF() {
     videoPlane.object3D.position.set(markerPositionX, markerPositionY, markerPositionZ);
     videoPlane.object3D.quaternion.copy(quat);
     
-    lastMarkerPos.copy(markerWorldPos);
-    lastMarkerQuat.copy(quat);
+    // lastMarkerQuat.copy(quat);
+    // const rot = camera.object3D.rotation.clone();
+    // console.log("camera.rot",rot);
  
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
@@ -104,7 +106,6 @@ barcodeMarker.addEventListener("markerFound", () => {
 
     // look-controlsを無効化
     camera.setAttribute("look-controls", {
-        enabled: false,
         magicWindowTrackingEnabled: false
     });
     markerVisible = true;
@@ -114,14 +115,11 @@ barcodeMarker.addEventListener("markerFound", () => {
         cameraFrag = false;
     }
     
-    const pos = camera.object3D.position.clone();
-    const rot = camera.object3D.rotation.clone();
-    console.log("camera.Pos",pos);
-    console.log("camera.rot",rot);
-    setTimeout(() => {
-        camera.object3D.position.copy(pos);
-        camera.object3D.rotation.copy(rot);
-    }, 0);
+    // const rot = camera.object3D.rotation.clone();
+    // console.log("camera.rot",rot);
+    // setTimeout(() => {
+    //     camera.object3D.rotation.copy(rot);
+    // }, 0);
     
     startPlayback();
     
@@ -147,19 +145,16 @@ barcodeMarker.addEventListener("markerLost", () => {
         cancelAnimationFrame(update6DoFFrameId);
         update6DoFFrameId = null;
     }
-    const pos = camera.object3D.position.clone();
+    
     const rot = camera.object3D.rotation.clone();
-    console.log("camera.Pos",pos);
     console.log("camera.rot",rot);
     camera.setAttribute("look-controls", {
-        enabled: true,
         magicWindowTrackingEnabled: true
     });
-    
-    setTimeout(() => {
-        camera.object3D.position.copy(pos);
-        camera.object3D.rotation.copy(rot);
-    }, 0);
+    // setTimeout(() => {
+    //     camera.object3D.rotation.copy(rot);
+    // }, 0);
+
 });
 
 // 🔹 まずフレームを読み込み開始
