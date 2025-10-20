@@ -80,7 +80,6 @@ let lastMarkerQuat = new THREE.Quaternion();
 
 function update6DoF() {
     if (!markerVisible) return;
-    console.log("update6DoF");
     const markerWorldPos = new THREE.Vector3();
     const quat = new THREE.Quaternion();
     barcodeMarker.object3D.updateMatrixWorld(true);
@@ -137,8 +136,6 @@ barcodeMarker.addEventListener("markerFound", () => {
 barcodeMarker.addEventListener("markerLost", () => {
     markerVisible = false;
     console.log("markerLost",lastMarkerPos);
-
-    videoGroup.object3D.position.copy(lastMarkerPos);
     
     stopPlayback();
     if (update6DoFFrameId) { 
@@ -146,8 +143,8 @@ barcodeMarker.addEventListener("markerLost", () => {
         update6DoFFrameId = null;
     }
     
-    const rot = camera.object3D.rotation.clone();
-    console.log("camera.rot",rot);
+    // const rot = camera.object3D.rotation.clone();
+    // console.log("camera.rot",rot);
     camera.setAttribute("look-controls", {
         magicWindowTrackingEnabled: true
     });
