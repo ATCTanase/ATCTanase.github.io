@@ -109,16 +109,8 @@ barcodeMarker.addEventListener("markerFound", () => {
     });
     markerVisible = true;
 
-    if(cameraFrag) {
-        videoPlane.setAttribute("visible", "true");
-        cameraFrag = false;
-    }
-    
-    // const rot = camera.object3D.rotation.clone();
-    // console.log("camera.rot",rot);
-    // setTimeout(() => {
-    //     camera.object3D.rotation.copy(rot);
-    // }, 0);
+    const lookControls = camera.components["look-controls"];
+    lookControls.magicWindowTrackingEnabled = false;
     
     startPlayback();
     
@@ -143,14 +135,8 @@ barcodeMarker.addEventListener("markerLost", () => {
         update6DoFFrameId = null;
     }
     
-    // const rot = camera.object3D.rotation.clone();
-    // console.log("camera.rot",rot);
-    // camera.setAttribute("look-controls", {
-    //     magicWindowTrackingEnabled: true
-    // });
-    // setTimeout(() => {
-    //     camera.object3D.rotation.copy(rot);
-    // }, 0);
+    const lookControls = camera.components["look-controls"];
+    lookControls.magicWindowTrackingEnabled = true;
 
 });
 
