@@ -1,13 +1,8 @@
 const barcodeMarker = document.getElementById("barcodeMarker");
 const videoPlane    = document.getElementById("videoPlane");
 const videoGroup    = document.getElementById("videoGroup");
-let mainCamera  = null;
-let subCamera = null;
+const camera        = document.querySelector("#mainCamera");
 
-document.addEventListener('DOMContentLoaded', () => {
-    mainCamera = document.getElementById('mainCamera');
-    subCamera = document.getElementById('subCamera');
-});
 
 let markerTimer = null;
 let markerVisible = false;
@@ -80,13 +75,9 @@ let markerPositionZ = -2;
 let cameraFrag = true;
 let update6DoFFrameId = null;
 
-
 let lastMarkerPos = new THREE.Vector3();
 let lastMarkerQuat = new THREE.Quaternion();
-
-let lastCamPos = new THREE.Vector3();
-let lastCamQuat = new THREE.Quaternion();
-
+let firstMarkerPos = new THREE.Vector3();
 
 function update6DoF() {
     if (!markerVisible) return;
@@ -104,40 +95,27 @@ function update6DoF() {
     
     lastMarkerPos.copy(markerWorldPos);
     lastMarkerQuat.copy(quat);
-    
-    mainCamera.object3D.updateMatrixWorld(true);
-    mainCamera.object3D.getWorldPosition(lastCamPos);
-    mainCamera.object3D.getWorldQuaternion(lastCamQuat);
-    
+ 
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 };
 
 barcodeMarker.addEventListener("markerFound", () => {
+    console.log("markerFound",lastMarkerPos);
     barcodeMarker.setAttribute("axes-helper", "size: 2");
-    barcodeMarker.setAttribute("visible", "true"); // visible を true に設定
-    barcodeMarker.setAttribute("position", "0 0 0");
+
+    // look-controlsを無効化
+    camera.setAttribute("look-controls", {
+        enabled: false,
+        magicWindowTrackingEnabled: false
+    });
     markerVisible = true;
-    
-    if(cameraFrag)
-    {
+
+    if(cameraFrag) {
+        videoPlane.setAttribute("visible", "true");
         cameraFrag = false;
     }
-    else{
-        const pos = new THREE.Vector3();
-        const quat = new THREE.Quaternion();
-
-        subCamera.object3D.updateMatrixWorld(true);
-        subCamera.object3D.getWorldPosition(pos);
-        subCamera.object3D.getWorldQuaternion(quat);
-            
-        // 切り替え後のカメラに座標と回転を適用
-        mainCamera.object3D.position.copy(pos);
-        mainCamera.object3D.quaternion.copy(quat);
-
-        mainCamera.setAttribute('camera', 'active', true);
-        subCamera.setAttribute('camera', 'active', false);
-    }
-
+    console.log("camera.Pos",camera.object3D.position);
+    
     startPlayback();
     
     setTimeout(() => {
@@ -152,20 +130,25 @@ barcodeMarker.addEventListener("markerFound", () => {
 // });
 
 barcodeMarker.addEventListener("markerLost", () => {
-    
     markerVisible = false;
+    console.log("markerLost",lastMarkerPos);
+    if(firstMarkerPos == new THREE.Vector3())
+    {
+        console.log("firstMarkerPos",lastMarkerPos);
+        firstMarkerPos = new THREE.Vector3(lastMarkerPos.X,lastMarkerPos.Y,0);
+    }
+    videoGroup.object3D.position.copy(lastMarkerPos - firstMarkerPos);
+    
     stopPlayback();
     if (update6DoFFrameId) { 
         cancelAnimationFrame(update6DoFFrameId);
         update6DoFFrameId = null;
     }
-            
-    // 切り替え後のカメラに座標と回転を適用
-    subCamera.object3D.position.copy(lastCamPos);
-    subCamera.object3D.quaternion.copy(lastCamQuat);
-
-    mainCamera.setAttribute('camera', 'active', false);
-    subCamera.setAttribute('camera', 'active', true);
+    camera.setAttribute("look-controls", {
+        enabled: true,
+        magicWindowTrackingEnabled: true
+    });
+    console.log("camera.Pos",camera.object3D.position);
 });
 
 // 🔹 まずフレームを読み込み開始

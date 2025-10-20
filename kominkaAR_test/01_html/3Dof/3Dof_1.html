@@ -53,21 +53,12 @@
                 material="shader: flat; side: double; transparent: true; alphaTest: 0.01;">
             </a-plane>
         </a-entity>
-
-        <a-entity
-            camera
+        
+        <a-camera 
             position="0 0 0" 
             id="mainCamera"
-            active="true"
             look-controls="enabled: false; magicWindowTrackingEnabled: false; touchEnabled: false">
-        </a-entity>   
-        <a-entity 
-           camera 
-            position="0 0 0" 
-            id="subCamera"
-            active="false"
-            look-controls="enabled: true; magicWindowTrackingEnabled: true; touchEnabled: false">
-        </a-entity>   
+        </a-camera>   
     </a-scene>
 
     <dialog id="kariModalDialog" class="dialog">
