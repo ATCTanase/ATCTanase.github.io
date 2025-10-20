@@ -95,24 +95,25 @@ marker.addEventListener("markerFound", () => {
     {
         cameraEl = scene.camera.el;
     }
+    videoPlane.setAttribute("visible", true);
     videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
     startPlayback();
 
-    
     cameraEl.setAttribute("look-controls", {
         enabled: false,
         magicWindowTrackingEnabled: false
     });
 
     // 既存の clone があれば削除
-    if (!clone) {
+    if (clone == null) {
         // videoPlaneの複製を作成
         clone = videoPlane.cloneNode(true);
         clone.setAttribute("id", "videoPlaneClone");
-        cameraEl.appendChild(clone);
         clone.setAttribute("visible", true);
         clone.setAttribute("material", "src", canvas);
     }
+    
+    cameraEl.appendChild(clone);
     update6DoFFrameId = requestAnimationFrame(update6DoF);
 });
 
@@ -122,11 +123,14 @@ marker.addEventListener("markerLost", () => {
         cancelAnimationFrame(update6DoFFrameId);
         update6DoFFrameId = null;
     }
+    
+
     cameraEl.setAttribute("look-controls", {
         enabled: true,
         magicWindowTrackingEnabled: true
     });
 
+    scene.appendChild(clone);
 });
 
 // 🔹 まずフレームを読み込み開始
