@@ -145,9 +145,9 @@ barcodeMarker.addEventListener("markerLost", () => {
     
     // const rot = camera.object3D.rotation.clone();
     // console.log("camera.rot",rot);
-    camera.setAttribute("look-controls", {
-        magicWindowTrackingEnabled: true
-    });
+    // camera.setAttribute("look-controls", {
+    //     magicWindowTrackingEnabled: true
+    // });
     // setTimeout(() => {
     //     camera.object3D.rotation.copy(rot);
     // }, 0);
