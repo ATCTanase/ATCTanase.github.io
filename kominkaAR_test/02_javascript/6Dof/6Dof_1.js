@@ -65,9 +65,10 @@ function stopPlayback() {
         playTimer = null;
     }
 }
-let clone = null;
+
 // マーカーイベント
 marker.addEventListener("markerFound", () => {
+    console.log("markerFound");
     if(cameraEl == null)
     {
         cameraEl = scene.camera.el;
@@ -75,64 +76,39 @@ marker.addEventListener("markerFound", () => {
     videoPlane.setAttribute("visible", true);
     videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
     startPlayback();
-
-    
     cameraEl.setAttribute("look-controls", {
         enabled: false,
         magicWindowTrackingEnabled: false
     });
+    
+    const cameraObj = cameraEl.object3D;
+    const markerObj = marker.object3D;
 
-    // 既存の clone があれば削除
-    if (clone == null) {
-        // videoPlaneの複製を作成
-        clone = videoPlane.cloneNode(true);
-        clone.setAttribute("id", "videoPlaneClone");
-        clone.setAttribute("material", "src", canvas);
-        cameraEl.appendChild(clone);
-    }
-    clone.setAttribute("visible", true);
+    // Vector3 でワールド座標を取得
+    const cameraPos = new THREE.Vector3();
+    const markerPos = new THREE.Vector3();
+    cameraObj.getWorldPosition(cameraPos);
+    markerObj.getWorldPosition(markerPos);
+
+    // カメラ → マーカーへのベクトル
+    const vectorToMarker = new THREE.Vector3();
+    vectorToMarker.subVectors(markerPos, cameraPos); // marker - cameras
+    // 距離
+    const distance = vectorToMarker.length();
+
+    console.log("Camera position:", cameraPos);          // Vector3(x, y, z)
+    console.log("Marker position:", markerPos);          // Vector3(x, y, z)
+    console.log("Vector to marker:", vectorToMarker);    // Vector3(x, y, z)
+    console.log("Distance to marker:", distance.toFixed(3));
+
 });
 marker.addEventListener("markerLost", () => {
-    const srcObj = videoPlane.object3D;
-    const dstObj = clone.object3D;
-    const pos = new THREE.Vector3();
-    const quat = new THREE.Quaternion();
-    const scale = new THREE.Vector3();
-
-    srcObj.getWorldPosition(pos);
-    srcObj.getWorldQuaternion(quat);
-    srcObj.getWorldScale(scale);
-
-    // ワールド座標と回転をコピー
-    dstObj.position.copy(pos);
-    dstObj.quaternion.copy(quat);
-    dstObj.scale.copy(scale);
-
-    // 見えるように設定
-    clone.setAttribute("visible", true);
-
+    // scene直下に追加
+    scene.appendChild(clone);
     cameraEl.setAttribute("look-controls", {
         enabled: true,
         magicWindowTrackingEnabled: true
     });
-    
-    setTimeout(() => {
-        const srcObj = clone.object3D;
-        const pos = new THREE.Vector3();
-        const quat = new THREE.Quaternion();
-        const scale = new THREE.Vector3();
-        srcObj.updateMatrixWorld(true);
-        srcObj.getWorldPosition(pos);
-        srcObj.getWorldQuaternion(quat);
-        srcObj.getWorldScale(scale);
-
-        scene.appendChild(clone);
-
-        // ワールド座標と回転をコピー
-        srcObj.position.copy(pos);
-        srcObj.quaternion.copy(quat);
-        srcObj.scale.copy(scale);
-    }, 200);
 });
 
 // 🔹 まずフレームを読み込み開始
