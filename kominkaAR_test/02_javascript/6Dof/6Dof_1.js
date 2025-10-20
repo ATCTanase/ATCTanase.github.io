@@ -104,7 +104,6 @@ marker.addEventListener("markerFound", () => {
 });
 marker.addEventListener("markerLost", () => {
     // scene直下に追加
-    scene.appendChild(clone);
     cameraEl.setAttribute("look-controls", {
         enabled: true,
         magicWindowTrackingEnabled: true
