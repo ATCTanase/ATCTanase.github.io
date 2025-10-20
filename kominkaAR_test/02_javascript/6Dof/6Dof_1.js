@@ -88,7 +88,7 @@ marker.addEventListener("markerFound", () => {
         clone = videoPlane.cloneNode(true);
         clone.setAttribute("id", "videoPlaneClone");
         clone.setAttribute("material", "src", canvas);
-        scene.appendChild(clone);
+        cameraEl.appendChild(clone);
     }
     clone.setAttribute("visible", false);
 });
