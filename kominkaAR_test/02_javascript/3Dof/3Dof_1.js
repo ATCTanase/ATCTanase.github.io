@@ -110,21 +110,19 @@ barcodeMarker.addEventListener("markerFound", () => {
 
     if(cameraFrag) {
         videoPlane.setAttribute("visible", "true");
-        cameraFrag = false;
+        cameraFrag = false;  const planeMesh = videoPlane.getObject3D("mesh");
+        const planeMesh = videoPlane.getObject3D("mesh");
+        if (planeMesh) {
+            planeMesh.geometry.translate(0, planeMesh.geometry.parameters.height / 2, 0);
+        }
     }
+    
     
     startPlayback();
     
     setTimeout(() => {
        update6DoF();
     }, 200);
-});
-
-videoPlane.addEventListener('loaded', () => {
-    const planeMesh = videoPlane.getObject3D("mesh");
-    if (planeMesh) {
-        planeMesh.geometry.translate(0, planeMesh.geometry.parameters.height / 2, 0);
-    }
 });
 
 barcodeMarker.addEventListener("markerLost", () => {
