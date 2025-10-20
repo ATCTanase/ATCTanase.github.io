@@ -115,26 +115,7 @@ marker.addEventListener("markerLost", () => {
         enabled: true,
         magicWindowTrackingEnabled: true
     });
-    cameraEl.object3D.position.set(0, 0, 0);
-    cameraEl.object3D.rotation.set(0, 0, 0);
-    
-    setTimeout(() => {
-        const srcObj = clone.object3D;
-        const pos = new THREE.Vector3();
-        const quat = new THREE.Quaternion();
-        const scale = new THREE.Vector3();
 
-        srcObj.getWorldPosition(pos);
-        srcObj.getWorldQuaternion(quat);
-        srcObj.getWorldScale(scale);
-
-        scene.appendChild(clone);
-
-        // ワールド座標と回転をコピー
-        srcObj.position.copy(pos);
-        srcObj.quaternion.copy(quat);
-        srcObj.scale.copy(scale);
-    }, 200);
 });
 
 // 🔹 まずフレームを読み込み開始
