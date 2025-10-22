@@ -46,6 +46,8 @@
 
     <div id="title" style="top:2px; left:2px; position:fixed; font-size: 30px;">3DOF1</div>
 
+    <canvas id="overlay"></canvas>
+
     <a-scene embedded vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true; alpha: true;"
         arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
 
@@ -53,7 +55,7 @@
         <a-light type="point" intensity="2" position="0 2 2"></a-light>
 
         <a-marker type="pattern" value="5" id="barcodeMarker" url="../../04_image/patt/AR1.patt" size="0.2"></a-marker>
-        <a-plane id="videoPlane" position="0 0 0" rotation="0 0 0" width="1" height="1" visible="false"
+        <a-plane id="videoPlane" position="0 0 0" rotation="-90 0 0" width="1" height="1" visible="false"
             material="shader: flat; side: double; transparent: true; alphaTest: 0.01;">
         </a-plane>
 
@@ -136,10 +138,12 @@
         function onOff() {
             if (guidemarkerOnOff) {
                 document.querySelector("#videoPlane").removeAttribute("axes-helper");
+                document.getElementById("barcodeMarker").removeAttribute("axes-helper");
 
                 guidemarkerOnOff = false;
             } else {
                 document.querySelector("#videoPlane").setAttribute("axes-helper", "size: 3");
+                document.getElementById("barcodeMarker").setAttribute("axes-helper", "size: 3");
 
                 guidemarkerOnOff = true;
             }

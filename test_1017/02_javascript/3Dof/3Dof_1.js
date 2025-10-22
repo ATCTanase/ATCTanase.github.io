@@ -193,7 +193,30 @@ barcodeMarker.addEventListener("markerLost", () => {
   //videoPlane.setAttribute('visible', 'false');
 });
 
-// 初期ロード
-preloadFrames(() => {
-  console.log("アニメーション準備完了");
-});
+const vector = new THREE.Vector3();
+const overlay = document.getElementById("overlay");
+
+overlay.width = window.innerWidth;
+overlay.height = window.innerHeight;
+function update() {
+        requestAnimationFrame(update);
+        ctx.clearRect(0, 0, overlay.width, overlay.height);
+
+        // マーカーが見つかってない場合はスキップ
+        if (!barcodeMarker.object3D.visible) return;
+
+        // マーカーの中心をスクリーン座標に変換
+        vector.setFromMatrixPosition(barcodeMarker.object3D.matrixWorld);
+        vector.project(camera);
+
+        const x = (vector.x * 0.5 + 0.5) * overlay.width;
+        const y = (-vector.y * 0.5 + 0.5) * overlay.height;
+
+        // 四角を描画
+        const size = 50;
+        ctx.strokeStyle = "lime";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x - size / 2, y - size / 2, size, size);
+      }
+
+update();
