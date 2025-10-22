@@ -55,11 +55,11 @@ function drawNextFrame() {
   const img = frames[currentFrame];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  
+
     const planeMesh = videoPlane.getObject3D('mesh');
     if (planeMesh) {
       const mat = planeMesh.material;
-      if (mat?.map) mat.map.needsUpdate = true;
+  if (mat?.map) mat.map.needsUpdate = true;
     }
 
   currentFrame = (currentFrame + 1) % frameCount;
@@ -132,7 +132,7 @@ barcodeMarker.addEventListener("markerFound", () => {
 
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
-        const yCorrection = -rotX * correctionFactor;
+        const yCorrection = (45 - rotX) * correctionFactor;
 
         // rotY（左右）で左右方向（x軸）を補正
         const correctionFactorX = 0.02;  // 左右補正の強さ
