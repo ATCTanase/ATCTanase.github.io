@@ -205,10 +205,14 @@ function update() {
 
         // マーカーが見つかってない場合はスキップ
         if (!barcodeMarker.object3D.visible) return;
+        const threeCamera = cameraEntity.getObject3D("camera");
+        if (!threeCamera) return; // カメラ初期化待ち
 
-        // マーカーの中心をスクリーン座標に変換
+        barcodeMarker.object3D.updateMatrixWorld(true);
+
+        // ワールド位置取得
         vector.setFromMatrixPosition(barcodeMarker.object3D.matrixWorld);
-        vector.project(camera);
+        vector.project(threeCamera); 
 
         const x = (vector.x * 0.5 + 0.5) * overlay.width;
         const y = (-vector.y * 0.5 + 0.5) * overlay.height;
