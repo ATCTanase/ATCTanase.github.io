@@ -42,6 +42,16 @@ function preloadFrames(callback) {
       progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
       if (loaded === frameCount) {
         loadingOverlay.style.display = "none";
+        
+        // ✅ プレーンの高さを設定（横幅に比例）
+        const width = 1.0;
+        const height = width * offset;
+        videoPlane.setAttribute("width", width);
+        videoPlane.setAttribute("height", height);
+
+        // ✅ 「下中央基準」に見せるために、プレーン全体を半分下げる
+        videoPlane.object3D.position.y -= height / 2;
+        
         callback();
         offset = img.height / img.width;
       }
@@ -59,10 +69,7 @@ function drawNextFrame() {
     const planeMesh = videoPlane.getObject3D('mesh');
     if (planeMesh) {
       const mat = planeMesh.material;
-      const height = planeMesh.geometry.parameters?.height || 1;
-      planeMesh.geometry.translate(0, height / 2, 0);
       if (mat?.map) mat.map.needsUpdate = true;
-
     }
 
   currentFrame = (currentFrame + 1) % frameCount;
@@ -128,9 +135,9 @@ barcodeMarker.addEventListener("markerFound", () => {
 
         // --- 位置補正 ---
         const offsetPosition = new THREE.Vector3(
-          markerWorldPos.x,
-          markerWorldPos.y,
-          markerWorldPos.z
+          markerWorldPos.x + markerPositionX,
+          markerWorldPos.y + markerPositionY,
+          markerWorldPos.z + markerPositionZ
         );
 
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
