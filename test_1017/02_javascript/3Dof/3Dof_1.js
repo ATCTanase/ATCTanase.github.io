@@ -26,6 +26,9 @@ const loadingOverlay = document.getElementById("loadingOverlay");
 const progressText = document.getElementById("progress");
 
 let offset;
+let markerPositionX = 0;
+let markerPositionY = 0;
+let markerPositionZ = 0;
 
 // フレームロード
 function preloadFrames(callback) {
