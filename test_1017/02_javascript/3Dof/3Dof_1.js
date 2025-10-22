@@ -28,7 +28,7 @@ const progressText = document.getElementById("progress");
 let offset;
 let markerPositionX = 0;
 let markerPositionY = 0;
-let markerPositionZ = 0;
+let markerPositionZ = -1;
 
 // フレームロード
 function preloadFrames(callback) {
@@ -165,7 +165,9 @@ barcodeMarker.addEventListener("markerFound", () => {
         // // --- 補正適用 ---
         offsetPosition.y += yCorrection;
         offsetPosition.x += xCorrection;
-        offsetPosition.z -= Number(markerPositionZ);
+        
+        const camRotX = camera.object3D.rotation.x;
+        offsetPosition.z += Number(markerPositionZ) * Math.cos(camRotX);
 
         // --- カメラ相対からワールド座標に変換 ---
         const worldPos = camera.object3D.localToWorld(offsetPosition.clone());
