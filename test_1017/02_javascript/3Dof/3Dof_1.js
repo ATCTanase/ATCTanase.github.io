@@ -95,82 +95,58 @@ barcodeMarker.addEventListener("markerFound", () => {
 
     markerTimer = setInterval(() => {
       if (markerVisible) {
-        // ワールド座標
+        // 1. マーカーのワールド座標・回転取得
         const markerWorldPos = new THREE.Vector3();
         barcodeMarker.object3D.updateMatrixWorld(true);
         barcodeMarker.object3D.getWorldPosition(markerWorldPos);
-        
-        // --- カメラ座標系に変換 ---
-        const markerPosLocalToCamera = camera.object3D.worldToLocal(markerWorldPos.clone());
 
-        // --- 角度計算 ---
-        // マーカーのワールド回転クォータニオン
         const markerWorldQuat = new THREE.Quaternion();
         barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
 
-        // カメラのワールド回転クォータニオン
-        const cameraWorldQuat = new THREE.Quaternion();
-        camera.object3D.getWorldQuaternion(cameraWorldQuat);
-      
-        // マーカーの回転をカメラ座標系に変換
-        const markerLocalQuat = cameraWorldQuat.clone().invert().multiply(markerWorldQuat);
-
-        // オイラー角に変換（ラジアン→度）
-        const euler = new THREE.Euler();
-        euler.setFromQuaternion(markerLocalQuat, 'YXZ'); // YXZはよく使う順序
-        const radToDeg = THREE.MathUtils.radToDeg;
-        const rotX = radToDeg(euler.x);
-        const rotY = radToDeg(euler.y);
-        const rotZ = radToDeg(euler.z);
-
-        // --- オフセット補正（カメラ相対） ---
-        const offsetPosition = markerPosLocalToCamera.clone().add( new THREE.Vector3(
+        // 2. マーカーからの相対位置をワールドに変換
+        const offsetLocal = new THREE.Vector3(
           Number(markerPositionX),
           Number(markerPositionY),
-          0
-        ));
-        
-        const worldPos = camera.object3D.localToWorld(offsetPosition.clone());
+          Number(markerPositionZ)
+        );
+        const offsetWorld = offsetLocal.clone().applyQuaternion(markerWorldQuat).add(markerWorldPos);
 
-        // マーカー距離（カメラからマーカーまでの距離）
+        // 3. カメラ座標系でのマーカー位置（距離や回転補正用）
+        const markerPosLocalToCamera = camera.object3D.worldToLocal(markerWorldPos.clone());
         const distance = markerPosLocalToCamera.length();
-        // 距離に応じて補正をスケーリング
-        const distanceFactor = THREE.MathUtils.clamp(distance * 0.5, 1, 4);
 
-        // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
-        const correctionFactor = 0.02; // 補正量は調整可能
+        // マーカーの回転をカメラ座標系に変換
+        const cameraWorldQuat = new THREE.Quaternion();
+        camera.object3D.getWorldQuaternion(cameraWorldQuat);
+        const markerLocalQuat = cameraWorldQuat.clone().invert().multiply(markerWorldQuat);
+        const euler = new THREE.Euler();
+        euler.setFromQuaternion(markerLocalQuat, 'YXZ');
+        const rotX = THREE.MathUtils.radToDeg(euler.x);
+        const rotY = THREE.MathUtils.radToDeg(euler.y);
+        const rotZ = THREE.MathUtils.radToDeg(euler.z);
+
+        // 4. 回転補正（カメラ回転に応じて微調整）
+        const correctionFactor = 0.02;
         const yCorrection = -rotX * correctionFactor;
 
-        // rotY（左右）で左右方向（x軸）を補正
-        const correctionFactorX = 0.02;  // 左右補正の強さ
+        const correctionFactorX = 0.02;
         let adjustedY;
         if (rotY > 0) {
-          if (rotZ > 0) {
-            adjustedY = rotY - rotZ;
-          }else{
-            adjustedY = rotY + rotZ;
-          }
+          adjustedY = rotZ > 0 ? rotY - rotZ : rotY + rotZ;
         } else if (rotY < 0) {
-          if (rotZ > 0) {
-            adjustedY = rotY + rotZ;
-          }else{
-            adjustedY = rotY - rotZ;
-          }
+          adjustedY = rotZ > 0 ? rotY + rotZ : rotY - rotZ;
         } else {
-          adjustedY = rotY; // 0 の場合
+          adjustedY = rotY;
         }
         const xCorrection = adjustedY * correctionFactorX;
-        // rotYが右向きで正になることが多いので符号反転
 
-        // // --- 補正適用 ---
-        worldPos.y += yCorrection;
-        worldPos.x += xCorrection;
-        
-        worldPos.z += Number(markerPositionZ);
+        // 5. 補正をワールド座標に適用
+        offsetWorld.x += xCorrection;
+        offsetWorld.y += yCorrection;
 
-        // --- カメラ相対からワールド座標に変換 ---
-        videoPlane.object3D.position.copy(worldPos);
-        console.log(videoPlane.object3D.position);
+        // 6. videoPlane に反映
+        videoPlane.object3D.position.copy(offsetWorld);
+        console.log('finalPos:', offsetWorld);
 
 
         //ここまで
