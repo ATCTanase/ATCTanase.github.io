@@ -29,12 +29,6 @@ let offset;
 let markerPositionX = 0;
 let markerPositionY = 0;
 let markerPositionZ = 0;
-videoPlane.addEventListener('model-loaded', () => {
-    const planeMesh = videoPlane.getObject3D('mesh');
-    if (planeMesh) {
-        planeMesh.geometry.translate(0, 0.5, 0); // y方向に半分移動
-    }
-});
 
 // フレームロード
 function preloadFrames(callback) {
@@ -61,9 +55,13 @@ function drawNextFrame() {
   const img = frames[currentFrame];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-  const mat = videoPlane.getObject3D("mesh")?.material;
-  if (mat?.map) mat.map.needsUpdate = true;
+  
+    const planeMesh = videoPlane.getObject3D('mesh');
+    if (planeMesh) {
+      const mat = planeMesh.material;
+      if (mat?.map) mat.map.needsUpdate = true;
+      planeMesh.geometry.translate(0, 0.5, 0);
+    }
 
   currentFrame = (currentFrame + 1) % frameCount;
 }
