@@ -205,7 +205,7 @@ function update() {
 
         // マーカーが見つかってない場合はスキップ
         if (!barcodeMarker.object3D.visible) return;
-        const threeCamera = cameraEntity.getObject3D("camera");
+        const threeCamera = camera.getObject3D("camera");
         if (!threeCamera) return; // カメラ初期化待ち
 
         barcodeMarker.object3D.updateMatrixWorld(true);
