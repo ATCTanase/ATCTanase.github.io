@@ -196,6 +196,10 @@ barcodeMarker.addEventListener("markerLost", () => {
   //videoPlane.setAttribute('visible', 'false');
 });
 
+// 初期ロード
+preloadFrames(() => {
+  console.log("アニメーション準備完了");
+});
 const vector = new THREE.Vector3();
 const overlay = document.getElementById("overlay");
 overlay.width = window.innerWidth;
