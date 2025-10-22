@@ -42,16 +42,6 @@ function preloadFrames(callback) {
       progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
       if (loaded === frameCount) {
         loadingOverlay.style.display = "none";
-        
-        // ✅ プレーンの高さを設定（横幅に比例）
-        const width = 1.0;
-        const height = width * offset;
-        videoPlane.setAttribute("width", width);
-        videoPlane.setAttribute("height", height);
-
-        // ✅ 「下中央基準」に見せるために、プレーン全体を半分下げる
-        videoPlane.object3D.position.y -= height / 2;
-        
         callback();
         offset = img.height / img.width;
       }
