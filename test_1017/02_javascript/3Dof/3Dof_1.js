@@ -129,9 +129,9 @@ barcodeMarker.addEventListener("markerFound", () => {
         const offsetPosition = markerPosLocalToCamera.clone().add( new THREE.Vector3(
           Number(markerPositionX),
           Number(markerPositionY),
-          Number(markerPositionZ)
+          0
         ));
-
+        
         // マーカー距離（カメラからマーカーまでの距離）
         const distance = markerPosLocalToCamera.length();
         // 距離に応じて補正をスケーリング
@@ -163,9 +163,9 @@ barcodeMarker.addEventListener("markerFound", () => {
         // rotYが右向きで正になることが多いので符号反転
 
         // // --- 補正適用 ---
-         offsetPosition.y += yCorrection;
-         offsetPosition.x += xCorrection;
-
+        offsetPosition.y += yCorrection;
+        offsetPosition.x += xCorrection;
+        offsetPosition.z -= Number(markerPositionZ);
 
         // --- カメラ相対からワールド座標に変換 ---
         const worldPos = camera.object3D.localToWorld(offsetPosition.clone());
