@@ -28,7 +28,9 @@ const progressText = document.getElementById("progress");
 let offset;
 let markerPositionX = 0;
 let markerPositionY = 0;
-let markerPositionZ = -1;
+let markerPositionZ = 0;
+
+let firstRotX = null;
 
 // フレームロード
 function preloadFrames(callback) {
@@ -110,12 +112,9 @@ barcodeMarker.addEventListener("markerFound", () => {
         // カメラのワールド回転クォータニオン
         const cameraWorldQuat = new THREE.Quaternion();
         camera.object3D.getWorldQuaternion(cameraWorldQuat);
-
-        // カメラ回転の逆元を計算（カメラ座標系に変換）
-        const cameraWorldQuatInverse = cameraWorldQuat.clone().invert();
-
+      
         // マーカーの回転をカメラ座標系に変換
-        const markerLocalQuat = cameraWorldQuatInverse.multiply(markerWorldQuat);
+        const markerLocalQuat = cameraWorldQuat.clone().invert().multiply(markerWorldQuat);
 
         // オイラー角に変換（ラジアン→度）
         const euler = new THREE.Euler();
@@ -124,6 +123,8 @@ barcodeMarker.addEventListener("markerFound", () => {
         const rotX = radToDeg(euler.x);
         const rotY = radToDeg(euler.y);
         const rotZ = radToDeg(euler.z);
+
+        if (firstRotX == null) firstRotX = rotX;
 
         // --- オフセット補正（カメラ相対） ---
         const offsetPosition = markerPosLocalToCamera.clone().add( new THREE.Vector3(
@@ -139,7 +140,7 @@ barcodeMarker.addEventListener("markerFound", () => {
 
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
-        const yCorrection = -rotX * correctionFactor * distanceFactor;
+        const yCorrection = (rotX - firstRotX) * correctionFactor * distanceFactor;
 
         // rotY（左右）で左右方向（x軸）を補正
         const correctionFactorX = 0.02;  // 左右補正の強さ
@@ -192,7 +193,7 @@ barcodeMarker.addEventListener("markerFound", () => {
           `y: ${rotY.toFixed(1)}<br>` +
           `z: ${rotZ.toFixed(1)}`;
       }
-    }, 10);
+    }, 33);
   }
 });
 
