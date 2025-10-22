@@ -11,6 +11,12 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 videoPlane.setAttribute("material", "src", canvas);
+const aspect = window.innerHeight / window.innerWidth;
+videoPlane.setAttribute("height", 1);
+videoPlane.setAttribute("width", 1 / aspect);
+
+//Xを90回転させ補正
+barcodeMarker.object3D.rotation.x = -Math.PI / 2
 
 // ARアニメ
 const ARImageFolder = "../../04_image/ARImage/AR1/";
