@@ -29,7 +29,6 @@ let offset;
 let markerPositionX = 0;
 let markerPositionY = 0;
 let markerPositionZ = 0;
-
 let firstRotX = null;
 
 // フレームロード
@@ -79,6 +78,7 @@ function stopPlayback() {
 }
 
 barcodeMarker.addEventListener("markerFound", () => {
+  firstRotX = null;
   if (!markerVisible) {
     markerVisible = true;
     startPlayback();
@@ -133,6 +133,8 @@ barcodeMarker.addEventListener("markerFound", () => {
           0
         ));
         
+        const worldPos = camera.object3D.localToWorld(offsetPosition.clone());
+
         // マーカー距離（カメラからマーカーまでの距離）
         const distance = markerPosLocalToCamera.length();
         // 距離に応じて補正をスケーリング
@@ -140,7 +142,7 @@ barcodeMarker.addEventListener("markerFound", () => {
 
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
-        const yCorrection = (rotX - firstRotX) * correctionFactor * distanceFactor;
+        const yCorrection = (rotX-firstRotX) * correctionFactor;
 
         // rotY（左右）で左右方向（x軸）を補正
         const correctionFactorX = 0.02;  // 左右補正の強さ
@@ -160,17 +162,16 @@ barcodeMarker.addEventListener("markerFound", () => {
         } else {
           adjustedY = rotY; // 0 の場合
         }
-        const xCorrection = adjustedY * correctionFactorX * distanceFactor;
+        const xCorrection = adjustedY * correctionFactorX;
         // rotYが右向きで正になることが多いので符号反転
 
         // // --- 補正適用 ---
-        offsetPosition.y += yCorrection;
-        offsetPosition.x += xCorrection;
+        worldPos.y += yCorrection;
+        worldPos.x += xCorrection;
         
-        offsetPosition.z += Number(markerPositionZ);
+        worldPos.z += Number(markerPositionZ);
 
         // --- カメラ相対からワールド座標に変換 ---
-        const worldPos = camera.object3D.localToWorld(offsetPosition.clone());
         videoPlane.object3D.position.copy(worldPos);
         console.log(videoPlane.object3D.position);
 
@@ -180,6 +181,11 @@ barcodeMarker.addEventListener("markerFound", () => {
 
         // ログUIに表示
         logUI.innerHTML =
+          `markerPosLocalToCamera:<br>` +
+          `x: ${markerPosLocalToCamera.x.toFixed(3)}<br>` +
+          `y: ${markerPosLocalToCamera.y.toFixed(3)}<br>` +
+          `z: ${markerPosLocalToCamera.z.toFixed(3)}<br><br>` +
+          `distance: ${distance.toFixed(3)}<br>` +
           `Marker World Position:<br>` +
           `x: ${markerWorldPos.x.toFixed(3)}<br>` +
           `y: ${markerWorldPos.y.toFixed(3)}<br>` +
