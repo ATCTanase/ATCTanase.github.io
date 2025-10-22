@@ -125,14 +125,14 @@ barcodeMarker.addEventListener("markerFound", () => {
 
         // --- 位置補正 ---
         const offsetPosition = new THREE.Vector3(
-          markerWorldPos.x + markerPositionX,
-          markerWorldPos.y + markerPositionY,
-          markerWorldPos.z + markerPositionZ
+          markerWorldPos.x + Number(markerPositionX),
+          markerWorldPos.y + Number(markerPositionY),
+          markerWorldPos.z + Number(markerPositionZ)
         );
 
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
-        const yCorrection = (45 - rotX) * correctionFactor;
+        const yCorrection = -rotX * correctionFactor;
 
         // rotY（左右）で左右方向（x軸）を補正
         const correctionFactorX = 0.02;  // 左右補正の強さ
