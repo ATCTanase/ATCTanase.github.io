@@ -166,8 +166,7 @@ barcodeMarker.addEventListener("markerFound", () => {
         offsetPosition.y += yCorrection;
         offsetPosition.x += xCorrection;
         
-        const camRotX = camera.object3D.rotation.x;
-        offsetPosition.z += Number(markerPositionZ) * Math.cos(camRotX);
+        offsetPosition.z += Number(markerPositionZ);
 
         // --- カメラ相対からワールド座標に変換 ---
         const worldPos = camera.object3D.localToWorld(offsetPosition.clone());
