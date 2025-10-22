@@ -195,12 +195,13 @@ barcodeMarker.addEventListener("markerLost", () => {
 
 const vector = new THREE.Vector3();
 const overlay = document.getElementById("overlay");
-
 overlay.width = window.innerWidth;
 overlay.height = window.innerHeight;
+const ctx2 = overlay.getContext("2d", { willReadFrequently: true });
+
 function update() {
         requestAnimationFrame(update);
-        ctx.clearRect(0, 0, overlay.width, overlay.height);
+        ctx2.clearRect(0, 0, overlay.width, overlay.height);
 
         // マーカーが見つかってない場合はスキップ
         if (!barcodeMarker.object3D.visible) return;
@@ -214,9 +215,9 @@ function update() {
 
         // 四角を描画
         const size = 50;
-        ctx.strokeStyle = "lime";
-        ctx.lineWidth = 3;
-        ctx.strokeRect(x - size / 2, y - size / 2, size, size);
+        ctx2.strokeStyle = "lime";
+        ctx2.lineWidth = 3;
+        ctx2.strokeRect(x - size / 2, y - size / 2, size, size);
       }
 
 update();
