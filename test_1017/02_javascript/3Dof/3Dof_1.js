@@ -130,9 +130,14 @@ barcodeMarker.addEventListener("markerFound", () => {
           markerWorldPos.z + Number(markerPositionZ)
         );
 
+        // マーカー距離（カメラからマーカーまでの距離）
+        const distance = camera.object3D.position.distanceTo(markerWorldPos);
+        // 距離に応じて補正をスケーリング
+        const distanceFactor = THREE.MathUtils.clamp(distance * 0.5, 1, 4);
+
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
-        const yCorrection = -rotX * correctionFactor;
+        const yCorrection = -rotX * correctionFactor * distanceFactor;
 
         // rotY（左右）で左右方向（x軸）を補正
         const correctionFactorX = 0.02;  // 左右補正の強さ
@@ -152,7 +157,7 @@ barcodeMarker.addEventListener("markerFound", () => {
         } else {
           adjustedY = rotY; // 0 の場合
         }
-        const xCorrection = adjustedY * correctionFactorX;
+        const xCorrection = adjustedY * correctionFactorX * distanceFactor;
         // rotYが右向きで正になることが多いので符号反転
 
         // // --- 補正適用 ---
