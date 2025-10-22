@@ -193,7 +193,7 @@ barcodeMarker.addEventListener("markerFound", () => {
           `y: ${rotY.toFixed(1)}<br>` +
           `z: ${rotZ.toFixed(1)}`;
       }
-    }, 100);
+    }, 10);
   }
 });
 
