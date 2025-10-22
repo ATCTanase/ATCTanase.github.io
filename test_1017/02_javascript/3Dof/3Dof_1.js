@@ -1,9 +1,6 @@
 const barcodeMarker = document.getElementById("barcodeMarker");
 const videoPlane = document.getElementById("videoPlane");
 const camera = document.querySelector("#mainCamera");
-const wrapper = document.getElementById("markerWrapper");
-wrapper.setAttribute("rotation", "-90 0 0"); // マーカー座標系を水平に
-wrapper.setAttribute("axes-helper", "size: 3");
 
 let markerTimer = null;
 let markerVisible = false;
@@ -14,9 +11,6 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 videoPlane.setAttribute("material", "src", canvas);
-
-//Xを90回転させ補正
-barcodeMarker.object3D.rotation.x = -Math.PI / 2
 
 // ARアニメ
 const ARImageFolder = "../../04_image/ARImage/AR1/";
@@ -135,7 +129,7 @@ barcodeMarker.addEventListener("markerFound", () => {
 
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
-        const yCorrection = (45 - rotX) * correctionFactor;
+        const yCorrection = (90 - rotX) * correctionFactor;
 
         // rotY（左右）で左右方向（x軸）を補正
         const correctionFactorX = 0.02;  // 左右補正の強さ
@@ -205,19 +199,4 @@ barcodeMarker.addEventListener("markerLost", () => {
 // 初期ロード
 preloadFrames(() => {
   console.log("アニメーション準備完了");
-});
-
-AFRAME.registerComponent('axes-helper', {
-  schema: { size: { type: 'number', default: 1 }, offsetY: { type: 'number', default: 0 } },
-  init: function () {
-    this.helper = new THREE.AxesHelper(this.data.size);
-    this.helper.position.y += this.data.offsetY; // オフセット
-    this.el.object3D.add(this.helper);
-  },
-  remove: function () {
-    if (this.helper) {
-      this.el.object3D.remove(this.helper);
-      this.helper = null;
-    }
-  }
 });
