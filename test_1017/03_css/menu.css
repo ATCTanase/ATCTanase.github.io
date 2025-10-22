@@ -1,0 +1,157 @@
+/*＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+ * メニュー画面
+ *＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
+#menu {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  background-color: rgb(188, 219, 148);
+}
+
+.menuBtnFlex {
+  display: flex;
+  margin-bottom: 2%;
+}
+.menuBtnFlex button {
+  margin-right: 2%;
+}
+.menuBtnFlex button:last-of-type {
+  margin-right: 0;
+}
+.menuFooterContents {
+  position: relative;
+  z-index: 1;
+  margin-top: -1%;
+  padding-top: 4%;
+  background-color: rgb(188, 219, 148);
+}
+.menuFooterFlex {
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  padding: 0 5% 1.5%;
+}
+.menuAttendContents {
+  display: none;
+  position: absolute;
+  width: 15%;
+  right: 6%;
+  padding-top: 7%;
+}
+.menuAttendContents.flash {
+  display: block;
+  -webkit-animation: flashing 0.5s ease-in-out infinite alternate;
+  animation: flashing 0.5s ease-in-out infinite alternate;
+}
+@-webkit-keyframes flashing{
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+@keyframes flashing {
+  0% {opacity: 0}
+  100% {opacity: 1}
+}
+.footerArea {
+  position: relative;
+}
+.footerArea:first-child{
+  margin-right: 5%;
+}
+.footerArea button {
+  display: block;
+}
+#recommendArea {
+  position: absolute;
+  bottom: 100%;
+  width: 100%;
+  margin: 0 0 5%;
+  padding: 3%;
+  background-color: #fff;
+  border: 1px solid #9e9e9e;
+  border-radius: 13px;
+  box-shadow: 3px 3px 0 #9e9e9e;
+  box-sizing: border-box;
+  list-style: none;
+  visibility: hidden;
+  opacity: 0;
+  transition: all .5s;
+}
+#recommendArea.open {
+  visibility: visible;
+  opacity: 1;
+}
+#recommendArea li:not(:first-child) {
+  border-top: 1px solid rgba(158,158,158,0.3);
+  padding-top: 3%;
+  margin-top: 3%;
+}
+#recommendArea a {
+  display: flex;
+  align-items: center;
+  color: #303030;
+  font-size: 2.7vw;
+  font-weight: bold;
+  border-radius: 10px;
+  text-decoration: none;
+  line-height: 1;
+  aspect-ratio: 172 / 44;
+  padding-left: 14%;
+}
+#recommendArea a::before {
+  content: "";
+  position: absolute;
+  left: 2%;
+  width: 12%;
+  height: 12%;
+  background: url(../04_image/arrow_head.png) no-repeat center center / contain;
+}
+#recommendArea a:active {
+  color: #303030;
+  background-color: rgba(158,158,158,0.3);
+}
+#recommendArea a:visited {
+  color: #303030;
+}
+
+
+
+
+
+#menuBackgroud {
+  position: absolute;
+  top: 0;
+}
+
+#menuBtnContents {
+  position: relative;
+  padding-bottom: 0%;
+  padding-left: 3%;
+  padding-right: 3%;
+  padding-top: 71%;
+  z-index: 1;
+}
+
+.menuBtnFlex {
+  display: flex;
+  margin-bottom: 2%;
+}
+
+.menuBtnFlex button {
+  margin-right: 2%;
+}
+
+.menuBtnFlex button:last-of-type {
+  margin-right: 0;
+}
+
+#menuExplanationErea{
+  padding-bottom: 3%;
+  padding-left: 10%;
+  width: 80%;
+}
+
+#menuStopAndLookErea{
+  padding-left: 10%;
+  width: 80%;
+}

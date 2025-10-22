@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>古民家AR スタンプラリー</title>
+
+    <!-- ↓faviconエラー消すための1行 -->
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="../03_css/stampRally.css">
+    <link rel="stylesheet" href="../03_css/style.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- <?php include($_SERVER['DOCUMENT_ROOT'] . "/common/inc/gtm_head.php"); ?> -->
+  </head>
+
+  <body>
+    <!-- <?php include($_SERVER['DOCUMENT_ROOT'] . "/common/inc/gtm_body.php"); ?> -->
+    <div id="mainContents">
+      <div id="stampRally">
+        <img id="stampRallyBackground">
+        <div id="stampRallyStampContents">
+        </div>
+
+        <div class="langBtn">
+          <button type="button" id="changeLanguageBtn">
+            <img id="langBtnImg">
+            <img id="langBtnImgOn">
+          </button>
+          <ul class="langArea">
+            <li><a href="" class="jp active">日本語</a></li>
+            <li><a href="" class="en">English</a></li>
+            <li><a href="" class="cn">简体中文</a></li>
+            <li><a href="" class="tw">繁體中文</a></li>
+            <li><a href="" class="ko">한국어</a></li>
+          </ul>
+        </div>
+
+
+        <button type="button" id="backBtn">
+          <img id="backBtnImg">
+          <img id="backBtnImgOn">
+        </button>
+
+        <div id="stampRallyCompleteContents">
+          <div class="stampRallyCompleteBtnContents">
+            <img id="stampRallyCompleteImg">
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLScBBdZ7m5nMm-YmkCKPtWGBzvR3NTXxKzOjRRLvQpLgS2LF3A/viewform?usp=header" target="_blank" id="moveEnqueteBtn">
+              <img id="enqueteBtnImg">
+              <img id="enqueteBtnImgOn">
+            </a>
+            <button type="button "id="closeCompleteBtn">
+              <img id="closeBtnImg">
+              <img id="closeBtnImgOn">
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="msgContents">
+      <img id="msgRotationImg">
+    </div>
+
+    <script src="../02_javascript/common.js"></script>
+    <script src="../02_javascript/data-store.js"></script>
+    <script src="../02_javascript/image-controller.js"></script>
+    <script>
+      setStampRallyImg();
+      setRotationImg();
+      // ボタン名、オフ時のボタン名、オン時のボタン名、url
+      pushBtn("backBtn",           "backBtnImg",    "backBtnImgOn",    "./");
+      pushBtn("closeCompleteBtn",  "closeBtnImg",   "closeBtnImgOn",   false);
+      pushBtn("changeLanguageBtn", "langBtnImg",    "langBtnImgOn",    false);
+      pushBtn("moveEnqueteBtn",    "enqueteBtnImg", "enqueteBtnImgOn", false);
+
+      if(checkCookie("stampList")){
+        if(getCookie("stampList").every(value => value === true)){
+          $("#stampRallyCompleteContents").show();
+          $("#stampRally").css("overflow", "hidden");
+        }
+      }
+
+      if(getCookie("enqueteBtnFlg").length > 0){
+        if(getCookie("enqueteBtnFlg").every(value => value === true)){
+          $("#stampRallyCompleteContents").hide();
+          $("#stampRally").css("overflow", "initial");
+        }
+      }
+      
+      $("#moveEnqueteBtn").on("click", function(){
+        setCookie("enqueteBtnFlg", [true]);
+      });
+      $("#closeCompleteBtn").on("click", function(){
+        setCookie("enqueteBtnFlg", [true]);
+        $("#stampRallyCompleteContents").hide();
+        $("#stampRally").css("overflow", "initial");
+      });
+    </script>
+  </body>
+</html>

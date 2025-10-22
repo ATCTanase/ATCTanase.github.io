@@ -1,0 +1,58 @@
+/*＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+ * スタンプラリー画面
+ *＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
+#stampRally {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  background-color: rgb(237, 232, 222);
+}
+img#stampRallyBackground {
+  position: absolute;
+  top: 0;
+}
+#stampRallyStampContents .stampRallyStamp {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 15%;
+}
+/* スタンプラリー完了エリア */
+#stampRallyCompleteContents {
+  position: relative;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  z-index: 2;
+  display: none;
+}
+img#stampRallyCompleteBackground {
+  position: absolute;
+  top: 0;
+}
+.stampRallyCompleteBtnContents {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+/* スタンプラリー完了画面閉じるボタン */
+#closeCompleteBtn {
+  width: 15%;
+  margin-top: 5%;
+}
+/* アンケートに答えるボタン */
+#moveEnqueteBtn {
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  width: 85%;
+  transform: translate(-50%, -50%);
+}
+#stampRally #backBtn {
+  position: relative;
+  float: right;
+  margin-top: 165%;
+}

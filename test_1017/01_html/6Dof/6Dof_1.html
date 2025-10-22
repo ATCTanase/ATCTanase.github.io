@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>AR1_日向椎葉の舞手</title>
+
+  <!-- ↓faviconエラー消すための1行 -->
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../../03_css/6Dof.css">
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+
+<body>
+  <!-- 🔹 ローディング表示 -->
+  <div id="loadingOverlay">
+    読み込み中... <span id="progress">0%</span>
+  </div>
+
+  <div id="title" style="top:2px; left:2px; position:fixed; font-size: 30px;">6DOF1</div>
+
+  <a-scene 
+    embedded 
+    vr-mode-ui="enabled: false" 
+    renderer="logarithmicDepthBuffer: true; alpha: true;"
+    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+
+    <a-marker type="pattern" value="5" id="barcodeMarker" url="../../04_image/patt/AR1.patt"
+      smooth="true" smoothCount="100" smoothTolerance="10" smoothThreshold="5">
+      <a-plane 
+        id="videoPlane" 
+        position="0 -1.2 -2" 
+        rotation="-90 0 0" 
+        width="8" 
+        height="8" 
+        visible="false"
+        material="shader: flat; side: double; transparent: true; alphaTest:0.01;">
+      </a-plane>
+    </a-marker>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <dialog id="kariModalDialog" class="dialog">
+    <div id="arrangementChange" style="overflow: visible; height: 250px;">
+      <div style="border: solid; height: 100%;">
+        位置
+        <ul style="margin: 0;">
+        <li>赤線</li>
+        <input id="XDirection" type="text" style="width: 50%; font-size: 150%;">
+        <li>緑線</li>
+        <input id="YDirection" type="text" style="width: 50%;font-size: 150%;">
+        <li>青線</li>
+        <input id="ZDirection" type="text" style="width: 50%;font-size: 150%;">
+        </ul>
+      </div>
+      <div style="border: solid; height: 100%;">
+        大きさ
+        <ul style="margin: 0;">
+        <li>縦幅：横幅に応じて決まります</li>
+        <input id="height" type="text" style="width: 50%; font-size: 150%;" hidden>
+        <li>横幅</li>
+        <input id="width"  type="text" style="width: 50%; font-size: 150%;">
+        </ul>
+      </div>
+      <div style="border: solid; height: 100%;">
+        回転
+        <ul style="margin: 0;">
+        <li>X軸回転(縦に回す)</li>
+        <input id="XRotation" type="text" style="width: 50%; font-size: 150%;">
+        <li>Y軸回転(横に回す)</li>
+        <input id="YRotation" type="text" style="width: 50%; font-size: 150%;">
+        <li>Z軸回転(平面時にプラスの値で時計回り)</li>
+        <input id="ZRotation" type="text" style="width: 50%; font-size: 150%;">
+        </ul>
+      </div>
+    </div>
+
+    <button id="kariCloseDialog" onclick="closeDialog()">適用</button>
+  </dialog>
+
+  <div id="kariDialogButton">
+    <button id="kariSettingButton" onclick="openDialog()">設定</button>
+  </div>
+  <div id="kariGuidemarkerButton" style="position: fixed; bottom: 60px; right: 10px;">
+    <button onclick="onOff()">マーカーON・OFF</button>
+  </div>
+
+  <script src="../../02_javascript/6Dof/6Dof_1.js"></script>
+  <script src="../../02_javascript/common.js"></script>
+  <script src="../../02_javascript/debugModeSetting_6Dof.js"></script>
+  <script>
+    // A-Frame コンポーネントを定義
+    AFRAME.registerComponent('axes-helper', {
+      schema: { size: { type: 'number', default: 1 } },
+      init: function () {
+        this.helper = new THREE.AxesHelper(this.data.size);
+        this.el.object3D.add(this.helper);
+      },
+      remove: function () {
+        if (this.helper) {
+          this.el.object3D.remove(this.helper);
+          this.helper = null;
+        }
+      }
+    });
+  </script>
+  <script>
+    let guidemarkerOnOff = false;
+
+    function onOff(){
+      if(guidemarkerOnOff){
+        document.querySelector("#barcodeMarker").removeAttribute("axes-helper");
+
+        guidemarkerOnOff = false;
+      }else{
+        document.querySelector("#barcodeMarker").setAttribute("axes-helper", "size: 3");
+
+        guidemarkerOnOff = true;
+      }
+    }
+  </script>
+</body>
+
+</html>
