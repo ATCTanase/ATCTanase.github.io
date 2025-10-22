@@ -98,7 +98,9 @@ barcodeMarker.addEventListener("markerFound", () => {
         const markerWorldPos = new THREE.Vector3();
         barcodeMarker.object3D.updateMatrixWorld(true);
         barcodeMarker.object3D.getWorldPosition(markerWorldPos);
-
+        
+        // --- カメラ座標系に変換 ---
+        const markerPosLocalToCamera = camera.object3D.worldToLocal(markerWorldPos.clone());
 
         // --- 角度計算 ---
         // マーカーのワールド回転クォータニオン
@@ -123,15 +125,15 @@ barcodeMarker.addEventListener("markerFound", () => {
         const rotY = radToDeg(euler.y);
         const rotZ = radToDeg(euler.z);
 
-        // --- 位置補正 ---
-        const offsetPosition = new THREE.Vector3(
-          markerWorldPos.x + Number(markerPositionX),
-          markerWorldPos.y + Number(markerPositionY),
-          markerWorldPos.z + Number(markerPositionZ)
-        );
+        // --- オフセット補正（カメラ相対） ---
+        const offsetPosition = markerPosLocalToCamera.clone().add( new THREE.Vector3(
+          Number(markerPositionX),
+          Number(markerPositionY),
+          Number(markerPositionZ)
+        ));
 
         // マーカー距離（カメラからマーカーまでの距離）
-        const distance = camera.object3D.position.distanceTo(markerWorldPos);
+        const distance = markerPosLocalToCamera.length();
         // 距離に応じて補正をスケーリング
         const distanceFactor = THREE.MathUtils.clamp(distance * 0.5, 1, 4);
 
@@ -165,7 +167,9 @@ barcodeMarker.addEventListener("markerFound", () => {
          offsetPosition.x += xCorrection;
 
 
-        videoPlane.object3D.position.copy(offsetPosition);
+        // --- カメラ相対からワールド座標に変換 ---
+        const worldPos = camera.object3D.localToWorld(offsetPosition.clone());
+        videoPlane.object3D.position.copy(worldPos);
         console.log(videoPlane.object3D.position);
 
 
