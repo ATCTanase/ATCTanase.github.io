@@ -163,8 +163,8 @@ barcodeMarker.addEventListener("markerFound", () => {
         // rotYが右向きで正になることが多いので符号反転
 
         // // --- 補正適用 ---
-        offsetPosition.y += yCorrection;
-        offsetPosition.x += xCorrection;
+        // offsetPosition.y += yCorrection;
+        // offsetPosition.x += xCorrection;
         offsetPosition.z -= Number(markerPositionZ);
 
         // --- カメラ相対からワールド座標に変換 ---
