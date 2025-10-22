@@ -51,8 +51,11 @@
 
         <a-light type="ambient" color="#ffffff"></a-light>
         <a-light type="point" intensity="2" position="0 2 2"></a-light>
+        
+        <a-entity id="markerWrapper">
+            <a-marker type="pattern" value="5" id="barcodeMarker" url="../../04_image/patt/AR1.patt" size="0.2"></a-marker>
+        </a-entity>
 
-        <a-marker type="pattern" value="5" id="barcodeMarker" url="../../04_image/patt/AR1.patt" size="0.2"></a-marker>
         <a-plane id="videoPlane" position="0 0 0" rotation="0 0 0" width="1" height="1" visible="false"
             material="shader: flat; side: double; transparent: true; alphaTest: 0.01;">
         </a-plane>
@@ -136,12 +139,10 @@
         function onOff() {
             if (guidemarkerOnOff) {
                 document.querySelector("#videoPlane").removeAttribute("axes-helper");
-                document.getElementById("barcodeMarker").removeAttribute("axes-helper");
 
                 guidemarkerOnOff = false;
             } else {
                 document.querySelector("#videoPlane").setAttribute("axes-helper", "size: 3");
-                document.getElementById("barcodeMarker").setAttribute("axes-helper", "size: 3");
 
                 guidemarkerOnOff = true;
             }

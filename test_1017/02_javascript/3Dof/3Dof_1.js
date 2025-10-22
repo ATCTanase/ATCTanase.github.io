@@ -1,6 +1,9 @@
 const barcodeMarker = document.getElementById("barcodeMarker");
 const videoPlane = document.getElementById("videoPlane");
 const camera = document.querySelector("#mainCamera");
+const wrapper = document.getElementById("markerWrapper");
+wrapper.setAttribute("rotation", "-90 0 0"); // マーカー座標系を水平に
+wrapper.setAttribute("axes-helper", "size: 3");
 
 let markerTimer = null;
 let markerVisible = false;
