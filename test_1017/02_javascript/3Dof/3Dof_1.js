@@ -129,7 +129,7 @@ barcodeMarker.addEventListener("markerFound", () => {
 
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
-        const yCorrection = (90 - rotX) * correctionFactor;
+        const yCorrection = (rotX-90) * correctionFactor;
 
         // rotY（左右）で左右方向（x軸）を補正
         const correctionFactorX = 0.02;  // 左右補正の強さ
