@@ -59,8 +59,10 @@ function drawNextFrame() {
     const planeMesh = videoPlane.getObject3D('mesh');
     if (planeMesh) {
       const mat = planeMesh.material;
+      const height = planeMesh.geometry.parameters?.height || 1;
+      planeMesh.geometry.translate(0, height / 2, 0);
       if (mat?.map) mat.map.needsUpdate = true;
-      planeMesh.geometry.translate(0, 0.5, 0);
+
     }
 
   currentFrame = (currentFrame + 1) % frameCount;
