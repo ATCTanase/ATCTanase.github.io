@@ -29,6 +29,12 @@ let offset;
 let markerPositionX = 0;
 let markerPositionY = 0;
 let markerPositionZ = 0;
+videoPlane.addEventListener('model-loaded', () => {
+    const planeMesh = videoPlane.getObject3D('mesh');
+    if (planeMesh) {
+        planeMesh.geometry.translate(0, 0.5, 0); // y方向に半分移動
+    }
+});
 
 // フレームロード
 function preloadFrames(callback) {
