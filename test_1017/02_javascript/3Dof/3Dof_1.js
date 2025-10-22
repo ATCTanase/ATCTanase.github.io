@@ -123,8 +123,6 @@ barcodeMarker.addEventListener("markerFound", () => {
         const rotY = radToDeg(euler.y);
         const rotZ = radToDeg(euler.z);
 
-        if (firstRotX == null) firstRotX = rotX;
-
         // --- オフセット補正（カメラ相対） ---
         const offsetPosition = markerPosLocalToCamera.clone().add( new THREE.Vector3(
           Number(markerPositionX),
