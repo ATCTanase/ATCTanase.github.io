@@ -155,7 +155,7 @@ AFRAME.registerComponent("marker-tracker", {
         offsetPosition.x += xCorrection;
         
         const cameraForward = new THREE.Vector3();
-        camera.getWorldDirection(cameraForward);
+        camera.object3D.getWorldDirection(cameraForward);
 
         // --- カメラ相対からワールド座標に変換 ---
         const worldPos = camera.object3D.localToWorld(offsetPosition.clone());
