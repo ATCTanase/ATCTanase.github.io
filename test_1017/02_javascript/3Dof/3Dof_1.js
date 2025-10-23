@@ -82,18 +82,13 @@ barcodeMarker.addEventListener("markerFound", () => {
     startPlayback();
     videoPlane.setAttribute('visible', 'true');
 
-    camera.setAttribute('look-controls', {
-      enabled: true,
-      magicWindowTrackingEnabled: true
-    });
-
     markerTimer = setInterval(() => {
       if (markerVisible) {
         barcodeMarker.object3D.updateMatrixWorld(true);
 
         // --- マーカーのワールド位置と回転を取得 ---
         const markerWorldPos = new THREE.Vector3();
-        const markerWorldQuat = new THREE.Quarternion();
+        const markerWorldQuat = new THREE.Quaternion();
         barcodeMarker.object3D.getWorldPosition(markerWorldPos);
         barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
 
