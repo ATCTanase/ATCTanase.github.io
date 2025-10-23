@@ -77,23 +77,9 @@ function stopPlayback() {
   }
 }
 
-barcodeMarker.addEventListener("markerFound", () => {
-  if (!markerVisible) {
-    markerVisible = true;
-    startPlayback();
-    videoPlane.setAttribute('visible', 'true');
 
-    // const playPromise = video.play();
-    // if (playPromise !== undefined) {
-    //   playPromise.catch(() => {/* ignore error */ });
-    // }
-
-    camera.setAttribute('look-controls', {
-      enabled: true,
-      magicWindowTrackingEnabled: true
-    });
-
-    markerTimer = setInterval(() => {
+AFRAME.registerComponent("marker-tracker", {
+  tick: function () {
       if (markerVisible) {
         // ワールド座標
         const markerWorldPos = new THREE.Vector3();
@@ -116,7 +102,8 @@ barcodeMarker.addEventListener("markerFound", () => {
         const cameraWorldQuatInverse = cameraWorldQuat.clone().invert();
 
         // マーカーの回転をカメラ座標系に変換
-        const markerLocalQuat = cameraWorldQuatInverse.multiply(markerWorldQuat);
+        const markerLocalQuat = new THREE.Quaternion();
+        markerLocalQuat.multiplyQuaternions(cameraWorldQuatInverse, markerWorldQuat);
 
         // オイラー角に変換（ラジアン→度）
         const euler = new THREE.Euler();
@@ -193,18 +180,22 @@ barcodeMarker.addEventListener("markerFound", () => {
           `x: ${rotX.toFixed(1)}<br>` +
           `y: ${rotY.toFixed(1)}<br>` +
           `z: ${rotZ.toFixed(1)}`;
-      }
-    }, 100);
+    }
   }
 });
+
+barcodeMarker.addEventListener("markerFound", () => {
+  if (!markerVisible) {
+    markerVisible = true;
+    startPlayback();
+    videoPlane.setAttribute('visible', 'true');
+  }
+})
 
 barcodeMarker.addEventListener("markerLost", () => {
   markerVisible = false;
   stopPlayback();
-  if (markerTimer) {
-    clearInterval(markerTimer);
-    markerTimer = null;
-  }
+
   logUI.innerHTML =
     `Marker World Position:<br>(x, y, z)<br><br>` +
     `Marker Rotation (deg):<br>(x, y, z)`;
