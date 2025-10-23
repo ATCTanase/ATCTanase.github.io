@@ -172,7 +172,7 @@ AFRAME.registerComponent("marker-tracker", {
           `z: ${videoPlane.object3D.position.z.toFixed(3)}<br><br>`
           
           `adjustedY: ${adjustedY.toFixed(3)}<br>` +
-          `xCorrection: ${xCorrection.toFixed(3)}<br>` + ;
+          `xCorrection: ${xCorrection.toFixed(3)}<br>`;
     }
   }
 });
