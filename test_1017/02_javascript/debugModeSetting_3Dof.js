@@ -69,8 +69,10 @@ videoPlane.addEventListener("loaded", () => {
 
             if(content[0].trim(" ") == "arHeightWidth1"){
                 const arHeightWidth = content[1].split(",");
-                markerHeight =Number(arHeightWidth[0]);
-                markerWidth = Number(arHeightWidth[1]);
+                height.setAttribute("value", arHeightWidth[0]);
+                width.setAttribute( "value", arHeightWidth[1]);
+                markerHeight = Number(arHeightWidth[0]);
+                markerWidth =  Number(arHeightWidth[1]);
             }
         }
 
