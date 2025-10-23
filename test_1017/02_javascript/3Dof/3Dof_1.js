@@ -109,7 +109,7 @@ barcodeMarker.addEventListener("markerFound", () => {
         // --- 位置補正 ---
         
         const offsetPosition = new THREE.Vector3(
-          0,
+          Number(markerPositionX),
           Number(markerPositionY),
           Number(markerPositionZ)
         );
@@ -117,7 +117,7 @@ barcodeMarker.addEventListener("markerFound", () => {
 
         // --- 回転補正 ---
         const offsetEuler = new THREE.Euler(
-          THREE.MathUtils.degToRad(45), // X軸に15度
+          0,
           0,
           0
         );
