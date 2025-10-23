@@ -105,11 +105,22 @@ AFRAME.registerComponent("marker-tracker", {
         const markerLocalQuat = new THREE.Quaternion();
         markerLocalQuat.multiplyQuaternions(cameraWorldQuatInverse, markerWorldQuat);
 
+        
+        const localOffset = new THREE.Vector3(
+          Number(markerPositionX),
+          Number(markerPositionY),
+          Number(markerPositionZ)
+        );
+
+        const offsetWorld = localOffset.applyQuaternion(markerWorldQuat);
+        const worldPos = markerWorldPos.clone().add(offsetWorld);
+
         // オイラー角に変換（ラジアン→度）
         const euler = new THREE.Euler();
         euler.setFromQuaternion(markerLocalQuat, 'YXZ'); // YXZはよく使う順序
         const radToDeg = THREE.MathUtils.radToDeg;
         const rotX = radToDeg(euler.x);
+        const rotY = radToDeg(euler.y);
 
         // マーカー距離（カメラからマーカーまでの距離）
         const distance = markerPosLocalToCamera.length();
@@ -119,18 +130,29 @@ AFRAME.registerComponent("marker-tracker", {
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
         const yCorrection = -rotX * correctionFactor * distanceFactor;
-
-        const localOffset = new THREE.Vector3(
-          Number(markerPositionX),
-          Number(markerPositionY),
-          Number(markerPositionZ)
-        );
-        const offsetWorld = localOffset.applyQuaternion(markerWorldQuat);
-        const worldPos = markerWorldPos.clone().add(offsetWorld);
+        let adjustedY;
+        if (rotY > 0) {
+          if (rotZ > 0) {
+            adjustedY = rotY - rotZ;
+          } else {
+            adjustedY = rotY + rotZ;
+          }
+        } else if (rotY < 0) {
+          if (rotZ > 0) {
+            adjustedY = rotY + rotZ;
+          } else {
+            adjustedY = rotY - rotZ;
+          }
+        } else {
+          adjustedY = rotY; // 0 の場合
+        }
+        const xCorrection = -adjustedY * correctionFactorX * distanceFactor;
+        
+        worldPos.x += xCorrection;
         worldPos.y += yCorrection;
+
         videoPlane.object3D.position.copy(worldPos);
         console.log(videoPlane.object3D.position);
-
 
         //ここまで
 
