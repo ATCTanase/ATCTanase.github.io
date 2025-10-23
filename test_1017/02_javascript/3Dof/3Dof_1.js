@@ -131,6 +131,8 @@ AFRAME.registerComponent("marker-tracker", {
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
         const yCorrection = -rotX * correctionFactor * distanceFactor;
+        
+        const correctionFactorX = 0.01;  // 左右補正の強さ
         let adjustedY;
         if (rotY > 0) {
           if (rotZ > 0) {
@@ -167,7 +169,10 @@ AFRAME.registerComponent("marker-tracker", {
           `AR World Position:<br>` +
           `x: ${videoPlane.object3D.position.x.toFixed(3)}<br>` +
           `y: ${videoPlane.object3D.position.y.toFixed(3)}<br>` +
-          `z: ${videoPlane.object3D.position.z.toFixed(3)}<br><br>` ;
+          `z: ${videoPlane.object3D.position.z.toFixed(3)}<br><br>`
+          
+          `adjustedY: ${adjustedY.toFixed(3)}<br>` +
+          `xCorrection: ${xCorrection.toFixed(3)}<br>` + ;
     }
   }
 });
