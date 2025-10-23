@@ -139,6 +139,13 @@ AFRAME.registerComponent("marker-tracker", {
         videoPlane.object3D.position.copy(worldPos);
         console.log(videoPlane.object3D.position);
 
+        // Euler角に変換（YXZ順が一般的）
+        const euler = new THREE.Euler().setFromQuaternion(markerWorldQuat, 'YXZ');
+        //yX軸のみ使用、他は0にする
+        const yOnlyEuler = new THREE.Euler(0, euler.y, 0, 'YXZ');
+        // planeに反映
+        videoPlane.object3D.quaternion.setFromEuler(yOnlyEuler);
+
         //ここまで
 
 
