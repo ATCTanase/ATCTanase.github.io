@@ -80,34 +80,28 @@ function stopPlayback() {
 
 AFRAME.registerComponent("marker-tracker", {
   tick: function () {
-      if (markerVisible) {
     if (!markerVisible) return;
-    
-    // マーカーのワールド位置と回転
+
+    // マーカーのワールド位置
     const markerWorldPos = new THREE.Vector3();
     barcodeMarker.object3D.updateMatrixWorld(true);
     barcodeMarker.object3D.getWorldPosition(markerWorldPos);
 
+    // マーカーのワールド回転
     const markerWorldQuat = new THREE.Quaternion();
     barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
 
-    // オフセット（Yは高さ固定、XZは回転に追従）
+    // オフセット（高さも含めて自由）
     const offsetVec = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ);
-    
-    // Y軸は固定、XZ平面のみ回転
-    const quatXZ = new THREE.Quaternion();
-    const euler = new THREE.Euler();
-    euler.setFromQuaternion(markerWorldQuat, "YXZ");
-    quatXZ.setFromEuler(new THREE.Euler(0, euler.y, 0)); // Y軸回転のみ
+    // マーカーの回転に沿ってオフセット
+    offsetVec.applyQuaternion(markerWorldQuat);
 
-    offsetVec.applyQuaternion(quatXZ);
-
-    // ワールド座標に加算
+    // ワールド座標に変換
     const worldPos = markerWorldPos.clone().add(offsetVec);
     videoPlane.object3D.position.copy(worldPos);
 
-    // Plane の回転もXZ回転のみ追従
-    videoPlane.object3D.quaternion.copy(quatXZ);
+    // Plane の回転はマーカーの回転に完全追従
+    videoPlane.object3D.quaternion.copy(markerWorldQuat);
 
 
         // ログUIに表示
@@ -120,7 +114,6 @@ AFRAME.registerComponent("marker-tracker", {
           `x: ${videoPlane.object3D.position.x.toFixed(3)}<br>` +
           `y: ${videoPlane.object3D.position.y.toFixed(3)}<br>` +
           `z: ${videoPlane.object3D.position.z.toFixed(3)}<br><br>`;
-    }
   }
 });
 
