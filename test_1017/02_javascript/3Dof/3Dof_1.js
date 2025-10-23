@@ -110,11 +110,6 @@ AFRAME.registerComponent("marker-tracker", {
         euler.setFromQuaternion(markerLocalQuat, 'YXZ'); // YXZはよく使う順序
         const radToDeg = THREE.MathUtils.radToDeg;
         const rotX = radToDeg(euler.x);
-        const rotY = radToDeg(euler.y);
-        const rotZ = radToDeg(euler.z);
-
-        // --- オフセット補正（カメラ相対） ---
-        const offsetPosition = markerPosLocalToCamera.clone();
 
         // マーカー距離（カメラからマーカーまでの距離）
         const distance = markerPosLocalToCamera.length();
@@ -124,43 +119,14 @@ AFRAME.registerComponent("marker-tracker", {
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
         const yCorrection = -rotX * correctionFactor * distanceFactor;
-
-        // rotY（左右）で左右方向（x軸）を補正
-        const correctionFactorX = 0.02;  // 左右補正の強さ
-        let adjustedY;
-        if (rotY > 0) {
-          if (rotZ > 0) {
-            adjustedY = rotY - rotZ;
-          }else{
-            adjustedY = rotY + rotZ;
-          }
-        } else if (rotY < 0) {
-          if (rotZ > 0) {
-            adjustedY = rotY + rotZ;
-          }else{
-            adjustedY = rotY - rotZ;
-          }
-        } else {
-          adjustedY = rotY; // 0 の場合
-        }
-        const xCorrection = adjustedY * correctionFactorX;
-        // rotYが右向きで正になることが多いので符号反転
-
-        // // --- 補正適用 ---
-        offsetPosition.y += yCorrection;
-        // offsetPosition.x += xCorrection;
         
-        const cameraForward = new THREE.Vector3();
-        camera.object3D.getWorldDirection(cameraForward);
-
-        const markerForward = new THREE.Vector3(0, 0, 1);
-        markerForward.applyQuaternion(barcodeMarker.object3D.getWorldQuaternion(new THREE.Quaternion()));
-        markerForward.normalize();
-
-        // マーカー前方向に沿ってZオフセットを加算
-        const worldPos = markerWorldPos.clone()
-          .add(markerForward.multiplyScalar(Number(markerPositionZ)))
-          .add(new THREE.Vector3(Number(markerPositionX), Number(markerPositionY), 0));
+        const localOffset = new THREE.Vector3(
+          Number(markerPositionX),
+          Number(markerPositionY) + yCorrection,
+          Number(markerPositionZ)
+        );
+        const offsetWorld = localOffset.applyQuaternion(markerWorldQuat);
+        const worldPos = markerWorldPos.clone().add(offsetWorld);
 
         videoPlane.object3D.position.copy(worldPos);
         console.log(videoPlane.object3D.position);
