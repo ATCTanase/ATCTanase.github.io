@@ -114,12 +114,8 @@ AFRAME.registerComponent("marker-tracker", {
         const rotZ = radToDeg(euler.z);
 
         // --- オフセット補正（カメラ相対） ---
-        const offsetPosition = markerPosLocalToCamera.clone().add( new THREE.Vector3(
-          Number(markerPositionX),
-          Number(markerPositionY),
-          0
-        ));
-        
+        const offsetPosition = markerPosLocalToCamera.clone();
+
         // マーカー距離（カメラからマーカーまでの距離）
         const distance = markerPosLocalToCamera.length();
         // 距離に応じて補正をスケーリング
@@ -152,20 +148,19 @@ AFRAME.registerComponent("marker-tracker", {
 
         // // --- 補正適用 ---
         offsetPosition.y += yCorrection;
-        offsetPosition.x += xCorrection;
+        // offsetPosition.x += xCorrection;
         
         const cameraForward = new THREE.Vector3();
         camera.object3D.getWorldDirection(cameraForward);
-
-        // --- カメラ相対からワールド座標に変換 ---
-        const worldPos = camera.object3D.localToWorld(offsetPosition.clone());
 
         const markerForward = new THREE.Vector3(0, 0, 1);
         markerForward.applyQuaternion(barcodeMarker.object3D.getWorldQuaternion(new THREE.Quaternion()));
         markerForward.normalize();
 
         // マーカー前方向に沿ってZオフセットを加算
-        worldPos.add(markerForward.multiplyScalar(Number(markerPositionZ)));
+        const worldPos = markerWorldPos.clone()
+          .add(markerForward.multiplyScalar(markerPositionZ))
+          .add(new THREE.Vector3(markerPositionX, markerPositionY, 0));
 
         videoPlane.object3D.position.copy(worldPos);
         console.log(videoPlane.object3D.position);
