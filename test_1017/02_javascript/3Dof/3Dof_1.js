@@ -172,8 +172,8 @@ AFRAME.registerComponent("marker-tracker", {
 
 barcodeMarker.addEventListener("markerFound", () => {
   if (!markerVisible) {
-    const markerInitialPos = new THREE.Vector3();
-    barcodeMarker.object3D.getWorldPosition(markerInitialPos);
+    const markerWorldPos  = new THREE.Vector3();
+    barcodeMarker.object3D.getWorldPosition(markerWorldPos );
     initialMarkerPosCamera = camera.object3D.worldToLocal(markerWorldPos.clone());
     markerVisible = true;
     startPlayback();
