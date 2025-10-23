@@ -93,17 +93,15 @@ barcodeMarker.addEventListener("markerFound", () => {
         barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
 
         // --- 固定オフセット（ローカル基準）をワールド変換 ---
-        const worldOffset = offsetLocal.clone().applyQuaternion(markerWorldQuat);
+        const localOffset = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ);
+        const worldOffset = localOffset.clone().applyQuaternion(markerWorldQuat);
+
+        // --- オフセットを適用して配置 ---
         const fixedWorldPos = markerWorldPos.clone().add(worldOffset);
 
-        // --- 手動オフセットをワールド座標に加算 ---
-        fixedWorldPos.x += Number(markerPositionX);
-        fixedWorldPos.y += Number(markerPositionY);
-        fixedWorldPos.z += Number(markerPositionZ);
 
-        // --- videoPlaneを配置 ---
         videoPlane.object3D.position.copy(fixedWorldPos);
-        videoPlane.object3D.quaternion.copy(markerWorldQuat)
+        videoPlane.object3D.quaternion.copy(markerWorldQuat); 
         console.log(videoPlane.object3D.position);
 
 
