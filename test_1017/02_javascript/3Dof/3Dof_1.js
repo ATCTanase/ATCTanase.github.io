@@ -80,6 +80,16 @@ function stopPlayback() {
   }
 }
 
+barcodeMarker.addEventListener("markerFound", () => {
+  if (!markerVisible) {
+    markerVisible = true;
+    startPlayback();
+    videoPlane.setAttribute('visible', 'true');
+
+    camera.setAttribute('look-controls', {
+      enabled: true,
+      magicWindowTrackingEnabled: true
+    });
 
     markerTimer = setInterval(() => {
       if (markerVisible) {
@@ -160,7 +170,7 @@ function stopPlayback() {
         
         offsetPosition.x += xCorrection + Num(markerPositionX);
         offsetPosition.y += yCorrection + Num(markerPositionY);
-        offsetPosition.z += Num(markerPositionZ);
+        offsetPosition.z +=  Num(markerPositionZ);
 
 
         videoPlane.object3D.position.copy(offsetPosition);
