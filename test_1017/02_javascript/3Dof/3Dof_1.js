@@ -105,7 +105,6 @@ AFRAME.registerComponent("marker-tracker", {
         const markerLocalQuat = new THREE.Quaternion();
         markerLocalQuat.multiplyQuaternions(cameraWorldQuatInverse, markerWorldQuat);
 
-        
         const localOffset = new THREE.Vector3(
           0,
           Number(markerPositionY),
@@ -113,12 +112,7 @@ AFRAME.registerComponent("marker-tracker", {
         );
 
         const offsetWorld = localOffset.applyQuaternion(markerWorldQuat);
-        const worldPos = markerWorldPos.clone().add(offsetWorld);
-        
-        // X補正（カメラ視点上で固定）
-        markerPosLocalToCamera.x = markerPositionX; // マーカー上のX位置に固定
-        // ワールド座標に戻す
-        const correctedWorldPos = camera.object3D.localToWorld(markerPosLocalToCamera.clone());
+        const worldPos = markerWorldPos.clone();
 
         // オイラー角に変換（ラジアン→度）
         const euler = new THREE.Euler();
@@ -136,9 +130,11 @@ AFRAME.registerComponent("marker-tracker", {
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
         const yCorrection = -rotX * correctionFactor * distanceFactor;
-        
-        worldPos.x = correctedWorldPos.x;
-        worldPos.y += yCorrection;
+      
+        const xWorld = barcodeMarker.object3D.localToWorld(new THREE.Vector3(markerPositionX, 0, 0));
+        worldPos.x = xWorld.x;
+        worldPos.y += offsetWorld.y + yCorrection;
+        worldPos.z += offsetWorld.z;
 
         videoPlane.object3D.position.copy(worldPos);
         console.log(videoPlane.object3D.position);
