@@ -1,3 +1,14 @@
+let markerPositionX = 0;
+let markerPositionY = 0;
+let markerPositionZ = 0;
+
+let markerRotationX = 0;
+let markerRotationY = 0;
+let markerRotationZ = 0;
+
+let markerHeight = 1;
+let markerWidth = 1;
+
 /*＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
  * AR要素を読み込んだ時、その値をデバッグ画面の初期値として設定する
  *＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
@@ -24,41 +35,6 @@ videoPlane.addEventListener("loaded", () => {
     zRotation.setAttribute("value", THREE.MathUtils.radToDeg(vpRotation.z));
     height.setAttribute("value", vpHeight);
     width.setAttribute("value", vpWidth);
-
-    // let offset;
-    // if(location.href.indexOf("3Dof_1") != -1){
-    //     // w:3224px × h:3336px
-    //     offset = 3336 / 3224;
-    // }
-    // if(location.href.indexOf("3Dof_3") != -1){
-    //     // w:4000px × h:4000px
-    //     offset = 4000 / 4000;
-    // }
-    // if(location.href.indexOf("3Dof_4") != -1){
-    //     // w:4848px × h:4200px
-    //     offset = 4200 / 4848;
-    // }
-    // if(location.href.indexOf("3Dof_6") != -1){
-    //     // w:3906px × h:3572px
-    //     offset = 3572 / 3906;
-    // }
-
-    // if(location.href.indexOf("3Dof_1") != -1){
-    //     videoPlane.setAttribute("height", 4.0 * vpHeight);
-    //     videoPlane.setAttribute("width",  4.1 * vpWidth);
-    // }
-    // if(location.href.indexOf("3Dof_3") != -1){
-    //     videoPlane.setAttribute("height", 4.0 * vpHeight);
-    //     videoPlane.setAttribute("width",  4.0 * vpWidth);
-    // }
-    // if(location.href.indexOf("3Dof_4") != -1){
-    //     videoPlane.setAttribute("height", 1.7 * vpHeight);
-    //     videoPlane.setAttribute("width",  2.0 * vpWidth);
-    // }
-    // if(location.href.indexOf("3Dof_6") != -1){
-    //     videoPlane.setAttribute("height", 1.7 * vpHeight);
-    //     videoPlane.setAttribute("width",  1.9 * vpWidth);
-    // }
     
     console.log("cookie：" + document.cookie);
     const cookies = document.cookie;
@@ -74,9 +50,9 @@ videoPlane.addEventListener("loaded", () => {
                 xDirection.setAttribute("value", arPosition[0]);
                 yDirection.setAttribute("value", arPosition[1]);
                 zDirection.setAttribute("value", arPosition[2]);
-                markerPositionX = arPosition[0];
-                markerPositionY = arPosition[1];
-                markerPositionZ = arPosition[2];
+                markerPositionX = Number(arPosition[0]);
+                markerPositionY = Number(arPosition[1]);
+                markerPositionZ = Number(arPosition[2]);
             }
 
             if(content[0].trim(" ") == "arRotation1"){
@@ -85,18 +61,16 @@ videoPlane.addEventListener("loaded", () => {
                 xRotation.setAttribute("value", arRotation[0]);
                 yRotation.setAttribute("value", arRotation[1]);
                 zRotation.setAttribute("value", arRotation[2]);
-                videoPlane.setAttribute("rotation", {x: arRotation[0], y: arRotation[1], z: arRotation[2]});
+                
+                markerRotationX = xRotation.value;
+                markerRotationY = yRotation.value;
+                markerRotationZ = zRotation.value;
             }
 
             if(content[0].trim(" ") == "arHeightWidth1"){
                 const arHeightWidth = content[1].split(",");
-
-                height.setAttribute("value", arHeightWidth[0]);
-                width.setAttribute( "value", arHeightWidth[1]);
-                // videoPlane.setAttribute("height", 4.0 * arHeightWidth[0]);
-                // videoPlane.setAttribute("width",  4.1 * arHeightWidth[1]);
-                videoPlane.setAttribute("height", arHeightWidth[1] * offset);
-                videoPlane.setAttribute("width",  arHeightWidth[1]);
+                markerHeight =Number(arHeightWidth[0]);
+                markerWidth = Number(arHeightWidth[1]);
             }
         }
 
@@ -266,11 +240,13 @@ function closeDialog() {
         // videoPlane.setAttribute("width",  1.9 * width.value);
     }
 
-    videoPlane.setAttribute("rotation", {x: xRotation.value, y: yRotation.value, z: zRotation.value});
-
+    markerRotationX = xRotation.value;
+    markerRotationY = yRotation.value;
+    markerRotationZ = zRotation.value;
+    
     let offset =  frames[0].height / frames[0].width;
-    videoPlane.setAttribute("height", width.value * offset);
-    videoPlane.setAttribute("width",  width.value); 
+    markerHeight = width.value * offset;
+    markerWidth = width.value;
 
     markerPositionX = Number(xDirection.value);
     markerPositionY = Number(yDirection.value);

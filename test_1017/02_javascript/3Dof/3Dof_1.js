@@ -73,11 +73,6 @@ function stopPlayback() {
   }
 }
 
-let markerPositionX = 0;
-let markerPositionY = 2;
-let markerPositionZ = -1;
-
-
 AFRAME.registerComponent("marker-tracker", {
   tick: function () {
     if (markerVisible) {
@@ -110,16 +105,16 @@ AFRAME.registerComponent("marker-tracker", {
 
       // --- 回転補正 ---
       const offsetEuler = new THREE.Euler(
-        0,
-        0,
-        0
+        THREE.MathUtils.degToRad(markerRotationX),
+        THREE.MathUtils.degToRad(markerRotationY),
+        THREE.MathUtils.degToRad(markerRotationZ)
       );
       const offsetQuat = new THREE.Quaternion().setFromEuler(offsetEuler);
       const finalQuat = markerWorldQuat.clone().multiply(offsetQuat);
 
       // --- スケール補正 ---
       const markerScale = barcodeMarker.object3D.scale.clone();
-      const offsetScale = new THREE.Vector3(3, 3, 3);
+      const offsetScale = new THREE.Vector3(markerWidth ,markerHeight,1);
       const finalScale = markerScale.multiply(offsetScale);
 
       // --- 適用 ---
