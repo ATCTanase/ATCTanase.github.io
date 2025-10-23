@@ -28,7 +28,7 @@ const progressText = document.getElementById("progress");
 let offset;
 let markerPositionX = 0;
 let markerPositionY = 0;
-let markerPositionZ = 0;
+let markerPositionZ = -1;
 
 // フレームロード
 function preloadFrames(callback) {
@@ -62,7 +62,7 @@ function drawNextFrame() {
       mat = planeMesh.material;
     }
   }
-  if (mat?.map) mat.map.needsUpdate = true;
+    if (mat?.map) mat.map.needsUpdate = true;
   currentFrame = (currentFrame + 1) % frameCount;
 }
 
@@ -80,26 +80,90 @@ function stopPlayback() {
 
 AFRAME.registerComponent("marker-tracker", {
   tick: function () {
-    if (!markerVisible) return;
-      const markerWorldPos = new THREE.Vector3();
-      barcodeMarker.object3D.updateMatrixWorld(true);
-      barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+      if (markerVisible) {
+        // ワールド座標
+        const markerWorldPos = new THREE.Vector3();
+        barcodeMarker.object3D.updateMatrixWorld(true);
+        barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+        
+        // --- カメラ座標系に変換 ---
+        const markerPosLocalToCamera = camera.object3D.worldToLocal(markerWorldPos.clone());
 
-      const markerWorldQuat = new THREE.Quaternion();
-      barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
+        // --- 角度計算 ---
+        // マーカーのワールド回転クォータニオン
+        const markerWorldQuat = new THREE.Quaternion();
+        barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
 
-      // Plane のオフセット（必要ならY方向微調整）
-      const offsetVec = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ);
+        // カメラのワールド回転クォータニオン
+        const cameraWorldQuat = new THREE.Quaternion();
+        camera.object3D.getWorldQuaternion(cameraWorldQuat);
 
-      // マーカー回転に沿わせる
-      offsetVec.applyQuaternion(markerWorldQuat);
+        // カメラ回転の逆元を計算（カメラ座標系に変換）
+        const cameraWorldQuatInverse = cameraWorldQuat.clone().invert();
 
-      // Plane のワールド座標に設定
-      const worldPos = markerWorldPos.clone().add(offsetVec);
-      videoPlane.object3D.position.copy(worldPos);
+        // マーカーの回転をカメラ座標系に変換
+        const markerLocalQuat = new THREE.Quaternion();
+        markerLocalQuat.multiplyQuaternions(cameraWorldQuatInverse, markerWorldQuat);
 
-      // Plane の回転はマーカーに完全追従
-      videoPlane.object3D.quaternion.copy(markerWorldQuat);
+        // オイラー角に変換（ラジアン→度）
+        const euler = new THREE.Euler();
+        euler.setFromQuaternion(markerLocalQuat, 'YXZ'); // YXZはよく使う順序
+        const radToDeg = THREE.MathUtils.radToDeg;
+        const rotX = radToDeg(euler.x);
+        const rotY = radToDeg(euler.y);
+        const rotZ = radToDeg(euler.z);
+
+        // --- オフセット補正（カメラ相対） ---
+        const offsetPosition = markerPosLocalToCamera.clone().add( new THREE.Vector3(
+          Number(markerPositionX),
+          Number(markerPositionY),
+          0
+        ));
+        
+        // マーカー距離（カメラからマーカーまでの距離）
+        const distance = markerPosLocalToCamera.length();
+        // 距離に応じて補正をスケーリング
+        const distanceFactor = THREE.MathUtils.clamp(distance * 0.5, 1, 4);
+
+        // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
+        const correctionFactor = 0.02; // 補正量は調整可能
+        const yCorrection = -rotX * correctionFactor * distanceFactor;
+
+        // rotY（左右）で左右方向（x軸）を補正
+        const correctionFactorX = 0.02;  // 左右補正の強さ
+        let adjustedY;
+        if (rotY > 0) {
+          if (rotZ > 0) {
+            adjustedY = rotY - rotZ;
+          }else{
+            adjustedY = rotY + rotZ;
+          }
+        } else if (rotY < 0) {
+          if (rotZ > 0) {
+            adjustedY = rotY + rotZ;
+          }else{
+            adjustedY = rotY - rotZ;
+          }
+        } else {
+          adjustedY = rotY; // 0 の場合
+        }
+        const xCorrection = adjustedY * correctionFactorX;
+        // rotYが右向きで正になることが多いので符号反転
+
+        // // --- 補正適用 ---
+        offsetPosition.y += yCorrection;
+        offsetPosition.x += xCorrection;
+        
+        const camRotX = camera.object3D.rotation.x;
+        offsetPosition.z += Number(markerPositionZ) * Math.cos(camRotX);
+
+        // --- カメラ相対からワールド座標に変換 ---
+        const worldPos = camera.object3D.localToWorld(offsetPosition.clone());
+        videoPlane.object3D.position.copy(worldPos);
+        console.log(videoPlane.object3D.position);
+
+
+        //ここまで
 
 
         // ログUIに表示
@@ -111,7 +175,12 @@ AFRAME.registerComponent("marker-tracker", {
           `AR World Position:<br>` +
           `x: ${videoPlane.object3D.position.x.toFixed(3)}<br>` +
           `y: ${videoPlane.object3D.position.y.toFixed(3)}<br>` +
-          `z: ${videoPlane.object3D.position.z.toFixed(3)}<br><br>`;
+          `z: ${videoPlane.object3D.position.z.toFixed(3)}<br><br>` +
+          `Marker Rotation (deg):<br>` +
+          `x: ${rotX.toFixed(1)}<br>` +
+          `y: ${rotY.toFixed(1)}<br>` +
+          `z: ${rotZ.toFixed(1)}`;
+    }
   }
 });
 
@@ -119,9 +188,7 @@ barcodeMarker.addEventListener("markerFound", () => {
   if (!markerVisible) {
     markerVisible = true;
     startPlayback();
-    videoPlane.object3D.scale.set( 0.2 * offset,  0.2, 1);
     videoPlane.setAttribute('visible', 'true');
-    
   }
 })
 
