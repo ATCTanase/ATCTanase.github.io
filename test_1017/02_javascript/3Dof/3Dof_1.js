@@ -30,6 +30,10 @@ let markerPositionX = 0;
 let markerPositionY = 0;
 let markerPositionZ = 0;
 
+let firstRotX = null;
+let firstRotY = null;
+let firstRotZ = null;
+
 // フレームロード
 function preloadFrames(callback) {
   let loaded = 0;
@@ -76,77 +80,91 @@ function stopPlayback() {
   }
 }
 
-barcodeMarker.addEventListener("markerFound", () => {
-
-  if (!markerVisible) {
-    markerVisible = true;
-    startPlayback();
-    videoPlane.setAttribute('visible', 'true');
-
-    // const playPromise = video.play();
-    // if (playPromise !== undefined) {
-    //   playPromise.catch(() => {/* ignore error */ });
-    // }
-
-    camera.setAttribute('look-controls', {
-      enabled: true,
-      magicWindowTrackingEnabled: true
-    });
 
     markerTimer = setInterval(() => {
       if (markerVisible) {
-        // 1. マーカーのワールド座標・回転取得
+        const testWorldPos = new THREE.Vector3();
+        // ワールド座標
         const markerWorldPos = new THREE.Vector3();
         barcodeMarker.object3D.updateMatrixWorld(true);
         barcodeMarker.object3D.getWorldPosition(markerWorldPos);
 
+
+        // --- 角度計算 ---
+        // マーカーのワールド回転クォータニオン
         const markerWorldQuat = new THREE.Quaternion();
+        camera.object3D.updateMatrixWorld(true);
         barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
 
-        // 2. マーカーからの相対位置をワールドに変換
-        const offsetLocal = new THREE.Vector3(
-          Number(markerPositionX),
-          Number(markerPositionY),
-          Number(markerPositionZ)
-        );
-        const offsetWorld = offsetLocal.clone().applyQuaternion(markerWorldQuat).add(markerWorldPos);
+        // マーカーのローカル位置を取得
+        markerWorldPos.setFromMatrixPosition(barcodeMarker.object3D.matrixWorld);
 
-        // 3. カメラ座標系でのマーカー位置（距離や回転補正用）
-        const markerPosLocalToCamera = camera.object3D.worldToLocal(markerWorldPos.clone());
-        const distance = markerPosLocalToCamera.length();
+        // カメラの行列を掛けてワールド位置に変換
+        markerWorldPos.applyMatrix4(camera.object3D.matrixWorld);
 
-        // マーカーの回転をカメラ座標系に変換
+
+        // カメラのワールド回転クォータニオン
         const cameraWorldQuat = new THREE.Quaternion();
         camera.object3D.getWorldQuaternion(cameraWorldQuat);
-        const markerLocalQuat = cameraWorldQuat.clone().invert().multiply(markerWorldQuat);
+
+        // カメラ回転の逆元を計算（カメラ座標系に変換）
+        const cameraWorldQuatInverse = cameraWorldQuat.clone().invert();
+
+        // マーカーの回転をカメラ座標系に変換
+        const markerLocalQuat = cameraWorldQuatInverse.multiply(markerWorldQuat);
+
+        // オイラー角に変換（ラジアン→度）
         const euler = new THREE.Euler();
-        euler.setFromQuaternion(markerLocalQuat, 'YXZ');
-        const rotX = THREE.MathUtils.radToDeg(euler.x);
-        const rotY = THREE.MathUtils.radToDeg(euler.y);
-        const rotZ = THREE.MathUtils.radToDeg(euler.z);
+        euler.setFromQuaternion(markerLocalQuat, 'YXZ'); // YXZはよく使う順序
+        const radToDeg = THREE.MathUtils.radToDeg;
+        const rotX = radToDeg(euler.x);
+        const rotY = radToDeg(euler.y);
+        const rotZ = radToDeg(euler.z);
+        if (firstRotX == null) firstRotX = rotX;
+        if (firstRotY == null) firstRotY = rotY;
+        if (firstRotZ == null) firstRotZ = rotZ;
 
-        // 4. 回転補正（カメラ回転に応じて微調整）
-        const correctionFactor = 0.02;
-        const yCorrection = -rotX * correctionFactor;
+        // --- 位置補正 ---
+        const offsetPosition = new THREE.Vector3(
+          markerWorldPos.x,
+          markerWorldPos.y,
+          markerWorldPos.z
+        );
 
-        const correctionFactorX = 0.02;
+        // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
+        const correctionFactor = 0.02; // 補正量は調整可能
+        const yCorrection = (rotX - firstRotX) * correctionFactor;
+
+        // rotY（左右）で左右方向（x軸）を補正
+        const correctionFactorX = 0.02;  // 左右補正の強さ
         let adjustedY;
         if (rotY > 0) {
-          adjustedY = rotZ > 0 ? rotY - rotZ : rotY + rotZ;
+          if (rotZ > 0) {
+            adjustedY = rotY - rotZ;
+          } else {
+            adjustedY = rotY + rotZ;
+          }
         } else if (rotY < 0) {
-          adjustedY = rotZ > 0 ? rotY + rotZ : rotY - rotZ;
+          if (rotZ > 0) {
+            adjustedY = rotY + rotZ;
+          } else {
+            adjustedY = rotY - rotZ;
+          }
         } else {
-          adjustedY = rotY;
+          adjustedY = rotY; // 0 の場合
         }
         const xCorrection = adjustedY * correctionFactorX;
+        // rotYが右向きで正になることが多いので符号反転
 
-        // 5. 補正をワールド座標に適用
-        offsetWorld.x += xCorrection;
-        offsetWorld.y += yCorrection;
+        // // --- 補正適用 ---
+        
+        offsetPosition.x += xCorrection + Num(markerPositionX);
+        offsetPosition.y += yCorrection + Num(markerPositionY);
+        offsetPosition.z += Num(markerPositionZ);
 
-        // 6. videoPlane に反映
-        videoPlane.object3D.position.copy(offsetWorld);
-        console.log('finalPos:', offsetWorld);
+
+        videoPlane.object3D.position.copy(offsetPosition);
+        console.log(videoPlane.object3D.position);
 
 
         //ここまで
@@ -154,15 +172,14 @@ barcodeMarker.addEventListener("markerFound", () => {
 
         // ログUIに表示
         logUI.innerHTML =
-          `markerPosLocalToCamera:<br>` +
-          `x: ${markerPosLocalToCamera.x.toFixed(3)}<br>` +
-          `y: ${markerPosLocalToCamera.y.toFixed(3)}<br>` +
-          `z: ${markerPosLocalToCamera.z.toFixed(3)}<br><br>` +
-          `distance: ${distance.toFixed(3)}<br>` +
           `Marker World Position:<br>` +
           `x: ${markerWorldPos.x.toFixed(3)}<br>` +
           `y: ${markerWorldPos.y.toFixed(3)}<br>` +
           `z: ${markerWorldPos.z.toFixed(3)}<br><br>` +
+          `True World Position:<br>` +
+          `x: ${testWorldPos.x.toFixed(3)}<br>` +
+          `y: ${testWorldPos.y.toFixed(3)}<br>` +
+          `z: ${testWorldPos.z.toFixed(3)}<br><br>` +
           `AR World Position:<br>` +
           `x: ${videoPlane.object3D.position.x.toFixed(3)}<br>` +
           `y: ${videoPlane.object3D.position.y.toFixed(3)}<br>` +
@@ -170,11 +187,20 @@ barcodeMarker.addEventListener("markerFound", () => {
           `Marker Rotation (deg):<br>` +
           `x: ${rotX.toFixed(1)}<br>` +
           `y: ${rotY.toFixed(1)}<br>` +
-          `z: ${rotZ.toFixed(1)}`;
+          `z: ${rotZ.toFixed(1)}<br><br>` +
+          `Marker Rotation:<br>` +
+          `x: ${radToDeg(markerWorldQuat.x).toFixed(1)}<br>` +
+          `y: ${radToDeg(markerWorldQuat.y).toFixed(1)}<br>` +
+          `z: ${radToDeg(markerWorldQuat.z).toFixed(1)}<br><br>` +
+          `Camera Rotation:<br>` +
+          `x: ${radToDeg(cameraWorldQuat.x).toFixed(1)}<br>` +
+          `y: ${radToDeg(cameraWorldQuat.y).toFixed(1)}<br>` +
+          `z: ${radToDeg(cameraWorldQuat.z).toFixed(1)}`;
       }
-    }, 33);
+    }, 100);
   }
 });
+
 
 barcodeMarker.addEventListener("markerLost", () => {
   markerVisible = false;
