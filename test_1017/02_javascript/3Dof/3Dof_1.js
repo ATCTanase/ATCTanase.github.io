@@ -159,8 +159,8 @@ AFRAME.registerComponent("marker-tracker", {
 
         // マーカー前方向に沿ってZオフセットを加算
         const worldPos = markerWorldPos.clone()
-          .add(markerForward.multiplyScalar(markerPositionZ))
-          .add(new THREE.Vector3(markerPositionX, markerPositionY, 0));
+          .add(markerForward.multiplyScalar(Number(markerPositionZ)))
+          .add(new THREE.Vector3(Number(markerPositionX), Number(markerPositionY), 0));
 
         videoPlane.object3D.position.copy(worldPos);
         console.log(videoPlane.object3D.position);
