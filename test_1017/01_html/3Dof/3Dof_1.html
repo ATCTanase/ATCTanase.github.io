@@ -136,10 +136,11 @@
         function onOff() {
             if (guidemarkerOnOff) {
                 document.querySelector("#videoPlane").removeAttribute("axes-helper");
-
+                document.getElementById("barcodeMarker").removeAttribute("axes-helper");
                 guidemarkerOnOff = false;
             } else {
                 document.querySelector("#videoPlane").setAttribute("axes-helper", "size: 3");
+                document.getElementById("barcodeMarker").setAttribute("axes-helper", "size: 3");
 
                 guidemarkerOnOff = true;
             }
