@@ -77,6 +77,59 @@ let markerPositionX = 0;
 let markerPositionY = 2;
 let markerPositionZ = -1;
 
+
+AFRAME.registerComponent("marker-tracker", {
+  tick: function () {
+    if (markerVisible) {
+      // --- ワールド座標 ---
+      const markerWorldPos = new THREE.Vector3();
+      barcodeMarker.object3D.updateMatrixWorld(true);
+      barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+      camera.object3D.updateMatrixWorld(true);
+      markerWorldPos.setFromMatrixPosition(barcodeMarker.object3D.matrixWorld);
+      markerWorldPos.applyMatrix4(camera.object3D.matrixWorld);
+
+      // --- ワールド回転 ---
+      const markerLocalQuat = new THREE.Quaternion();
+      const markerWorldQuat = new THREE.Quaternion();
+      barcodeMarker.object3D.getWorldQuaternion(markerLocalQuat);
+      const cameraWorldQuat = new THREE.Quaternion();
+      camera.object3D.getWorldQuaternion(cameraWorldQuat);
+      markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
+
+      // --- 位置補正 ---
+      
+      const offsetPosition = new THREE.Vector3(
+        Number(markerPositionX),
+        Number(markerPositionY),
+        Number(markerPositionZ)
+      );
+      // マーカーのワールド回転を適用
+      const rotatedOffset = offsetPosition.clone().applyQuaternion(markerWorldQuat);
+      const finalPos = markerWorldPos.clone().add(rotatedOffset);
+
+      // --- 回転補正 ---
+      const offsetEuler = new THREE.Euler(
+        0,
+        0,
+        0
+      );
+      const offsetQuat = new THREE.Quaternion().setFromEuler(offsetEuler);
+      const finalQuat = markerWorldQuat.clone().multiply(offsetQuat);
+
+      // --- スケール補正 ---
+      const markerScale = barcodeMarker.object3D.scale.clone();
+      const offsetScale = new THREE.Vector3(3, 3, 3);
+      const finalScale = markerScale.multiply(offsetScale);
+
+      // --- 適用 ---
+      videoPlane.object3D.position.copy(finalPos);
+      videoPlane.object3D.quaternion.copy(finalQuat);
+      videoPlane.object3D.scale.copy(finalScale);
+    }
+  }
+});
+
 barcodeMarker.addEventListener("markerFound", () => {
   if (!markerVisible) {
     markerVisible = true;
@@ -87,56 +140,9 @@ barcodeMarker.addEventListener("markerFound", () => {
       enabled: true,
       magicWindowTrackingEnabled: true
     });
-
-    markerTimer = setInterval(() => {
-      if (markerVisible) {
-        // --- ワールド座標 ---
-        const markerWorldPos = new THREE.Vector3();
-        barcodeMarker.object3D.updateMatrixWorld(true);
-        barcodeMarker.object3D.getWorldPosition(markerWorldPos);
-        camera.object3D.updateMatrixWorld(true);
-        markerWorldPos.setFromMatrixPosition(barcodeMarker.object3D.matrixWorld);
-        markerWorldPos.applyMatrix4(camera.object3D.matrixWorld);
-
-        // --- ワールド回転 ---
-        const markerLocalQuat = new THREE.Quaternion();
-        const markerWorldQuat = new THREE.Quaternion();
-        barcodeMarker.object3D.getWorldQuaternion(markerLocalQuat);
-        const cameraWorldQuat = new THREE.Quaternion();
-        camera.object3D.getWorldQuaternion(cameraWorldQuat);
-        markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
-
-        // --- 位置補正 ---
-        
-        const offsetPosition = new THREE.Vector3(
-          Number(markerPositionX),
-          Number(markerPositionY),
-          Number(markerPositionZ)
-        );
-        const finalPos = markerWorldPos.clone().add(offsetPosition);
-
-        // --- 回転補正 ---
-        const offsetEuler = new THREE.Euler(
-          0,
-          0,
-          0
-        );
-        const offsetQuat = new THREE.Quaternion().setFromEuler(offsetEuler);
-        const finalQuat = markerWorldQuat.clone().multiply(offsetQuat);
-
-        // --- スケール補正 ---
-        const markerScale = barcodeMarker.object3D.scale.clone();
-        const offsetScale = new THREE.Vector3(3, 3, 3);
-        const finalScale = markerScale.multiply(offsetScale);
-
-        // --- 適用 ---
-        videoPlane.object3D.position.copy(finalPos);
-        videoPlane.object3D.quaternion.copy(finalQuat);
-        videoPlane.object3D.scale.copy(finalScale);
-      }
-    }, 10);
   }
 });
+
 
 barcodeMarker.addEventListener("markerLost", () => {
   markerVisible = false;
