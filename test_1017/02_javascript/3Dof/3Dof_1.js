@@ -81,23 +81,25 @@ function stopPlayback() {
 AFRAME.registerComponent("marker-tracker", {
   tick: function () {
     if (!markerVisible) return;
-    const planeWidth = videoPlane.getAttribute("geometry").width;
-    const planeHeight = videoPlane.getAttribute("geometry").height;
+      const markerWorldPos = new THREE.Vector3();
+      barcodeMarker.object3D.updateMatrixWorld(true);
+      barcodeMarker.object3D.getWorldPosition(markerWorldPos);
 
-    // マーカー原点が左上の場合、Plane の中心を原点に合わせるための補正
-    const centerOffset = new THREE.Vector3(planeWidth/2, planeHeight/2, 0);
+      const markerWorldQuat = new THREE.Quaternion();
+      barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
 
-    // 1. マーカー原点（ローカル）とワールド変換
-    const localPos = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ).add(centerOffset);;
-    const markerWorldPos = barcodeMarker.object3D.localToWorld(localPos);
+      // Plane のオフセット（必要ならY方向微調整）
+      const offsetVec = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ);
 
-    // 2. Plane の位置を設定
-    videoPlane.object3D.position.copy(markerWorldPos);
+      // マーカー回転に沿わせる
+      offsetVec.applyQuaternion(markerWorldQuat);
 
-    // 3. Plane の回転もマーカーに完全追従
-    const markerQuat = new THREE.Quaternion();
-    barcodeMarker.object3D.getWorldQuaternion(markerQuat);
-    videoPlane.object3D.quaternion.copy(markerQuat);
+      // Plane のワールド座標に設定
+      const worldPos = markerWorldPos.clone().add(offsetVec);
+      videoPlane.object3D.position.copy(worldPos);
+
+      // Plane の回転はマーカーに完全追従
+      videoPlane.object3D.quaternion.copy(markerWorldQuat);
 
 
         // ログUIに表示
