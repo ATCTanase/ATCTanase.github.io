@@ -136,10 +136,18 @@ AFRAME.registerComponent("marker-tracker", {
 
         // ログUIに表示
         logUI.innerHTML =
-          `Marker World Position:<br>` +
-          `x: ${markerWorldPos.x.toFixed(3)}<br>` +
-          `y: ${markerWorldPos.y.toFixed(3)}<br>` +
-          `z: ${markerWorldPos.z.toFixed(3)}<br><br>` +
+          `Marker currentPos Position:<br>` +
+          `x: ${currentPos.x.toFixed(3)}<br>` +
+          `y: ${currentPos.y.toFixed(3)}<br>` +
+          `z: ${currentPos.z.toFixed(3)}<br><br>` +
+          `Marker Initial Position:<br>` +
+          `x: ${markerInitialPos.x.toFixed(3)}<br>` +
+          `y: ${markerInitialPos.y.toFixed(3)}<br>` +
+          `z: ${markerInitialPos.z.toFixed(3)}<br><br>` +
+          `delta Position:<br>` +
+          `x: ${deltaPos.x.toFixed(3)}<br>` +
+          `y: ${deltaPos.y.toFixed(3)}<br>` +
+          `z: ${deltaPos.z.toFixed(3)}<br><br>` +
           `AR World Position:<br>` +
           `x: ${videoPlane.object3D.position.x.toFixed(3)}<br>` +
           `y: ${videoPlane.object3D.position.y.toFixed(3)}<br>` +
