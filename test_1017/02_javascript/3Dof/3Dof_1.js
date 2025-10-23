@@ -132,26 +132,9 @@ AFRAME.registerComponent("marker-tracker", {
         const correctionFactor = 0.02; // 補正量は調整可能
         const yCorrection = -rotX * correctionFactor * distanceFactor;
         
-        const correctionFactorX = 0.01;  // 左右補正の強さ
-        let adjustedY;
-        if (rotY > 0) {
-          if (rotZ > 0) {
-            adjustedY = rotY - rotZ;
-          } else {
-            adjustedY = rotY + rotZ;
-          }
-        } else if (rotY < 0) {
-          if (rotZ > 0) {
-            adjustedY = rotY + rotZ;
-          } else {
-            adjustedY = rotY - rotZ;
-          }
-        } else {
-          adjustedY = rotY; // 0 の場合
-        }
-        const xCorrection = -adjustedY * correctionFactorX * distanceFactor;
-        
-        worldPos.x += xCorrection;
+        const worldOffsetX = barcodeMarker.object3D.localToWorld(new THREE.Vector3(markerPositionX, 0, 0));
+
+        worldPos.x = worldOffsetX.x;
         worldPos.y += yCorrection;
 
         videoPlane.object3D.position.copy(worldPos);
