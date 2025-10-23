@@ -152,10 +152,7 @@ AFRAME.registerComponent("marker-tracker", {
           `AR World Position:<br>` +
           `x: ${videoPlane.object3D.position.x.toFixed(3)}<br>` +
           `y: ${videoPlane.object3D.position.y.toFixed(3)}<br>` +
-          `z: ${videoPlane.object3D.position.z.toFixed(3)}<br><br>`+
-          
-          `adjustedY: ${adjustedY.toFixed(3)}<br>` +
-          `xCorrection: ${xCorrection.toFixed(3)}<br>`;
+          `z: ${videoPlane.object3D.position.z.toFixed(3)}<br><br>`;
     }
   }
 });
