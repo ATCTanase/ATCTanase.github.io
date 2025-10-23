@@ -140,7 +140,6 @@ AFRAME.registerComponent("marker-tracker", {
         const xWorld = barcodeMarker.object3D.localToWorld(new THREE.Vector3(markerPositionX, 0, 0));
         worldPos.x = xWorld.x;
         worldPos.y += offsetWorld.y + yCorrection;
-        worldPos.y += offsetWorld.y + yCorrection;
         worldPos.z += offsetWorld.z;
 
         videoPlane.object3D.position.copy(worldPos);
