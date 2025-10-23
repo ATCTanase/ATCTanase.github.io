@@ -50,19 +50,19 @@ function preloadFrames(callback) {
   }
 }
 
-let tex = null;
+let mat = null;
 // 次フレーム描画
 function drawNextFrame() {
   const img = frames[currentFrame];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  if(tex == null){  
-    tex = new THREE.CanvasTexture(canvas);
-    videoPlane.getObject3D('mesh').material.map = tex;
+  if(mat == null){
+    const planeMesh = videoPlane.getObject3D('mesh');
+    if (planeMesh) {
+      mat = planeMesh.material;
+    }
   }
-  if(tex){
-    tex.needsUpdate = true;
-  }
+    if (mat?.map) mat.map.needsUpdate = true;
   currentFrame = (currentFrame + 1) % frameCount;
 }
 
