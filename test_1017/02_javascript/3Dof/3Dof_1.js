@@ -119,7 +119,9 @@ barcodeMarker.addEventListener("markerFound", () => {
   if (!markerVisible) {
     markerVisible = true;
     startPlayback();
+    videoPlane.object3D.scale.set( 0.2 * offset,  0.2, 1);
     videoPlane.setAttribute('visible', 'true');
+    
   }
 })
 
