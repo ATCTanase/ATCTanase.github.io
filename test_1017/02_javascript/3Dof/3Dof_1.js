@@ -28,7 +28,7 @@ const progressText = document.getElementById("progress");
 let offset;
 let markerPositionX = 0;
 let markerPositionY = 0;
-let markerPositionZ = -1;
+let markerPositionZ = 0;
 
 // フレームロード
 function preloadFrames(callback) {
@@ -82,26 +82,17 @@ AFRAME.registerComponent("marker-tracker", {
   tick: function () {
     if (!markerVisible) return;
 
-    // マーカーのワールド位置
-    const markerWorldPos = new THREE.Vector3();
-    barcodeMarker.object3D.updateMatrixWorld(true);
-    barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+    // 1. マーカー原点（ローカル）とワールド変換
+    const localPos = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ);
+    const worldPos = barcodeMarker.object3D.localToWorld(localPos);
 
-    // マーカーのワールド回転
-    const markerWorldQuat = new THREE.Quaternion();
-    barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
-
-    // オフセット（高さも含めて自由）
-    const offsetVec = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ);
-    // マーカーの回転に沿ってオフセット
-    offsetVec.applyQuaternion(markerWorldQuat);
-
-    // ワールド座標に変換
-    const worldPos = markerWorldPos.clone().add(offsetVec);
+    // 2. Plane の位置を設定
     videoPlane.object3D.position.copy(worldPos);
 
-    // Plane の回転はマーカーの回転に完全追従
-    videoPlane.object3D.quaternion.copy(markerWorldQuat);
+    // 3. Plane の回転もマーカーに完全追従
+    const markerQuat = new THREE.Quaternion();
+    barcodeMarker.object3D.getWorldQuaternion(markerQuat);
+    videoPlane.object3D.quaternion.copy(markerQuat);
 
 
         // ログUIに表示
