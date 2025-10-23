@@ -81,13 +81,18 @@ function stopPlayback() {
 AFRAME.registerComponent("marker-tracker", {
   tick: function () {
     if (!markerVisible) return;
+    const planeWidth = videoPlane.getAttribute("geometry").width;
+    const planeHeight = videoPlane.getAttribute("geometry").height;
+
+    // マーカー原点が左上の場合、Plane の中心を原点に合わせるための補正
+    const centerOffset = new THREE.Vector3(planeWidth/2, planeHeight/2, 0);
 
     // 1. マーカー原点（ローカル）とワールド変換
-    const localPos = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ);
-    const worldPos = barcodeMarker.object3D.localToWorld(localPos);
+    const localPos = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ).add(centerOffset);;
+    const markerWorldPos = barcodeMarker.object3D.localToWorld(localPos);
 
     // 2. Plane の位置を設定
-    videoPlane.object3D.position.copy(worldPos);
+    videoPlane.object3D.position.copy(markerWorldPos);
 
     // 3. Plane の回転もマーカーに完全追従
     const markerQuat = new THREE.Quaternion();
