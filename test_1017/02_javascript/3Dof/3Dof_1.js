@@ -168,9 +168,9 @@ barcodeMarker.addEventListener("markerFound", () => {
 
         // // --- 補正適用 ---
         
-        offsetPosition.x += xCorrection + Num(markerPositionX);
-        offsetPosition.y += yCorrection + Num(markerPositionY);
-        offsetPosition.z +=  Num(markerPositionZ);
+        offsetPosition.x += xCorrection + Number(markerPositionX);
+        offsetPosition.y += yCorrection + Number(markerPositionY); 
+        offsetPosition.z += Number(markerPositionZ);
 
 
         videoPlane.object3D.position.copy(offsetPosition);
