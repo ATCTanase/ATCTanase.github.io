@@ -164,12 +164,9 @@ AFRAME.registerComponent("marker-tracker", {
         markerForward.applyQuaternion(barcodeMarker.object3D.getWorldQuaternion(new THREE.Quaternion()));
         markerForward.normalize();
 
-        // カメラ相対オフセットをワールド座標に変換
-        const worldPos = camera.object3D.localToWorld(offsetPosition.clone());
-
         // マーカー前方向に沿ってZオフセットを加算
         worldPos.add(markerForward.multiplyScalar(Number(markerPositionZ)));
-        
+
         videoPlane.object3D.position.copy(worldPos);
         console.log(videoPlane.object3D.position);
 
