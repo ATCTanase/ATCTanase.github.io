@@ -138,11 +138,14 @@ AFRAME.registerComponent("marker-tracker", {
         const xCorrection = -rotY * correctionFactorX;
       
         const xWorld = barcodeMarker.object3D.localToWorld(new THREE.Vector3(markerPositionX, 0, 0));
-        worldPos.x = xWorld.x + deltaXCamera;
+        worldPos.x = xWorld.x;
+        worldPos.y += offsetWorld.y + yCorrection;
         worldPos.y += offsetWorld.y + yCorrection;
         worldPos.z += offsetWorld.z;
 
         videoPlane.object3D.position.copy(worldPos);
+        const cameraRight = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.object3D.quaternion);
+        videoPlane.object3D.position.add(cameraRight.multiplyScalar(deltaX));
         console.log(videoPlane.object3D.position);
 
         // 現在の回転を取得
