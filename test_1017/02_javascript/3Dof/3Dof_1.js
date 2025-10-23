@@ -121,6 +121,7 @@ AFRAME.registerComponent("marker-tracker", {
         const radToDeg = THREE.MathUtils.radToDeg;
         const rotX = radToDeg(euler.x);
         const rotY = radToDeg(euler.y);
+        const rotZ = radToDeg(euler.z);
 
         // マーカー距離（カメラからマーカーまでの距離）
         const distance = markerPosLocalToCamera.length();
