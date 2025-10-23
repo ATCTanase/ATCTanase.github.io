@@ -130,9 +130,12 @@ AFRAME.registerComponent("marker-tracker", {
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
         const yCorrection = -rotX * correctionFactor * distanceFactor;
+        
+        const correctionFactorX = 0.01; // 補正量は調整可能
+        const xCorrection = -rotY * correctionFactorX;
       
         const xWorld = barcodeMarker.object3D.localToWorld(new THREE.Vector3(markerPositionX, 0, 0));
-        worldPos.x = xWorld.x;
+        worldPos.x = xWorld.x + xCorrection;
         worldPos.y += offsetWorld.y + yCorrection;
         worldPos.z += offsetWorld.z;
 
