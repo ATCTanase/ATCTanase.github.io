@@ -119,15 +119,15 @@ AFRAME.registerComponent("marker-tracker", {
         // 下向き角度に応じたy軸補正（rotXが正ならplaneは下方向にズレるので、y座標を減らす）
         const correctionFactor = 0.02; // 補正量は調整可能
         const yCorrection = -rotX * correctionFactor * distanceFactor;
-        
+
         const localOffset = new THREE.Vector3(
           Number(markerPositionX),
-          Number(markerPositionY) + yCorrection,
+          Number(markerPositionY),
           Number(markerPositionZ)
         );
         const offsetWorld = localOffset.applyQuaternion(markerWorldQuat);
         const worldPos = markerWorldPos.clone().add(offsetWorld);
-
+        worldPos.y += yCorrection;
         videoPlane.object3D.position.copy(worldPos);
         console.log(videoPlane.object3D.position);
 
@@ -144,11 +144,7 @@ AFRAME.registerComponent("marker-tracker", {
           `AR World Position:<br>` +
           `x: ${videoPlane.object3D.position.x.toFixed(3)}<br>` +
           `y: ${videoPlane.object3D.position.y.toFixed(3)}<br>` +
-          `z: ${videoPlane.object3D.position.z.toFixed(3)}<br><br>` +
-          `Marker Rotation (deg):<br>` +
-          `x: ${rotX.toFixed(1)}<br>` +
-          `y: ${rotY.toFixed(1)}<br>` +
-          `z: ${rotZ.toFixed(1)}`;
+          `z: ${videoPlane.object3D.position.z.toFixed(3)}<br><br>` ;
     }
   }
 });
