@@ -98,11 +98,11 @@ function updateVideoPlane(){
     camera.object3D.getWorldQuaternion(cameraWorldQuat);
     markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
    
-    const beforEuler = new THREE.Euler().setFromQuaternion(markerWorldQuat, "YXZ");
     console.log(
-    `beforEuler (deg): x=${THREE.MathUtils.radToDeg(beforEuler.x).toFixed(2)}, ` +
-    `y=${THREE.MathUtils.radToDeg(beforEuler.y).toFixed(2)}, ` +
-    `z=${THREE.MathUtils.radToDeg(beforEuler.z).toFixed(2)}`
+      `markerWorldQuat: x=${markerWorldQuat.x.toFixed(3)}, ` +
+      `y=${markerWorldQuat.y.toFixed(3)}, ` +
+      `z=${markerWorldQuat.z.toFixed(3)}, ` +
+      `w=${markerWorldQuat.w.toFixed(3)}`
     );
 
     const axis = new THREE.Vector3();
@@ -145,11 +145,12 @@ function updateVideoPlane(){
     videoPlane.object3D.quaternion.copy(finalQuat);
     videoPlane.object3D.scale.copy(finalScale);
     
-    const finalEuler = new THREE.Euler().setFromQuaternion(finalQuat, "YXZ");
+   
     console.log(
-    `finalQuat (deg): x=${THREE.MathUtils.radToDeg(finalEuler.x).toFixed(2)}, ` +
-    `y=${THREE.MathUtils.radToDeg(finalEuler.y).toFixed(2)}, ` +
-    `z=${THREE.MathUtils.radToDeg(finalEuler.z).toFixed(2)}`
+      `finalQuat: x=${finalQuat.x.toFixed(3)}, ` +
+      `y=${finalQuat.y.toFixed(3)}, ` +
+      `z=${finalQuat.z.toFixed(3)}, ` +
+      `w=${finalQuat.w.toFixed(3)}`
     );
   }
 }
