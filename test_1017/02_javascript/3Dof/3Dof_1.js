@@ -144,11 +144,11 @@ function updateVideoPlane(){
     videoPlane.object3D.quaternion.copy(finalQuat);
     videoPlane.object3D.scale.copy(finalScale);
     
-    const finalQuat = new THREE.Euler().setFromQuaternion(finalQuat, "YXZ");
+    const finalEuler = new THREE.Euler().setFromQuaternion(finalQuat, "YXZ");
     console.log(
-    `finalQuat (deg): x=${THREE.MathUtils.radToDeg(finalQuat.x).toFixed(2)}, ` +
-    `y=${THREE.MathUtils.radToDeg(finalQuat.y).toFixed(2)}, ` +
-    `z=${THREE.MathUtils.radToDeg(finalQuat.z).toFixed(2)}`
+    `finalQuat (deg): x=${THREE.MathUtils.radToDeg(finalEuler.x).toFixed(2)}, ` +
+    `y=${THREE.MathUtils.radToDeg(finalEuler.y).toFixed(2)}, ` +
+    `z=${THREE.MathUtils.radToDeg(finalEuler.z).toFixed(2)}`
     );
   }
 }
