@@ -116,7 +116,7 @@ function updateVideoPlane(){
 
     // 元のマーカーの回転に補正回転を適用（ワールド座標系で回転を安定させる）
     const stableMarkerWorldQuat = correctionQuaternion.multiply(markerWorldQuat);
-    .
+    
     // --- 位置補正 ---
     
     const offsetPosition = new THREE.Vector3(
