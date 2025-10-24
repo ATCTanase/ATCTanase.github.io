@@ -105,16 +105,20 @@ function updateVideoPlane(){
       `w=${markerWorldQuat.w.toFixed(3)}`
     );
 
-    const axis = new THREE.Vector3();
-    let angle = markerWorldQuat.angleTo(new THREE.Quaternion()); // identityとの角度
-    if (angle > Math.PI / 2) { // 90°を超えていたら反転の可能性
-      // 回転軸を反転
-      markerWorldQuat.x *= -1;
-      markerWorldQuat.y *= -1;
-      markerWorldQuat.z *= -1;
-      markerWorldQuat.w *= -1;
+    // 反転補正
+    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat);
+    if (up.y < 0) { // 上方向が下向きになっていたら180°回転
+        const correction = new THREE.Quaternion();
+        correction.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI); // X軸回転で反転
+        markerWorldQuat.premultiply(correction);
     }
-
+    // 左右補正
+    const right = new THREE.Vector3(1, 0, 0).applyQuaternion(markerWorldQuat);
+    if (right.x < 0) { // 右向きが左になっていたら反転
+        const correction = new THREE.Quaternion();
+        correction.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI); // Y軸回転で左右反転補正
+        markerWorldQuat.premultiply(correction);
+    }
     // --- 位置補正 ---
     
     const offsetPosition = new THREE.Vector3(
