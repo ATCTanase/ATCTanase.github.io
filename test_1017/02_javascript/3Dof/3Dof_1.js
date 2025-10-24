@@ -79,6 +79,7 @@ function stopPlayback() {
     playTimer = null;
   }
 }
+let prevQuat = new THREE.Quaternion();
 function updateVideoPlane(){
   if (markerVisible) {
     // --- ワールド座標 ---
@@ -97,6 +98,15 @@ function updateVideoPlane(){
     camera.object3D.getWorldQuaternion(cameraWorldQuat);
     markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
 
+        // --- Quaternion符号補正 ---
+    if (markerWorldQuat.dot(prevQuat) < 0) {
+      markerWorldQuat.x *= -1;
+      markerWorldQuat.y *= -1;
+      markerWorldQuat.z *= -1;
+      markerWorldQuat.w *= -1;
+    }
+    prevQuat.copy(markerWorldQuat);
+    
     // --- 位置補正 ---
     
     const offsetPosition = new THREE.Vector3(
@@ -115,9 +125,6 @@ function updateVideoPlane(){
       THREE.MathUtils.degToRad(markerRotationZ)
     );
     const offsetQuat = new THREE.Quaternion().setFromEuler(offsetEuler);
-    //マーカーのY軸以外の回転を無視
-    markerWorldQuat.x = 0;
-    markerWorldQuat.z = 0;
     const finalQuat = markerWorldQuat.clone().multiply(offsetQuat);
 
     // --- スケール補正 ---
