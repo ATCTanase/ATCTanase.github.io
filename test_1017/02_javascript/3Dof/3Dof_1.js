@@ -110,6 +110,9 @@ AFRAME.registerComponent("marker-tracker", {
         THREE.MathUtils.degToRad(markerRotationZ)
       );
       const offsetQuat = new THREE.Quaternion().setFromEuler(offsetEuler);
+      //マーカーのY軸以外の回転を無視
+      markerWorldQuat.x = 0;
+      markerWorldQuat.z = 0;
       const finalQuat = markerWorldQuat.clone().multiply(offsetQuat);
 
       // --- スケール補正 ---
