@@ -177,19 +177,18 @@ videoPlane.addEventListener("loaded", () => {
     })
 });
 
-
+const dialog = document.getElementById("kariModalDialog");;
+const kariSettingButton = document.getElementById("kariSettingButton");;
+const kariGuidemarkerButton =  document.getElementById("kariGuidemarkerButton");
 /*＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
  * 設定ボタン・適応ボタン押下時の処理
  *＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
 function openDialog() {
-    const dialog = document.getElementById("kariModalDialog");
     dialog.show();
-    const kariSettingButton = document.getElementById("kariSettingButton");
     kariSettingButton.setAttribute("style", "display: none;");
-
-    const kariGuidemarkerButton = document.getElementById("kariGuidemarkerButton");
     kariGuidemarkerButton.setAttribute("style", "display: none;");
 }
+
 function closeDialog() {
     // デバッグ画面に入力されている値を、a-planeのposition、rotation、height・widthに適応する
     const xDirection = document.getElementById("XDirection");
@@ -254,12 +253,8 @@ function closeDialog() {
     markerPositionY = Number(yDirection.value);
     markerPositionZ = Number(zDirection.value);
     
-    const dialog = document.getElementById("kariModalDialog");
     dialog.close();
-    const kariSettingButton = document.getElementById("kariSettingButton");
     kariSettingButton.setAttribute("style", "display: block;");
-
-    const kariGuidemarkerButton = document.getElementById("kariGuidemarkerButton");
     kariGuidemarkerButton.setAttribute("style", "display: block; position: fixed; bottom: 60px; right: 10px;");
 
     // 設定更新
@@ -267,9 +262,9 @@ function closeDialog() {
     startPlayback();
     cameraFrag = true;
 
-    const offsetPosition = markerWorldPos.clone().add(new THREE.Vector3(parseInt(markerPositionX), parseInt(markerPositionY), parseInt(markerPositionZ)));
-    videoPlane.object3D.position.copy(offsetPosition);
+    updateVideoPlane();
 }
+
 
 
 /*＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝

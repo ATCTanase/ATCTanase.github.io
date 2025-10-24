@@ -73,58 +73,63 @@ function stopPlayback() {
   }
 }
 
+function updateVideoPlane()
+{
+  if (markerVisible) {
+    // --- ワールド座標 ---
+    const markerWorldPos = new THREE.Vector3();
+    barcodeMarker.object3D.updateMatrixWorld(true);
+    barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+    camera.object3D.updateMatrixWorld(true);
+    markerWorldPos.setFromMatrixPosition(barcodeMarker.object3D.matrixWorld);
+    markerWorldPos.applyMatrix4(camera.object3D.matrixWorld);
+
+    // --- ワールド回転 ---
+    const markerLocalQuat = new THREE.Quaternion();
+    const markerWorldQuat = new THREE.Quaternion();
+    barcodeMarker.object3D.getWorldQuaternion(markerLocalQuat);
+    const cameraWorldQuat = new THREE.Quaternion();
+    camera.object3D.getWorldQuaternion(cameraWorldQuat);
+    markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
+
+    // --- 位置補正 ---
+    
+    const offsetPosition = new THREE.Vector3(
+      Number(markerPositionX),
+      Number(markerPositionY),
+      Number(markerPositionZ)
+    );
+    // マーカーのワールド回転を適用
+    const rotatedOffset = offsetPosition.clone().applyQuaternion(markerWorldQuat);
+    const finalPos = markerWorldPos.clone().add(rotatedOffset);
+
+    // --- 回転補正 ---
+    const offsetEuler = new THREE.Euler(
+      THREE.MathUtils.degToRad(markerRotationX),
+      THREE.MathUtils.degToRad(markerRotationY),
+      THREE.MathUtils.degToRad(markerRotationZ)
+    );
+    const offsetQuat = new THREE.Quaternion().setFromEuler(offsetEuler);
+    //マーカーのY軸以外の回転を無視
+    markerWorldQuat.x = 0;
+    markerWorldQuat.z = 0;
+    const finalQuat = markerWorldQuat.clone().multiply(offsetQuat);
+
+    // --- スケール補正 ---
+    const markerScale = barcodeMarker.object3D.scale.clone();
+    const offsetScale = new THREE.Vector3(markerWidth ,markerHeight,1);
+    const finalScale = markerScale.multiply(offsetScale);
+
+    // --- 適用 ---
+    videoPlane.object3D.position.copy(finalPos);
+    videoPlane.object3D.quaternion.copy(finalQuat);
+    videoPlane.object3D.scale.copy(finalScale);
+  }
+}
+
 AFRAME.registerComponent("marker-tracker", {
   tick: function () {
-    if (markerVisible) {
-      // --- ワールド座標 ---
-      const markerWorldPos = new THREE.Vector3();
-      barcodeMarker.object3D.updateMatrixWorld(true);
-      barcodeMarker.object3D.getWorldPosition(markerWorldPos);
-      camera.object3D.updateMatrixWorld(true);
-      markerWorldPos.setFromMatrixPosition(barcodeMarker.object3D.matrixWorld);
-      markerWorldPos.applyMatrix4(camera.object3D.matrixWorld);
-
-      // --- ワールド回転 ---
-      const markerLocalQuat = new THREE.Quaternion();
-      const markerWorldQuat = new THREE.Quaternion();
-      barcodeMarker.object3D.getWorldQuaternion(markerLocalQuat);
-      const cameraWorldQuat = new THREE.Quaternion();
-      camera.object3D.getWorldQuaternion(cameraWorldQuat);
-      markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
-
-      // --- 位置補正 ---
-      
-      const offsetPosition = new THREE.Vector3(
-        Number(markerPositionX),
-        Number(markerPositionY),
-        Number(markerPositionZ)
-      );
-      // マーカーのワールド回転を適用
-      const rotatedOffset = offsetPosition.clone().applyQuaternion(markerWorldQuat);
-      const finalPos = markerWorldPos.clone().add(rotatedOffset);
-
-      // --- 回転補正 ---
-      const offsetEuler = new THREE.Euler(
-        THREE.MathUtils.degToRad(markerRotationX),
-        THREE.MathUtils.degToRad(markerRotationY),
-        THREE.MathUtils.degToRad(markerRotationZ)
-      );
-      const offsetQuat = new THREE.Quaternion().setFromEuler(offsetEuler);
-      //マーカーのY軸以外の回転を無視
-      markerWorldQuat.x = 0;
-      markerWorldQuat.z = 0;
-      const finalQuat = markerWorldQuat.clone().multiply(offsetQuat);
-
-      // --- スケール補正 ---
-      const markerScale = barcodeMarker.object3D.scale.clone();
-      const offsetScale = new THREE.Vector3(markerWidth ,markerHeight,1);
-      const finalScale = markerScale.multiply(offsetScale);
-
-      // --- 適用 ---
-      videoPlane.object3D.position.copy(finalPos);
-      videoPlane.object3D.quaternion.copy(finalQuat);
-      videoPlane.object3D.scale.copy(finalScale);
-    }
+    updateVideoPlane();
   }
 });
 
