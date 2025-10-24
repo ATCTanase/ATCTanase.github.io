@@ -97,16 +97,32 @@ function updateVideoPlane(){
     const cameraWorldQuat = new THREE.Quaternion();
     camera.object3D.getWorldQuaternion(cameraWorldQuat);
     markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
-
+   
     const euler = new THREE.Euler().setFromQuaternion(markerWorldQuat, "YXZ");
-    console.log(euler);
-    // Y軸回転が±180度付近なら補正
-    if (Math.abs(Math.abs(THREE.MathUtils.radToDeg(euler.y)) - 180) < 1) {
-      // 強制的に0に戻す
-      euler.y = 0;
-      markerWorldQuat.setFromEuler(euler);
+    const eulerDeg = {
+      x: THREE.MathUtils.radToDeg(euler.x),
+      y: THREE.MathUtils.radToDeg(euler.y),
+      z: THREE.MathUtils.radToDeg(euler.z)
+    };
+    console.log("before",eulerDeg);
+    // 正面向きの基準クォータニオン
+    const frontQuat = new THREE.Quaternion(); // identity (0,0,0,1)
+
+    // 反転チェック（ドット積で180°回転していないか判定）
+    if (markerWorldQuat.dot(frontQuat) < 0) {
+      markerWorldQuat.x *= -1;
+      markerWorldQuat.y *= -1;
+      markerWorldQuat.z *= -1;
+      markerWorldQuat.w *= -1;
     }
-    
+
+    euler = new THREE.Euler().setFromQuaternion(markerWorldQuat, "YXZ");
+    eulerDeg = {
+      x: THREE.MathUtils.radToDeg(euler.x),
+      y: THREE.MathUtils.radToDeg(euler.y),
+      z: THREE.MathUtils.radToDeg(euler.z)
+    };
+    console.log("after",eulerDeg);
 
     // --- 位置補正 ---
     
