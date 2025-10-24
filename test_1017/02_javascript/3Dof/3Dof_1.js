@@ -79,7 +79,7 @@ function stopPlayback() {
     playTimer = null;
   }
 }
-let lastMarkerQuat = new THREE.Quaternion(); // 前フレーム保持
+
 function updateVideoPlane(){
   if (markerVisible) {
     // --- ワールド座標 ---
@@ -98,14 +98,16 @@ function updateVideoPlane(){
     camera.object3D.getWorldQuaternion(cameraWorldQuat);
     markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
 
-    if (lastMarkerQuat.dot(markerWorldQuat) < 0) {
-      markerWorldQuat.x *= -1;
-      markerWorldQuat.y *= -1;
-      markerWorldQuat.z *= -1;
-      markerWorldQuat.w *= -1;
+    const euler = new THREE.Euler().setFromQuaternion(markerWorldQuat, "YXZ");
+    console.log(euler);
+    // Y軸回転が±180度付近なら補正
+    if (Math.abs(Math.abs(THREE.MathUtils.radToDeg(euler.y)) - 180) < 1) {
+      // 強制的に0に戻す
+      euler.y = 0;
+      markerWorldQuat.setFromEuler(euler);
     }
-    lastMarkerQuat.copy(markerWorldQuat);
     
+
     // --- 位置補正 ---
     
     const offsetPosition = new THREE.Vector3(
