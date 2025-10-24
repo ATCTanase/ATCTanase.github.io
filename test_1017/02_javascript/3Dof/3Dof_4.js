@@ -12,8 +12,10 @@ canvas.height = window.innerHeight;
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 videoPlane.setAttribute("material", "src", canvas);
 
-const ARImage = "../../04_image/ARImage/AR4_小豆島の農村歌舞伎舞台";
-const frameCount = 1;
+// ARアニメ
+const ARImageFolder = "../../04_image/ARImage/AR4/";
+const fileName = "kominka_AR4_anim";
+const frameCount = 22;
 const frameExt = ".png";
 const frames = [];
 let currentFrame = 0;
@@ -21,211 +23,167 @@ const fps = 20;
 let playTimer = null;
 
 const loadingOverlay = document.getElementById("loadingOverlay");
+const AROverlay = document.getElementById("AROverlay");
 const progressText = document.getElementById("progress");
 
 let offset;
+let markerPositionX = 0;
+let markerPositionY = 0;
+let markerPositionZ = 0;
 
-// 🔹 全フレームをロード
+let markerRotationX = 0;
+let markerRotationY = 0;
+let markerRotationZ = 0;
+
+let markerHeight = 1;
+let markerWidth = 1;
+// フレームロード
 function preloadFrames(callback) {
-    let loaded = 0;
-    for (let i = 1; i <= frameCount; i++) {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        // img.src = `${ARImage}${String(i).padStart(3, "0")}${frameExt}`;
-        img.src = `${ARImage}${frameExt}`;
-        img.onload = () => {
-            loaded++;
-            // 進捗を表示
-            progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
-            if (loaded === frameCount) {
-                console.log("✅ 全フレームロード完了");
-                loadingOverlay.style.display = "none"; // ローディング画面を隠す
-                callback();
-                offset = img.height / img.width;
-            }
-        };
-        frames.push(img);
-    }
+  let loaded = 0;
+  for (let i = 0; i <= frameCount; i++) {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = `${ARImageFolder}${fileName}${String(i).padStart(2, "0")}${frameExt}`;
+    img.onload = () => {
+      loaded++;
+      progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
+      if (loaded === frameCount) {
+        loadingOverlay.style.display = "none";
+        callback();
+        offset = img.height / img.width;
+      }
+    };
+    frames.push(img);
+  }
 }
 
+// 次フレーム描画
 function drawNextFrame() {
-    const img = frames[currentFrame];
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const img = frames[currentFrame];
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    const mat = videoPlane.getObject3D("mesh")?.material;
-    if (mat?.map) mat.map.needsUpdate = true;
+  const mat = videoPlane.getObject3D("mesh")?.material;
+  if (mat?.map) mat.map.needsUpdate = true;
 
-    currentFrame = (currentFrame + 1) % frameCount;
+  currentFrame = (currentFrame + 1) % frameCount;
 }
 
 function startPlayback() {
-    if (!playTimer) playTimer = setInterval(drawNextFrame, 1000 / fps);
+  if (!playTimer) playTimer = setInterval(drawNextFrame, 1000 / fps);
 }
 
 function stopPlayback() {
-    if (playTimer) {
-        clearInterval(playTimer);
-        playTimer = null;
-    }
+  if (playTimer) {
+    clearInterval(playTimer);
+    playTimer = null;
+  }
 }
 
-let markerPositionX = 0;
-let markerPositionY = -2.5;
-let markerPositionZ = -7;
-let cameraFrag = true;
+function updateVideoPlane() {
+  if (markerVisible) {
+    // --- ワールド座標 ---
+    const markerWorldPos = new THREE.Vector3();
+    barcodeMarker.object3D.updateMatrixWorld(true);
+    barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+    camera.object3D.updateMatrixWorld(true);
+    markerWorldPos.setFromMatrixPosition(barcodeMarker.object3D.matrixWorld);
+    markerWorldPos.applyMatrix4(camera.object3D.matrixWorld);
 
-// barcodeMarker.addEventListener("markerFound", () => {
-//     if (!cameraFrag) return;
+    // --- ワールド回転 ---
+    const markerLocalQuat = new THREE.Quaternion();
+    const markerWorldQuat = new THREE.Quaternion();
+    barcodeMarker.object3D.getWorldQuaternion(markerLocalQuat);
+    const cameraWorldQuat = new THREE.Quaternion();
+    camera.object3D.getWorldQuaternion(cameraWorldQuat);
+    markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
 
-//     if (!markerVisible) {
-//         markerVisible = true;
-//         videoPlane.setAttribute("visible", "true");
-//         startPlayback();
-//         cameraFrag = false;
+    // 現在のマーカーの「上」方向（ローカルのY軸がワールド空間でどうなっているか）
+    const markerUp = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat);
+    // ワールドの「上」方向
+    const worldUp = new THREE.Vector3(0, 1, 0);
+    // マーカーのUpベクトルとワールドのUpベクトルの間の回転軸と角度を計算
+    const correctionQuaternion = new THREE.Quaternion().setFromUnitVectors(markerUp, worldUp);
+    // 元のマーカーの回転に補正回転を適用（ワールド座標系で回転を安定させる）
+    const stableMarkerWorldQuat = correctionQuaternion.multiply(markerWorldQuat);
 
-//         // カメラ視点のリセット（look-controlsを一時有効化）
-//         camera.setAttribute("look-controls", {
-//             enabled: true,
-//             magicWindowTrackingEnabled: true
-//         });
+    // --- 位置補正 ---
 
-//         markerTimer = setTimeout(() => {
-//             if (markerVisible) {
-//                 const markerWorldPos = new THREE.Vector3();
-//                 barcodeMarker.object3D.updateMatrixWorld(true);
-//                 barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+    const offsetPosition = new THREE.Vector3(
+      Number(markerPositionX),
+      Number(markerPositionY),
+      Number(markerPositionZ)
+    );
+    // マーカーのワールド回転を適用
+    const rotatedOffset = offsetPosition.clone().applyQuaternion(stableMarkerWorldQuat);
+    const finalPos = markerWorldPos.clone().add(rotatedOffset);
 
-//                 const offsetPosition = markerWorldPos.clone().add(new THREE.Vector3(parseInt(markerPositionX), parseInt(markerPositionY), parseInt(markerPositionZ)));
-//                 videoPlane.object3D.position.copy(offsetPosition);
-//                 videoPlane.setAttribute("visible", "true");  // ← マーカー検出時に表示
-//             }
-//         }, 100);
-//     }
-// });
+    // --- 回転補正 ---
+    const offsetEuler = new THREE.Euler(
+      THREE.MathUtils.degToRad(markerRotationX),
+      THREE.MathUtils.degToRad(markerRotationY),
+      THREE.MathUtils.degToRad(markerRotationZ)
+    );
+    const offsetQuat = new THREE.Quaternion().setFromEuler(offsetEuler);
+    const finalQuat = stableMarkerWorldQuat.clone().multiply(offsetQuat);
+
+    // --- スケール補正 ---
+    const markerObject3D = barcodeMarker.object3D;
+    // AR.jsが提供するマーカーの推定サイズを取得することを試みる
+    // 通常、AR.jsのマーカーは1x1の単位平面として扱われるため、
+    // markerObject3D.scale にはそのスケールが反映されているはず
+    const currentMarkerScaleX = markerObject3D.scale.x;
+    const currentMarkerScaleY = markerObject3D.scale.y; // 縦のマーカーの場合、Yスケールも意味を持
+    // ARコンテンツの元のアスペクト比
+    const originalAspectRatio = 1 / offset; // width / height
+
+    // videoPlane の新しい幅と高さを計算
+    // `markerWidth` はユーザー定義のオフセットスケールなので、これも考慮
+    const newPlaneWidth = currentMarkerScaleX * markerWidth; 
+    const newPlaneHeight = newPlaneWidth / originalAspectRatio; // アスペクト比を維持して高さを計算
+
+    // finalScale の計算を修正
+    // videoPlane の Z軸のスケールは通常1で固定
+    const finalScale = new THREE.Vector3(newPlaneWidth, newPlaneHeight, 1);
+
+    // --- 適用 ---
+    videoPlane.object3D.position.copy(finalPos);
+    videoPlane.object3D.quaternion.copy(finalQuat);
+    videoPlane.object3D.scale.copy(finalScale);
+  }
+}
+
+AFRAME.registerComponent("marker-tracker", {
+  tick: function () {
+    updateVideoPlane();
+  }
+});
+
+barcodeMarker.addEventListener("markerFound", () => {
+  if (!markerVisible) {
+    markerVisible = true;
+    startPlayback();
+    videoPlane.setAttribute('visible', 'true');
+    AROverlay.style.display = "none";
+
+    camera.setAttribute('look-controls', {
+      enabled: true,
+      magicWindowTrackingEnabled: true
+    });
+  }
+});
+
 
 barcodeMarker.addEventListener("markerLost", () => {
-    markerVisible = false;
-    CountOverlay.textContent = parseInt((holdTime) / 1000);
-    if (markerTimer) {
-        clearTimeout(markerTimer);
-        markerTimer = null;
-    }
+  markerVisible = false;
+  stopPlayback();
+  if (markerTimer) {
+    clearInterval(markerTimer);
+    markerTimer = null;
+  }
 });
 
-// 🔹 まずフレームを読み込み開始
+// 初期ロード
 preloadFrames(() => {
-    console.log("アニメーション準備完了");
-});
-
-const AROverlay = document.getElementById("AROverlay");
-const CountOverlay = document.getElementById("CountOverlay");
-const centerThreshold = 0.2; // 画面中央±20%以内を「中央」とみなす
-const holdTime = 3000; // 3秒保持で確定
-
-let markerWorldPos;
-let holdStartTime = null;
-let markerFound = false;
-
-window.addEventListener("load", () => {
-    const cameraEntity = document.querySelector("[camera]");
-
-    if (!cameraEntity) {
-        console.error("カメラが見つかりません。<a-entity camera> を確認してください。");
-        return;
-    }
-
-    const threeCamera = cameraEntity.getObject3D("camera");
-
-    // マーカーの認識位置検出
-    function checkMarkerPosition() {
-        if (!barcodeMarker.object3D.visible) {
-            // マーカーが見えなくなったらリセット
-            holdStartTime = null;
-            if (markerFound) markerFound = false;
-            return;
-        }
-
-        // --- マーカー四隅のワールド座標を取得 ---
-        const markerSize = 0.2; // meter
-        const half = markerSize / 2;
-        const corners = [
-            new THREE.Vector3(-half, -half, 0),
-            new THREE.Vector3(half, -half, 0),
-            new THREE.Vector3(half, half, 0),
-            new THREE.Vector3(-half, half, 0),
-        ];
-
-        const worldCorners = corners.map(v =>
-            v.clone().applyMatrix4(barcodeMarker.object3D.matrixWorld)
-        );
-
-        // --- 四隅の中点（見た目上の中心）を算出 ---
-        const avg = worldCorners.reduce((sum, v) => sum.add(v), new THREE.Vector3()).multiplyScalar(1 / 4);
-
-        // --- カメラ空間へ投影してスクリーン中心との距離を求める ---
-        const projected = avg.clone().project(threeCamera);
-        const dx = projected.x;
-        const dy = projected.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        const inCenter = dist < centerThreshold;
-
-        if (inCenter) {
-            if (!holdStartTime) {
-                holdStartTime = Date.now();
-            } else {
-                CountOverlay.textContent = parseInt((holdTime - (Date.now() - holdStartTime)) / 1000);
-                if (!markerFound && Date.now() - holdStartTime >= holdTime) {
-                    markerFound = true;
-                    barcodeMarker.dispatchEvent(new CustomEvent("centerMarkerFound"));
-                }
-            }
-        } else {
-            CountOverlay.textContent = parseInt((holdTime) / 1000);
-            holdStartTime = null;
-            if (markerFound) markerFound = false;
-        }
-    }
-
-    function loop() {
-        requestAnimationFrame(loop);
-        checkMarkerPosition();
-    }
-    loop();
-});
-
-barcodeMarker.addEventListener("centerMarkerFound", () => {
-    if (!cameraFrag) {
-        return;
-    }
-
-    if (!markerVisible) {
-        markerVisible = true;
-        videoPlane.setAttribute("visible", "true");
-        startPlayback();
-        cameraFrag = false;
-
-        videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
-
-        // カメラ視点のリセット（look-controlsを一時有効化）
-        camera.setAttribute("look-controls", {
-            enabled: true,
-            magicWindowTrackingEnabled: true
-        });
-
-        markerTimer = setTimeout(() => {
-            if (markerVisible) {
-                markerWorldPos = new THREE.Vector3();
-                barcodeMarker.object3D.updateMatrixWorld(true);
-                barcodeMarker.object3D.getWorldPosition(markerWorldPos);
-
-                const offsetPosition = markerWorldPos.clone().add(new THREE.Vector3(parseInt(markerPositionX), parseInt(markerPositionY), parseInt(markerPositionZ)));
-                videoPlane.object3D.position.copy(offsetPosition);
-                videoPlane.setAttribute("visible", "true");  // ← マーカー検出時に表示
-                AROverlay.style.display = "none";
-                CountOverlay.style.display = "none";
-            }
-        }, 100);
-    }
+  console.log("アニメーション準備完了");
 });

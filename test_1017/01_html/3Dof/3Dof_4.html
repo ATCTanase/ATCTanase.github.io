@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <meta name="robots" content="noindex">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>AR4_小豆島の農村歌舞伎舞台</title>
 
@@ -22,12 +23,7 @@
     
     <!-- 🔹 AR読み込み表示 -->
     <div id="AROverlay">
-        <img id="ARTargetImg" src="../../04_image/map/map_img_ar_frame.png" alt="">
-    </div>
-
-    <!-- 🔹 カウント表示 -->
-    <div id="CountOverlay">
-        <span id="progress">3</span>
+        <img id="ARTargetImg" src="../../04_image/map/map_img_ar_frame_vertical.png" alt="">
     </div>
 
     <div id="title" style="top:2px; left:2px; position:fixed; font-size: 30px;">3DOF4</div>
@@ -41,13 +37,13 @@
         <a-light type="ambient" color="#ffffff"></a-light>
         <a-light type="point" intensity="2" position="0 2 2"></a-light>
 
-        <a-marker type="pattern" value="5" id="barcodeMarker" url="../../04_image/patt/AR4.patt"></a-marker>
+        <a-marker type="pattern" value="5" id="barcodeMarker" url="../../04_image/patt/AR4.patt" size="0.2" marker-tracker></a-marker>
         <a-plane 
             id="videoPlane" 
             position="0 0 0" 
             rotation="0 0 0" 
-            width="18" 
-            height="18" 
+            width="1" 
+            height="1" 
             visible="false"
             material="shader: flat; side: double; transparent: true; alphaTest: 0.01;">
         </a-plane>
