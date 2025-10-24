@@ -104,15 +104,16 @@ function updateVideoPlane(){
     `y=${THREE.MathUtils.radToDeg(beforEuler.y).toFixed(2)}, ` +
     `z=${THREE.MathUtils.radToDeg(beforEuler.z).toFixed(2)}`
     );
-    // 正面向きの基準クォータニオン
-    const frontQuat = new THREE.Quaternion(); // identity (0,0,0,1)
 
-    if (Math.abs(THREE.MathUtils.radToDeg(beforEuler.y)) > 90) beforEuler.y = 0;
-    if (Math.abs(THREE.MathUtils.radToDeg(beforEuler.z)) > 90) beforEuler.z = 0;
-
-    // 修正済みクォータニオンに変換
-    markerWorldQuat.setFromEuler(beforEuler);
-
+    const axis = new THREE.Vector3();
+    let angle = markerWorldQuat.angleTo(new THREE.Quaternion()); // identityとの角度
+    if (angle > Math.PI / 2) { // 90°を超えていたら反転の可能性
+      // 回転軸を反転
+      markerWorldQuat.x *= -1;
+      markerWorldQuat.y *= -1;
+      markerWorldQuat.z *= -1;
+      markerWorldQuat.w *= -1;
+    }
 
     // --- 位置補正 ---
     
