@@ -105,20 +105,18 @@ function updateVideoPlane(){
       `w=${markerWorldQuat.w.toFixed(3)}`
     );
 
-    // 反転補正
-    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat);
-    if (up.y < 0) { // 上方向が下向きになっていたら180°回転
-        const correction = new THREE.Quaternion();
-        correction.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI); // X軸回転で反転
-        markerWorldQuat.premultiply(correction);
-    }
-    // 左右補正
-    const right = new THREE.Vector3(1, 0, 0).applyQuaternion(markerWorldQuat);
-    if (right.x < 0) { // 右向きが左になっていたら反転
-        const correction = new THREE.Quaternion();
-        correction.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI); // Y軸回転で左右反転補正
-        markerWorldQuat.premultiply(correction);
-    }
+    // 現在のマーカーの「上」方向（ローカルのY軸がワールド空間でどうなっているか）
+    const markerUp = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat);
+    
+    // ワールドの「上」方向
+    const worldUp = new THREE.Vector3(0, 1, 0);
+
+    // マーカーのUpベクトルとワールドのUpベクトルの間の回転軸と角度を計算
+    const correctionQuaternion = new THREE.Quaternion().setFromUnitVectors(markerUp, worldUp);
+
+    // 元のマーカーの回転に補正回転を適用（ワールド座標系で回転を安定させる）
+    const stableMarkerWorldQuat = correctionQuaternion.multiply(markerWorldQuat);
+    .
     // --- 位置補正 ---
     
     const offsetPosition = new THREE.Vector3(
@@ -127,7 +125,7 @@ function updateVideoPlane(){
       Number(markerPositionZ)
     );
     // マーカーのワールド回転を適用
-    const rotatedOffset = offsetPosition.clone().applyQuaternion(markerWorldQuat);
+    const rotatedOffset = offsetPosition.clone().applyQuaternion(stableMarkerWorldQuat);
     const finalPos = markerWorldPos.clone().add(rotatedOffset);
 
     // --- 回転補正 ---
@@ -137,7 +135,7 @@ function updateVideoPlane(){
       THREE.MathUtils.degToRad(markerRotationZ)
     );
     const offsetQuat = new THREE.Quaternion().setFromEuler(offsetEuler);
-    const finalQuat = markerWorldQuat.clone().multiply(offsetQuat);
+    const finalQuat = stableMarkerWorldQuat.clone().multiply(offsetQuat);
 
     // --- スケール補正 ---
     const markerScale = barcodeMarker.object3D.scale.clone();
