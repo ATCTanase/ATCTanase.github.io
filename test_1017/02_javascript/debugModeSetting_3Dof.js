@@ -245,8 +245,6 @@ function closeDialog() {
     dialog.close();
     kariSettingButton.setAttribute("style", "display: block;");
     kariGuidemarkerButton.setAttribute("style", "display: block; position: fixed; bottom: 60px; right: 10px;");
-
-    updateVideoPlane();
 }
 
 
