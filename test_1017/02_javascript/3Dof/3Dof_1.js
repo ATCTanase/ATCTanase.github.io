@@ -23,13 +23,20 @@ const fps = 20;
 let playTimer = null;
 
 const loadingOverlay = document.getElementById("loadingOverlay");
+const AROverlay = document.getElementById("AROverlay");
 const progressText = document.getElementById("progress");
 
 let offset;
-let firstRotX = null;
-let firstRotY = null;
-let firstRotZ = null;
+let markerPositionX = 0;
+let markerPositionY = 0;
+let markerPositionZ = 0;
 
+let markerRotationX = 0;
+let markerRotationY = 0;
+let markerRotationZ = 0;
+
+let markerHeight = 1;
+let markerWidth = 1;
 // フレームロード
 function preloadFrames(callback) {
   let loaded = 0;
@@ -72,9 +79,7 @@ function stopPlayback() {
     playTimer = null;
   }
 }
-
-function updateVideoPlane()
-{
+function updateVideoPlane(){
   if (markerVisible) {
     // --- ワールド座標 ---
     const markerWorldPos = new THREE.Vector3();
@@ -117,7 +122,7 @@ function updateVideoPlane()
 
     // --- スケール補正 ---
     const markerScale = barcodeMarker.object3D.scale.clone();
-    const offsetScale = new THREE.Vector3(markerWidth ,markerHeight,1);
+    const offsetScale = new THREE.Vector3(markerWidth ,markerWidth*offset,1);
     const finalScale = markerScale.multiply(offsetScale);
 
     // --- 適用 ---
@@ -138,6 +143,7 @@ barcodeMarker.addEventListener("markerFound", () => {
     markerVisible = true;
     startPlayback();
     videoPlane.setAttribute('visible', 'true');
+    AROverlay.style.display = "none";
 
     camera.setAttribute('look-controls', {
       enabled: true,

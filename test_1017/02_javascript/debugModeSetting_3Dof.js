@@ -1,14 +1,3 @@
-let markerPositionX = 0;
-let markerPositionY = 0;
-let markerPositionZ = 0;
-
-let markerRotationX = 0;
-let markerRotationY = 0;
-let markerRotationZ = 0;
-
-let markerHeight = 1;
-let markerWidth = 1;
-
 /*＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
  * AR要素を読み込んだ時、その値をデバッグ画面の初期値として設定する
  *＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
