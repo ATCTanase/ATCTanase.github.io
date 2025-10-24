@@ -98,13 +98,12 @@ function updateVideoPlane(){
     camera.object3D.getWorldQuaternion(cameraWorldQuat);
     markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
    
-    const euler = new THREE.Euler().setFromQuaternion(markerWorldQuat, "YXZ");
-    const eulerDeg = {
-      x: THREE.MathUtils.radToDeg(euler.x),
-      y: THREE.MathUtils.radToDeg(euler.y),
-      z: THREE.MathUtils.radToDeg(euler.z)
-    };
-    console.log("before",eulerDeg);
+    const beforEuler = new THREE.Euler().setFromQuaternion(markerWorldQuat, "YXZ");
+    console.log(
+    `beforEuler (deg): x=${THREE.MathUtils.radToDeg(beforEuler.x).toFixed(2)}, ` +
+    `y=${THREE.MathUtils.radToDeg(beforEuler.y).toFixed(2)}, ` +
+    `z=${THREE.MathUtils.radToDeg(beforEuler.z).toFixed(2)}`
+    );
     // 正面向きの基準クォータニオン
     const frontQuat = new THREE.Quaternion(); // identity (0,0,0,1)
 
@@ -116,14 +115,13 @@ function updateVideoPlane(){
       markerWorldQuat.w *= -1;
     }
 
-    euler = new THREE.Euler().setFromQuaternion(markerWorldQuat, "YXZ");
-    eulerDeg = {
-      x: THREE.MathUtils.radToDeg(euler.x),
-      y: THREE.MathUtils.radToDeg(euler.y),
-      z: THREE.MathUtils.radToDeg(euler.z)
-    };
-    console.log("after",eulerDeg);
-
+    const afterEuler = new THREE.Euler().setFromQuaternion(markerWorldQuat, "YXZ");
+    console.log(
+    `afterEuler (deg): x=${THREE.MathUtils.radToDeg(afterEuler.x).toFixed(2)}, ` +
+    `y=${THREE.MathUtils.radToDeg(afterEuler.y).toFixed(2)}, ` +
+    `z=${THREE.MathUtils.radToDeg(afterEuler.z).toFixed(2)}`
+    );
+    
     // --- 位置補正 ---
     
     const offsetPosition = new THREE.Vector3(
