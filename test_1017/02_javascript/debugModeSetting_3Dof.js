@@ -246,11 +246,6 @@ function closeDialog() {
     kariSettingButton.setAttribute("style", "display: block;");
     kariGuidemarkerButton.setAttribute("style", "display: block; position: fixed; bottom: 60px; right: 10px;");
 
-    // 設定更新
-    markerVisible = false;
-    startPlayback();
-    cameraFrag = true;
-
     updateVideoPlane();
 }
 
