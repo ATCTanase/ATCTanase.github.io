@@ -15,7 +15,7 @@ videoPlane.setAttribute("material", "src", canvas);
 // ARアニメ
 const ARImageFolder = "../../04_image/ARImage/AR4/";
 const fileName = "kominka_AR4_anim";
-const frameCount = 22;
+const frameCount = 1;
 const frameExt = ".png";
 const frames = [];
 let currentFrame = 0;
