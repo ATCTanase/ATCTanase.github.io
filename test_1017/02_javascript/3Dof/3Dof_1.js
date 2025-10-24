@@ -98,22 +98,12 @@ function updateVideoPlane(){
     camera.object3D.getWorldQuaternion(cameraWorldQuat);
     markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
    
-    console.log(
-      `markerWorldQuat: x=${markerWorldQuat.x.toFixed(3)}, ` +
-      `y=${markerWorldQuat.y.toFixed(3)}, ` +
-      `z=${markerWorldQuat.z.toFixed(3)}, ` +
-      `w=${markerWorldQuat.w.toFixed(3)}`
-    );
-
     // 現在のマーカーの「上」方向（ローカルのY軸がワールド空間でどうなっているか）
-    const markerUp = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat);
-    
+    const markerUp = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat); 
     // ワールドの「上」方向
     const worldUp = new THREE.Vector3(0, 1, 0);
-
     // マーカーのUpベクトルとワールドのUpベクトルの間の回転軸と角度を計算
     const correctionQuaternion = new THREE.Quaternion().setFromUnitVectors(markerUp, worldUp);
-
     // 元のマーカーの回転に補正回転を適用（ワールド座標系で回転を安定させる）
     const stableMarkerWorldQuat = correctionQuaternion.multiply(markerWorldQuat);
     
@@ -146,14 +136,6 @@ function updateVideoPlane(){
     videoPlane.object3D.position.copy(finalPos);
     videoPlane.object3D.quaternion.copy(finalQuat);
     videoPlane.object3D.scale.copy(finalScale);
-    
-   
-    console.log(
-      `finalQuat: x=${finalQuat.x.toFixed(3)}, ` +
-      `y=${finalQuat.y.toFixed(3)}, ` +
-      `z=${finalQuat.z.toFixed(3)}, ` +
-      `w=${finalQuat.w.toFixed(3)}`
-    );
   }
 }
 
