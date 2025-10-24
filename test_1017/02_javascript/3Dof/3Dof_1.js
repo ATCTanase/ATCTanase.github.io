@@ -107,21 +107,13 @@ function updateVideoPlane(){
     // 正面向きの基準クォータニオン
     const frontQuat = new THREE.Quaternion(); // identity (0,0,0,1)
 
-    // 反転チェック（ドット積で180°回転していないか判定）
-    if (markerWorldQuat.dot(frontQuat) < 0) {
-      markerWorldQuat.x *= -1;
-      markerWorldQuat.y *= -1;
-      markerWorldQuat.z *= -1;
-      markerWorldQuat.w *= -1;
-    }
+    if (Math.abs(THREE.MathUtils.radToDeg(beforEuler.y)) > 90) beforEuler.y = 0;
+    if (Math.abs(THREE.MathUtils.radToDeg(beforEuler.z)) > 90) beforEuler.z = 0;
 
-    const afterEuler = new THREE.Euler().setFromQuaternion(markerWorldQuat, "YXZ");
-    console.log(
-    `afterEuler (deg): x=${THREE.MathUtils.radToDeg(afterEuler.x).toFixed(2)}, ` +
-    `y=${THREE.MathUtils.radToDeg(afterEuler.y).toFixed(2)}, ` +
-    `z=${THREE.MathUtils.radToDeg(afterEuler.z).toFixed(2)}`
-    );
-    
+    // 修正済みクォータニオンに変換
+    markerWorldQuat.setFromEuler(beforEuler);
+
+
     // --- 位置補正 ---
     
     const offsetPosition = new THREE.Vector3(
@@ -151,6 +143,13 @@ function updateVideoPlane(){
     videoPlane.object3D.position.copy(finalPos);
     videoPlane.object3D.quaternion.copy(finalQuat);
     videoPlane.object3D.scale.copy(finalScale);
+    
+    const finalQuat = new THREE.Euler().setFromQuaternion(finalQuat, "YXZ");
+    console.log(
+    `finalQuat (deg): x=${THREE.MathUtils.radToDeg(finalQuat.x).toFixed(2)}, ` +
+    `y=${THREE.MathUtils.radToDeg(finalQuat.y).toFixed(2)}, ` +
+    `z=${THREE.MathUtils.radToDeg(finalQuat.z).toFixed(2)}`
+    );
   }
 }
 
