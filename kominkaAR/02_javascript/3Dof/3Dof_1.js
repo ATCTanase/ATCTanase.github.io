@@ -81,6 +81,8 @@ function stopPlayback() {
   }
 }
 
+let firstFrame = true;
+
 function updateVideoPlane() {
   if (markerVisible) {
     // --- ワールド座標 ---
@@ -132,24 +134,19 @@ function updateVideoPlane() {
     const markerScale = barcodeMarker.object3D.scale.clone();
     const offsetScale = new THREE.Vector3(markerWidth, markerHeight, 1);
     const finalScale = markerScale.multiply(offsetScale);
-    
-    const lerpFactor = 0.25; // 補間速度 (0〜1) 小さいほどゆっくり追従
-    // 現在の位置・回転・スケール
+        
     const currentPos = videoPlane.object3D.position;
-    const currentQuat = videoPlane.object3D.quaternion;
-    const currentScale = videoPlane.object3D.scale;
 
-    // 目標位置・回転・スケール
-    const targetPos = finalPos;   // THREE.Vector3
-    const targetQuat = finalQuat; // THREE.Quaternion
-    const targetScale = finalScale; // THREE.Vector3
-
-    // --- 位置補間 ---
-    currentPos.lerp(targetPos, lerpFactor);
-    // --- 回転補間 ---
-    currentQuat.slerp(targetQuat, lerpFactor);
-    // --- スケール補間 ---
-    currentScale.lerp(targetScale, lerpFactor);
+    if (firstFrame) {
+        videoPlane.object3D.position.copy(finalPos); 
+        firstFrame = false;
+    }
+    else {
+      const lerpFactor = 0.01; // 補間速度 
+      currentPos.lerp(finalPos, lerpFactor);
+    }
+    videoPlane.object3D.quaternion.copy(finalQuat); 
+    videoPlane.object3D.scale.copy(finalScale);
   }
 }
 
@@ -161,6 +158,7 @@ AFRAME.registerComponent("marker-tracker", {
 
 barcodeMarker.addEventListener("markerFound", () => {
   if (!markerVisible) {
+    firstFrame = true;
     markerVisible = true;
     startPlayback();
     videoPlane.setAttribute('visible', 'true');
