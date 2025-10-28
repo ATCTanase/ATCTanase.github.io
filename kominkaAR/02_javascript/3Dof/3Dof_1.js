@@ -85,19 +85,11 @@ function updateVideoPlane() {
   if (markerVisible) {
     // --- ワールド座標 ---
     const markerWorldPos = new THREE.Vector3();
-    barcodeMarker.object3D.updateMatrixWorld(true);
     barcodeMarker.object3D.getWorldPosition(markerWorldPos);
-    camera.object3D.updateMatrixWorld(true);
-    markerWorldPos.setFromMatrixPosition(barcodeMarker.object3D.matrixWorld);
-    markerWorldPos.applyMatrix4(camera.object3D.matrixWorld);
 
     // --- ワールド回転 ---
-    const markerLocalQuat = new THREE.Quaternion();
     const markerWorldQuat = new THREE.Quaternion();
-    barcodeMarker.object3D.getWorldQuaternion(markerLocalQuat);
-    const cameraWorldQuat = new THREE.Quaternion();
-    camera.object3D.getWorldQuaternion(cameraWorldQuat);
-    markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
+    barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
 
     // 現在のマーカーの「上」方向（ローカルのY軸がワールド空間でどうなっているか）
     const markerUp = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat);
@@ -130,7 +122,7 @@ function updateVideoPlane() {
 
     // --- スケール補正 ---
     const markerScale = barcodeMarker.object3D.scale.clone();
-    const offsetScale = new THREE.Vector3(markerWidth, markerHeight, 1);
+    const offsetScale = new THREE.Vector3(markerWidth, markerWidth, 1);
     const finalScale = markerScale.multiply(offsetScale);
 
     // --- 適用 ---
