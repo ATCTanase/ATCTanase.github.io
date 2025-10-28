@@ -81,24 +81,44 @@ function stopPlayback() {
   }
 }
 
+let markerInitialPos = null;
+
 function updateVideoPlane() {
   if (markerVisible) {
     // --- ワールド座標 ---
     const markerWorldPos = new THREE.Vector3();
+    barcodeMarker.object3D.updateMatrixWorld(true);
     barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+    camera.object3D.updateMatrixWorld(true);
+    markerWorldPos.setFromMatrixPosition(barcodeMarker.object3D.matrixWorld);
+    markerWorldPos.applyMatrix4(camera.object3D.matrixWorld);
 
     // --- ワールド回転 ---
+    const markerLocalQuat = new THREE.Quaternion();
+    barcodeMarker.object3D.getWorldQuaternion(markerLocalQuat);
+    const cameraWorldQuat = new THREE.Quaternion();
+    camera.object3D.getWorldQuaternion(cameraWorldQuat);
     const markerWorldQuat = new THREE.Quaternion();
-    barcodeMarker.object3D.getWorldQuaternion(markerWorldQuat);
+    markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
+    
+  if (!markerInitialPos) {
+    markerInitialPos = new THREE.Vector3();
+    markerInitialPos.copy(markerWorldPos)
+  }
 
-    // 現在のマーカーの「上」方向（ローカルのY軸がワールド空間でどうなっているか）
-    const markerUp = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat);
-    // ワールドの「上」方向
-    const worldUp = new THREE.Vector3(0, 1, 0);
-    // マーカーのUpベクトルとワールドのUpベクトルの間の回転軸と角度を計算
-    const correctionQuaternion = new THREE.Quaternion().setFromUnitVectors(markerUp, worldUp);
-    // 元のマーカーの回転に補正回転を適用（ワールド座標系で回転を安定させる）
-    const stableMarkerWorldQuat = correctionQuaternion.multiply(markerWorldQuat);
+  // カメラ回転に沿った横方向だけ抽出
+  const cameraRight = new THREE.Vector3(1, 0, 0).applyQuaternion(cameraQuat); // カメラ右方向
+  const deltaX = worldDelta.dot(cameraRight); // カメラ右方向の成分だけ残す
+  const deltaPos = cameraRight.clone().multiplyScalar(deltaX);
+
+  // 現在のマーカーの「上」方向（ローカルのY軸がワールド空間でどうなっているか）
+  const markerUp = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat);
+  // ワールドの「上」方向
+  const worldUp = new THREE.Vector3(0, 1, 0);
+  // マーカーのUpベクトルとワールドのUpベクトルの間の回転軸と角度を計算
+  const correctionQuaternion = new THREE.Quaternion().setFromUnitVectors(markerUp, worldUp);
+  // 元のマーカーの回転に補正回転を適用（ワールド座標系で回転を安定させる）
+  const stableMarkerWorldQuat = correctionQuaternion.multiply(markerWorldQuat);
 
     // --- 位置補正 ---
 
@@ -109,7 +129,7 @@ function updateVideoPlane() {
     );
     // マーカーのワールド回転を適用
     const rotatedOffset = offsetPosition.clone().applyQuaternion(stableMarkerWorldQuat);
-    const finalPos = markerWorldPos.clone().add(rotatedOffset);
+    const finalPos = markerWorldPos.clone().add(deltaPos).add(rotatedOffset);
 
     // --- 回転補正 ---
     const offsetEuler = new THREE.Euler(
@@ -139,12 +159,14 @@ AFRAME.registerComponent("marker-tracker", {
 });
 
 barcodeMarker.addEventListener("markerFound", () => {
+  
   if (!markerVisible) {
     markerVisible = true;
+    markerInitialPos = null;
     startPlayback();
     videoPlane.setAttribute('visible', 'true');
-    AROverlay.style.display = "none";
-
+    AROverlay.style.display = "none";    
+    
     camera.setAttribute('look-controls', {
       enabled: true,
       magicWindowTrackingEnabled: true
