@@ -82,6 +82,8 @@ function stopPlayback() {
 }
 
 let markerInitialPos = null;
+let markerInitialQuat = null;
+
 
 function updateVideoPlane() {
   if (markerVisible) {
@@ -104,15 +106,19 @@ function updateVideoPlane() {
   if (!markerInitialPos) {
     markerInitialPos = new THREE.Vector3();
     markerInitialPos.copy(markerWorldPos)
+    
+    markerInitialQuat = new THREE.Quaternion();
+    barcodeMarker.object3D.getWorldQuaternion(markerInitialQuat);
   }
 
   // 初期位置からの差分（ワールド座標）
   const worldDelta = markerWorldPos.clone().sub(markerInitialPos);
 
-  // カメラ回転に沿った横方向だけ抽出
-  const cameraRight = new THREE.Vector3(1, 0, 0).applyQuaternion(cameraWorldQuat); // カメラ右方向
-  const deltaX = worldDelta.dot(cameraRight); // カメラ右方向の成分だけ残す
-  const deltaPos = cameraRight.clone().multiplyScalar(deltaX);
+  // 初期マーカーの横方向ベクトル
+  const markerRight = new THREE.Vector3(1, 0, 0).applyQuaternion(markerInitialQuat);
+  // 横方向成分だけ抽出
+  const deltaX = worldDelta.dot(markerRight);
+  const deltaPos = markerRight.clone().multiplyScalar(deltaX);
 
   // 現在のマーカーの「上」方向（ローカルのY軸がワールド空間でどうなっているか）
   const markerUp = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat);
@@ -166,6 +172,8 @@ barcodeMarker.addEventListener("markerFound", () => {
   if (!markerVisible) {
     markerVisible = true;
     markerInitialPos = null;
+    markerInitialQuat = null;
+
     startPlayback();
     videoPlane.setAttribute('visible', 'true');
     AROverlay.style.display = "none";    
