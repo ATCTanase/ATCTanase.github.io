@@ -28,21 +28,19 @@
     arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
 
     <a-marker type="pattern" value="5" id="barcodeMarker" url="../../04_image/patt/AR1.patt"
-      smooth="true" smoothCount="100" smoothTolerance="10" smoothThreshold="5">
-      <a-plane 
-        id="videoPlane" 
-        position="0 -10 0" 
-        rotation="-90 0 0" 
-        width="3" 
-        height="3" 
-        visible="false"
-        material="shader: flat; side: double; transparent: true; alphaTest:0.01;">
-      </a-plane>
-    </a-marker>
-
-     <a-camera position="0 0 0" id="mainCamera"
-        look-controls="enabled: true; magicWindowTrackingEnabled: true; touchEnabled: false">
-      </a-camera>
+      smooth="true" smoothCount="100" smoothTolerance="10" smoothThreshold="5"></a-marker>
+    <a-plane 
+      id="videoPlane" 
+      position="0 -10 0" 
+      rotation="-90 0 0" 
+      width="3" 
+      height="3" 
+      visible="false"
+      material="shader: flat; side: double; transparent: true; alphaTest:0.01;">
+    </a-plane>
+    <a-camera position="0 0 0" id="mainCamera"
+      look-controls="enabled: true; magicWindowTrackingEnabled: true; touchEnabled: false">
+    </a-camera>
   </a-scene>
 
   <dialog id="kariModalDialog" class="dialog">
