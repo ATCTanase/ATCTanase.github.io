@@ -204,22 +204,22 @@ preloadFrames(() => {
 
 
   function updateWhitePlane() {
-    if (!markerVisible) return;
+    if (!markerVisible)
+    {
+      // マーカーの位置・回転をそのままコピー
+      const markerPos = new THREE.Vector3();
+      barcodeMarker.object3D.getWorldPosition(markerPos);
 
-    // マーカーの位置・回転をそのままコピー
-    const markerPos = new THREE.Vector3();
-    barcodeMarker.object3D.getWorldPosition(markerPos);
+      const markerQuat = new THREE.Quaternion();
+      barcodeMarker.object3D.getWorldQuaternion(markerQuat);
 
-    const markerQuat = new THREE.Quaternion();
-    barcodeMarker.object3D.getWorldQuaternion(markerQuat);
+      whitePlane.object3D.position.copy(markerPos);
+      whitePlane.object3D.quaternion.copy(markerQuat);
 
-    whitePlane.object3D.position.copy(markerPos);
-    whitePlane.object3D.quaternion.copy(markerQuat);
-
-    // マーカーサイズに合わせる
-    // const markerSize = barcodeMarker.getAttribute('size') || 0.2;
-    whitePlane.object3D.scale.set(1,1, 1);
-
+      // マーカーサイズに合わせる
+      // const markerSize = barcodeMarker.getAttribute('size') || 0.2;
+      whitePlane.object3D.scale.set(1,1, 1);
+    }
     requestAnimationFrame(updateWhitePlane);
   }
 
