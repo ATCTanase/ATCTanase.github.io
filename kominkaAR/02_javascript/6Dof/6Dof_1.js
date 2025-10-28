@@ -1,6 +1,7 @@
 const videoPlane = document.getElementById("videoPlane");
 const sceneRoot = videoPlane.parentElement;
 const marker     = document.getElementById("barcodeMarker");
+const camera = document.querySelector("#mainCamera");
 
 // Canvasを作成
 const canvas = document.createElement("canvas");
