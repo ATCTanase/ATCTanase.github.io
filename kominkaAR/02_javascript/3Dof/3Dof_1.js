@@ -36,8 +36,8 @@ let markerRotationX = 0;
 let markerRotationY = 0;
 let markerRotationZ = 0;
 
-let markerHeight = 6;
-let markerWidth = 6;
+let markerHeight = 1;
+let markerWidth = 1;
 // フレームロード
 function preloadFrames(callback) {
   let loaded = 0;
@@ -174,7 +174,7 @@ barcodeMarker.addEventListener("markerFound", () => {
     markerVisible = true;
     markerInitialPos = null;
     markerInitialQuat = null;
-    whitePlane.setAttribute('visible', true);
+    whitePlane.setAttribute('visible', 'true');
 
     startPlayback();
     videoPlane.setAttribute('visible', 'true');
@@ -189,7 +189,7 @@ barcodeMarker.addEventListener("markerFound", () => {
 
 
 barcodeMarker.addEventListener("markerLost", () => {
-  whitePlane.setAttribute('visible', false);
+  whitePlane.setAttribute('visible', 'false');
   markerVisible = false;
   if (markerTimer) {
     clearInterval(markerTimer);
@@ -217,8 +217,8 @@ preloadFrames(() => {
     whitePlane.object3D.quaternion.copy(markerQuat);
 
     // マーカーサイズに合わせる
-    const markerSize = barcodeMarker.getAttribute('size') || 0.2;
-    whitePlane.object3D.scale.set(markerSize, markerSize, 1);
+    // const markerSize = barcodeMarker.getAttribute('size') || 0.2;
+    whitePlane.object3D.scale.set(1,1, 1);
 
     requestAnimationFrame(updateWhitePlane);
   }
