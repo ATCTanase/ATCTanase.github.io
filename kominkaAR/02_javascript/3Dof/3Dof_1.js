@@ -204,7 +204,7 @@ preloadFrames(() => {
 
 
   function updateWhitePlane() {
-    if (!barcodeMarker.object3D.visible) return;
+    if (!markerVisible) return;
 
     // マーカーの位置・回転をそのままコピー
     const markerPos = new THREE.Vector3();
