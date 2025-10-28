@@ -81,7 +81,9 @@ function stopPlayback() {
   }
 }
 
-let firstFrame = true;
+let markerInitialPos = null;
+let markerInitialQuat = null;
+let cameraInitialQuat = null;
 
 function updateVideoPlane() {
   if (markerVisible) {
@@ -101,6 +103,33 @@ function updateVideoPlane() {
     camera.object3D.getWorldQuaternion(cameraWorldQuat);
     markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
 
+  if (!markerInitialPos) {
+    markerInitialPos = new THREE.Vector3();
+    barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+
+    markerInitialQuat = new THREE.Quaternion();
+    barcodeMarker.object3D.getWorldQuaternion(markerInitialQuat);
+
+    cameraInitialQuat = new THREE.Quaternion();
+    camera.object3D.getWorldQuaternion(cameraInitialQuat);
+  }
+
+    // --- 横方向の差分 ---
+    // 初期マーカーの右方向
+    const markerRight = new THREE.Vector3(1, 0, 0).applyQuaternion(markerInitialQuat);
+
+    // マーカーのワールド移動差分
+    const worldDelta = currentPos.clone().sub(markerInitialPos);
+
+    // スマホ回転による見かけ上の移動を補正
+    const deltaQuat = camQuat.clone().multiply(cameraInitialQuat.clone().invert()); // カメラ回転差分
+    const distance = markerInitialPos.distanceTo(camera.object3D.position); // マーカーまでの距離
+    const correction = markerRight.clone().multiplyScalar(distance * Math.tan(deltaQuat.toEuler(new THREE.Euler()).y)); 
+  
+  // 横方向のみ差分反映
+  const deltaX = worldDelta.dot(markerRight) - correction.dot(markerRight);
+  const deltaPos = markerRight.clone().multiplyScalar(deltaX);
+
     // 現在のマーカーの「上」方向（ローカルのY軸がワールド空間でどうなっているか）
     const markerUp = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat);
     // ワールドの「上」方向
@@ -119,7 +148,7 @@ function updateVideoPlane() {
     );
     // マーカーのワールド回転を適用
     const rotatedOffset = offsetPosition.clone().applyQuaternion(stableMarkerWorldQuat);
-    const finalPos = markerWorldPos.clone().add(rotatedOffset);
+    const finalPos = markerInitialPos.clone().add(deltaPos).add(rotatedOffset);
 
     // --- 回転補正 ---
     const offsetEuler = new THREE.Euler(
@@ -134,18 +163,10 @@ function updateVideoPlane() {
     const markerScale = barcodeMarker.object3D.scale.clone();
     const offsetScale = new THREE.Vector3(markerWidth, markerHeight, 1);
     const finalScale = markerScale.multiply(offsetScale);
-        
-    const currentPos = videoPlane.object3D.position;
 
-    if (firstFrame) {
-        videoPlane.object3D.position.copy(finalPos); 
-        firstFrame = false;
-    }
-    else {
-      const lerpFactor = 0.01; // 補間速度 
-      currentPos.lerp(finalPos, lerpFactor);
-    }
-    videoPlane.object3D.quaternion.copy(finalQuat); 
+    // --- 適用 ---
+    videoPlane.object3D.position.copy(finalPos);
+    videoPlane.object3D.quaternion.copy(finalQuat);
     videoPlane.object3D.scale.copy(finalScale);
   }
 }
@@ -158,10 +179,14 @@ AFRAME.registerComponent("marker-tracker", {
 
 barcodeMarker.addEventListener("markerFound", () => {
   if (!markerVisible) {
-    firstFrame = true;
     markerVisible = true;
     startPlayback();
-    videoPlane.setAttribute('visible', 'true');
+
+  markerInitialPos = null;
+  markerInitialQuat = null;
+  cameraInitialQuat = null;
+  
+  videoPlane.setAttribute('visible', 'true');
     AROverlay.style.display = "none";
 
     camera.setAttribute('look-controls', {
