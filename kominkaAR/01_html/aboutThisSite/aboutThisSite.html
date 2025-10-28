@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <title>このサイトについて</title>
+
+  <!-- ↓faviconエラー消すための1行 -->
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../../03_css/aboutThisSite.css">
+  <link rel="stylesheet" href="../../03_css/style.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <?php include($_SERVER['DOCUMENT_ROOT'] . "/common/inc/gtm_head.php"); ?>
+</head>
+
+<body>
+  <?php include($_SERVER['DOCUMENT_ROOT'] . "/common/inc/gtm_body.php"); ?>
+  <div id="mainContents">
+    <div id="aboutThisSite">
+      <!-- 戻るボタン -->
+      <div id="pageBackBtnErea">
+        <button type="button" id="pageBackBtn">
+          <img id="pageBack">
+          <img id="pageBackOn">
+        </button>
+      </div>
+
+      <!-- 古民家ARロゴ -->
+      <div id="kominkaArLogoErea">
+        <img id="kominkaArLogo">
+      </div>
+
+      <img id="aboutThisSiteBackgroud">
+
+      <div id="aboutThisSiteErea">
+        <!-- このサイトについて -->
+        <div id="aboutThisSiteTitleErea">
+          <img id="aboutThisSiteTitle">
+        </div>
+
+        <div id="aboutThisSiteExplanatoryErea">
+          <img id="aboutThisSiteExplanatoryImg">
+
+          <div id="explanatoryTextErea">
+            <!-- このサイトについて段落 -->
+            <img id="aboutThisSiteParagraphImg">
+            <div id="aboutThisSiteParagraphErea">
+              <p>当サイトは無料でお楽しみいただけますが、利用時の通信料はお客様のご負担となります。</p>
+              <p>当サイトの解説やイラストを含め、あくまでも掲載時点における情報により制作したものです。</p>
+              <p>利用者が当サイトの情報を用いて行う一切の行為について責任を負いません。</p>
+              <p>
+                当サイトに掲載されている文章、イラスト、ロゴ、写真、動画、ソフトウエア、その他のすべての情報は、日本民家集落博物館またはコンテンツ提供者が著作権を有しております。個人的な利用など著作権法によって認められる場合を除き、著作権者への事前の許可なく、これらの情報を2次利用
+                (複製、改変、配布、公衆送信等を含みます) することはできません。</p>
+              <p>※QRコードは（株）デンソーウェーブの登録商標です。</p>
+            </div>
+
+            <!-- 推奨閲覧環境段落 -->
+            <img id="recommendedViewingEnvironmentParagraphImg">
+            <div id="recommendedViewingEnvironmentParagraphErea">
+              <p>当サイトはスマートフォンでの利用を想定したWebアプリです。快適に閲覧していただくには、以下のOS/ブラウザの最新バージョンでの利用を推奨いたします。</p>
+              <p>　iOS/safari、Android/Chrome</p>
+              <div id="textFlexErea">
+                <span id="asteriskRightSide">※</span>
+                <span>推奨環境下でも、お使いの端末設定やネットワーク環境等により、正常に表示されない場合があります。<br>予めご了承下さい。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 画面を縦向きにしてください -->
+  <div id="msgContents">
+    <img id="msgRotationImg">
+  </div>
+
+  <script src="../../02_javascript/common.js"></script>
+  <script src="../../02_javascript/data-store.js"></script>
+  <script src="../../02_javascript/image-controller.js"></script>
+  <script src="../../02_javascript/aboutThisSite/determine-font-size-in-screen.js"></script>
+  <script type="module">
+    setAboutThisSite();
+
+    // ボタン名、オフ時のボタン名、オン時のボタン名、url
+    pushBtn("pageBackBtn", "pageBack", "pageBackOn", "../");
+  </script>
+</body>
+
+</html>

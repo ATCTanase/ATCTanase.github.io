@@ -1,0 +1,68 @@
+.zen-antique-regular {
+  font-family: "Zen Antique", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+html,
+body {
+    overflow: hidden;
+}
+
+#aboutThisSiteBackgroud {
+    position: absolute;
+    top: 0;
+}
+
+#aboutThisSite{
+    height: 100%;
+    margin: 0 auto;
+    position: relative;
+    width: 100%;
+}
+
+#aboutThisSiteErea{
+    position: relative;
+    padding-bottom: 0%;
+    padding-left: 8%;
+    padding-right: 8%;
+    padding-top: 14%;
+}
+
+#aboutThisSiteExplanatoryErea {
+    padding-top: 2%;
+    position: relative;
+}
+
+#aboutThisSiteParagraphErea,
+#recommendedViewingEnvironmentParagraphErea, 
+#textFlexErea {
+    margin-left: 3%; 
+    margin-right: 3%;
+}
+
+#aboutThisSiteTitleErea {
+    padding-left: 15%;
+    width: 70%;
+}
+
+#asteriskRightSide {
+    text-align: right;
+    width: 10%;
+}
+
+#explanatoryTextErea {
+    /* font-family: "Zen Antique", serif;
+    font-weight: 400;
+    font-style: normal; */
+    
+    height: auto;
+    left: 5%;
+    position: absolute;
+    top: 5%;
+    width: 90%;
+}
+
+#textFlexErea {
+    display: flex;
+}

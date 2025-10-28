@@ -1,0 +1,167 @@
+html,
+body {
+    overflow: hidden;
+}
+
+#ARExperienceErea{
+    height: auto;
+    position: absolute;
+}
+
+#ARInvoke{
+    bottom: 5%;
+    height: auto;
+    left: 10%;
+    position: absolute;
+    width: 80%;
+}
+
+#ARInvokeExplanationText{
+    font-size: 13.5px;
+    text-align: center;
+    margin: 0;
+}
+
+#ARInvokeExplanationTextErea{
+    height: auto;
+    left: 10%;
+    position: absolute;
+    top: 73%;
+    width: 80%;
+}
+
+#contentsExplanation{
+    height: 100%;
+    margin: 0 auto;
+    position: relative;
+    width: 100%;
+}
+
+#contentsExplanationErea{
+    overflow: scroll;
+    padding-left: 1.5%;  /* スクロールバーが重ならないように幅を取る */
+    padding-right: 1.5%;
+    
+    /* position: relative;
+    padding-bottom: 0%;
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-top: 60%; */
+}
+
+#contentsHeightLimitErea{
+    overflow: hidden; 
+    position: relative; 
+    padding-bottom: 0%; 
+    padding-left: 10%; 
+    padding-right: 10%; 
+    padding-top: 60%;
+}
+
+#explanationBackgroud1,
+#explanationBackgroud2,
+#explanationBackgroud3,
+#explanationBackgroud4,
+#explanationBackgroud5,
+#explanationBackgroud6,
+#explanationBackgroud7,
+#explanationBackgroud8,
+#explanationBackgroud9,
+#explanationBackgroud10,
+#explanationBackgroud11,
+#explanationBackgroud12{
+    position: absolute;
+    top: 0;
+}
+
+#explanationErea{
+    align-items: center;
+    display: flex;
+    font-size: 12px;
+    height: auto;
+    /* max-height: 162px; */
+    justify-content: center;
+    /* overflow: scroll; */
+    width: 100%;
+}
+
+#explanationImagesErea{
+    height: 90%;
+    width: 100%;
+}
+
+#howToClose{
+    height: auto;
+    position: absolute;
+    right: -5%;
+    top: -3%;
+    width: 15%;
+}
+
+#howToExperienceIt{
+    display: none;
+    height: 100%;
+    left: 0; 
+    position: absolute; 
+    top: 0; 
+    width: 100%;
+    z-index: 5;
+}
+
+#howToExperienceItBackgroud {
+    height: 100%;
+}
+
+#howToImageErea{
+    height: auto;
+    left: 10%;
+    position: absolute;
+    top: 10%;
+    width: 80%;
+}
+
+#iframeErea{
+    height: auto;
+    left: 0;
+    position: absolute;
+    top: 17%;
+    width: 100%;
+}
+
+#imageChoiceIconErea{
+    display: flex;
+    justify-content: space-evenly;
+    padding-left: 25%;
+    padding-top: 1%;
+    width: 50%;
+}
+
+#imageFlickErea{
+    height: 180px;
+    padding-top: 3%;
+    width: 100%;
+}
+
+#watchARButtonErea{
+    padding-right: 3%;
+}
+
+#watchContents{
+    display: flex;
+    padding-top: 3%;
+    width: 100%;
+}
+
+#watchMovie{
+    display: none;
+    height: auto; 
+    padding-top: 3%;
+    position: relative; 
+    width:100%;
+}
+
+#watchMovieBackButtonErea{
+    display: none;
+    padding-left:  35%;
+    padding-right: 35%;
+}
