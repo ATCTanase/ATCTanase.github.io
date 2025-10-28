@@ -68,10 +68,19 @@ function stopPlayback() {
 marker.addEventListener("markerFound", () => {
     videoPlane.setAttribute("visible", true);
     videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
+    
+    camera.setAttribute('look-controls', {
+      enabled: false,
+      magicWindowTrackingEnabled: false
+    });
     startPlayback();
 });
 marker.addEventListener("markerLost", () => {
-    videoPlane.setAttribute("visible", false);
+    
+    camera.setAttribute('look-controls', {
+      enabled: true,
+      magicWindowTrackingEnabled: true
+    });
     stopPlayback();
 });
 

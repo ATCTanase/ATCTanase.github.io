@@ -40,7 +40,9 @@
       </a-plane>
     </a-marker>
 
-    <a-entity camera></a-entity>
+     <a-camera position="0 0 0" id="mainCamera"
+        look-controls="enabled: true; magicWindowTrackingEnabled: true; touchEnabled: false">
+      </a-camera>
   </a-scene>
 
   <dialog id="kariModalDialog" class="dialog">
