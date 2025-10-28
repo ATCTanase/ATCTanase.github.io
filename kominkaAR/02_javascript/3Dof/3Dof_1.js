@@ -203,23 +203,31 @@ preloadFrames(() => {
 });
 
 
-  function updateWhitePlane() {
-    if (!markerVisible)
-    {
-      // マーカーの位置・回転をそのままコピー
-      const markerPos = new THREE.Vector3();
-      barcodeMarker.object3D.getWorldPosition(markerPos);
+function updateWhitePlane() {
+  if (markerVisible) {
+    const marker = barcodeMarker.object3D;
+    const plane = whitePlane.object3D;
 
-      const markerQuat = new THREE.Quaternion();
-      barcodeMarker.object3D.getWorldQuaternion(markerQuat);
+    // マーカーのワールド位置と回転を取得
+    const pos = new THREE.Vector3();
+    const quat = new THREE.Quaternion();
+    marker.getWorldPosition(pos);
+    marker.getWorldQuaternion(quat);
 
-      whitePlane.object3D.position.copy(markerPos);
-      whitePlane.object3D.quaternion.copy(markerQuat);
+    // A-Frame の plane は Z+ 正面、マーカーは Y+ 上 → XZ平面化のため 90° 回転補正
+    const correction = new THREE.Quaternion();
+    correction.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
 
-      // マーカーサイズに合わせる
-      // const markerSize = barcodeMarker.getAttribute('size') || 0.2;
-      whitePlane.object3D.scale.set(1,1, 1);
-    }
+    const finalQuat = quat.clone().multiply(correction);
+
+    // 適用
+    plane.position.copy(pos);
+    plane.quaternion.copy(finalQuat);
+
+    // サイズ調整
+    const size = barcodeMarker.getAttribute('size') || 0.2;
+    plane.scale.set(size, size, 1);
+  }
     requestAnimationFrame(updateWhitePlane);
   }
 
