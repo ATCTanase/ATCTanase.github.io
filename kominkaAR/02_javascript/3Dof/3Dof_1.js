@@ -106,6 +106,9 @@ function updateVideoPlane() {
     markerInitialPos.copy(markerWorldPos)
   }
 
+  // 初期位置からの差分（ワールド座標）
+  const worldDelta = markerWorldPos.clone().sub(markerInitialPos);
+
   // カメラ回転に沿った横方向だけ抽出
   const cameraRight = new THREE.Vector3(1, 0, 0).applyQuaternion(cameraWorldQuat); // カメラ右方向
   const deltaX = worldDelta.dot(cameraRight); // カメラ右方向の成分だけ残す
