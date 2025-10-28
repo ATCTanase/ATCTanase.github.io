@@ -223,6 +223,5 @@ preloadFrames(() => {
     requestAnimationFrame(updateWhitePlane);
   }
 
-  }
 
   updateWhitePlane();
