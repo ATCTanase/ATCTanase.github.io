@@ -1,6 +1,7 @@
 const barcodeMarker = document.getElementById("barcodeMarker");
 const videoPlane = document.getElementById("videoPlane");
 const camera = document.querySelector("#mainCamera");
+const whitePlane = document.querySelector('#whitePlane');
 
 let markerTimer = null;
 let markerVisible = false;
@@ -173,6 +174,7 @@ barcodeMarker.addEventListener("markerFound", () => {
     markerVisible = true;
     markerInitialPos = null;
     markerInitialQuat = null;
+    whitePlane.setAttribute('visible', true);
 
     startPlayback();
     videoPlane.setAttribute('visible', 'true');
@@ -187,6 +189,7 @@ barcodeMarker.addEventListener("markerFound", () => {
 
 
 barcodeMarker.addEventListener("markerLost", () => {
+  whitePlane.setAttribute('visible', false);
   markerVisible = false;
   if (markerTimer) {
     clearInterval(markerTimer);
@@ -198,3 +201,28 @@ barcodeMarker.addEventListener("markerLost", () => {
 preloadFrames(() => {
   console.log("アニメーション準備完了");
 });
+
+
+  function updateWhitePlane() {
+    if (!barcodeMarker.object3D.visible) return;
+
+    // マーカーの位置・回転をそのままコピー
+    const markerPos = new THREE.Vector3();
+    barcodeMarker.object3D.getWorldPosition(markerPos);
+
+    const markerQuat = new THREE.Quaternion();
+    barcodeMarker.object3D.getWorldQuaternion(markerQuat);
+
+    whitePlane.object3D.position.copy(markerPos);
+    whitePlane.object3D.quaternion.copy(markerQuat);
+
+    // マーカーサイズに合わせる
+    const markerSize = barcodeMarker.getAttribute('size') || 0.2;
+    whitePlane.object3D.scale.set(markerSize, markerSize, 1);
+
+    requestAnimationFrame(updateWhitePlane);
+  }
+
+  }
+
+  updateWhitePlane();
