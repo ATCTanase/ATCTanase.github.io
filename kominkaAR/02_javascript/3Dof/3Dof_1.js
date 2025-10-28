@@ -150,6 +150,7 @@ function updateVideoPlane() {
     currentQuat.slerp(targetQuat, lerpFactor);
     // --- スケール補間 ---
     currentScale.lerp(targetScale, lerpFactor);
+  }
 }
 
 AFRAME.registerComponent("marker-tracker", {
