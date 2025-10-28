@@ -49,20 +49,12 @@
 
         <a-marker type="pattern" value="5" id="barcodeMarker" url="../../04_image/patt/AR1.patt" size="0.2"
             marker-tracker>
-                <a-plane
-                    id="whitePlane"
-                    position="0 0 0"
-                    rotation="-90 0 0"
-                    width="1"
-                    height="1"
-                    material="color: white; opacity: 0.5; transparent: true; side: double;"
-                ></a-plane>
         </a-marker>
         <a-plane id="videoPlane" position="0 0 0" rotation="0 0 0" width="1" height="1" visible="false"
             material="shader: flat; side: double; transparent: true; alphaTest: 0.01;">
         </a-plane>
         <a-camera position="0 0 0" id="mainCamera"
-            look-controls="enabled: false; magicWindowTrackingEnabled: false; touchEnabled: false">
+            look-controls="enabled: true; magicWindowTrackingEnabled: true; touchEnabled: false">
         </a-camera>
     </a-scene>
 
