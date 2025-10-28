@@ -104,14 +104,11 @@ function updateVideoPlane() {
     markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
 
   if (!markerInitialPos) {
-    markerInitialPos = new THREE.Vector3();
-    barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+    markerInitialPos = markerWorldPos.clone();
 
-    markerInitialQuat = new THREE.Quaternion();
-    barcodeMarker.object3D.getWorldQuaternion(markerInitialQuat);
+    markerInitialQuat = markerWorldQuat.clone();
 
-    cameraInitialQuat = new THREE.Quaternion();
-    camera.object3D.getWorldQuaternion(cameraInitialQuat);
+    cameraInitialQuat = cameraWorldQuat.clone();
   }
 
     // --- 横方向の差分 ---
@@ -123,12 +120,15 @@ function updateVideoPlane() {
 
     // スマホ回転による見かけ上の移動を補正
     const deltaQuat = cameraWorldQuat.clone().multiply(cameraInitialQuat.clone().invert()); // カメラ回転差分
+    const deltaEuler = new THREE.Euler();
+    deltaEuler.setFromQuaternion(deltaQuat, 'YXZ'); // Y軸回転だけ使用
     const distance = markerInitialPos.distanceTo(camera.object3D.position); // マーカーまでの距離
-    const correction = markerRight.clone().multiplyScalar(distance * Math.tan(deltaQuat.toEuler(new THREE.Euler()).y)); 
-  
-  // 横方向のみ差分反映
-  const deltaX = worldDelta.dot(markerRight) - correction.dot(markerRight);
-  const deltaPos = markerRight.clone().multiplyScalar(deltaX);
+    const correction = markerRight.clone().multiplyScalar(distance * Math.tan(deltaEuler.y));
+
+    // 横方向差分のみ反映
+    const deltaX = worldDelta.dot(markerRight) - correction.dot(markerRight);
+    const deltaPos = markerRight.clone().multiplyScalar(deltaX);
+
 
     // 現在のマーカーの「上」方向（ローカルのY軸がワールド空間でどうなっているか）
     const markerUp = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat);
