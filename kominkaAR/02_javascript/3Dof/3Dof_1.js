@@ -122,7 +122,7 @@ function updateVideoPlane() {
     const worldDelta = markerWorldPos.clone().sub(markerInitialPos);
 
     // スマホ回転による見かけ上の移動を補正
-    const deltaQuat = camQuat.clone().multiply(cameraInitialQuat.clone().invert()); // カメラ回転差分
+    const deltaQuat = cameraWorldQuat.clone().multiply(cameraInitialQuat.clone().invert()); // カメラ回転差分
     const distance = markerInitialPos.distanceTo(camera.object3D.position); // マーカーまでの距離
     const correction = markerRight.clone().multiplyScalar(distance * Math.tan(deltaQuat.toEuler(new THREE.Euler()).y)); 
   
