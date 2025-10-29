@@ -90,6 +90,9 @@ marker.addEventListener("markerFound", () => {
       enabled: false,
       magicWindowTrackingEnabled: false
     });
+    
+    camera.object3D.quaternion.copy(lastCamQuat);
+    console.log("markerFound:lastCamQuat",lastCamQuat);
 });
 marker.addEventListener("markerLost", () => {
     pseudoMode = true;
@@ -104,9 +107,7 @@ marker.addEventListener("markerLost", () => {
     });
 
     // 保存したカメラ位置・回転を復元
-    camera.object3D.position.copy(lastCamPos);
     camera.object3D.quaternion.copy(lastCamQuat);
-    console.log("markerLost:lastCamPos",lastCamPos);
     console.log("markerLost:lastCamQuat",lastCamQuat);
 });
 
