@@ -119,10 +119,10 @@ AFRAME.registerComponent('pseudo-stabilizer', {
     tick: function () {
 
         const localPosOffset = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ);
-        const localRotOffset = new THREE.Euler(
-            THREE.Math.degToRad(markerRotationX),
-            THREE.Math.degToRad(markerRotationY),
-            THREE.Math.degToRad(markerRotationZ)
+        const offsetEuler = new THREE.Euler(
+        THREE.MathUtils.degToRad(markerRotationX),
+        THREE.MathUtils.degToRad(markerRotationY),
+        THREE.MathUtils.degToRad(markerRotationZ)
         );
         
         if (!pseudoMode) {
