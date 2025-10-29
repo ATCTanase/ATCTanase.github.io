@@ -125,19 +125,24 @@ AFRAME.registerComponent('pseudo-stabilizer', {
             const deltaPitch = currentEuler.x - lastEuler.x; // 前後
 
             // マーカー最後の距離
-            const d = lastDistance;
+            const d = lastDistance * 0.1;
+            // Yawだけの回転Quaternionを作成
+            const yawQuat = new THREE.Quaternion();
+            yawQuat.setFromAxisAngle(new THREE.Vector3(0,1,0), deltaYaw);
 
-            // Y軸回転による左右オフセット
-            const offsetX = d * Math.tan(deltaYaw);
+            // Pitchだけの回転Quaternionを作成
+            const pitchQuat = new THREE.Quaternion();
+            pitchQuat.setFromAxisAngle(new THREE.Vector3(1,0,0), deltaPitch);
 
-            // X軸回転による上下オフセット
-            const offsetY = d * Math.tan(deltaPitch);
+            // マーカーからカメラへのロスト時の方向ベクトル
+            const dir = new THREE.Vector3().subVectors(markerLastPos, new THREE.Vector3(0,0,0)).normalize();
+
+            // Yaw/Pitchを順番に適用して回転方向を計算
+            const rotatedDir = dir.clone().applyQuaternion(yawQuat).applyQuaternion(pitchQuat);
 
             // 疑似位置
-            const pseudoPos = markerLastPos.clone().add(new THREE.Vector3(offsetX, offsetY, 0));
+            const pseudoPos = rotatedDir.multiplyScalar(d).add(markerLastPos);
             videoPlane.object3D.position.copy(pseudoPos);
-
-            // 回転はマーカー最後のまま維持
             videoPlane.object3D.quaternion.copy(markerLastQuat);
         }
     }
