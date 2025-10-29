@@ -106,9 +106,10 @@ marker.addEventListener("markerLost", () => {
     const lastPos = markerLastPos.clone();
     const lastQuat = markerLastQuat.clone();
 
-
-    // 1フレーム待ってカメラ回転が更新されるのを待つ
-    setTimeout(() => {
+    // 次フレームでカメラ回転が反映された状態で適用
+    requestAnimationFrame(() => {
+        console.log("markerLost: lastPos", lastPos);
+        console.log("markerLost: lastQuat", lastQuat);
         const offset = lastPos.clone().sub(camera.object3D.position);
         offset.applyQuaternion(camera.object3D.quaternion);
 
@@ -117,8 +118,8 @@ marker.addEventListener("markerLost", () => {
 
         console.log("markerLost: videoPlane position", videoPlane.object3D.position);
         console.log("markerLost: videoPlane quaternion", videoPlane.object3D.quaternion);
-        console.log("markerLost:lastCamQuat",lastCamQuat);
-    }, 0);
+        console.log("markerLost: camera quaternion", camera.object3D.quaternion);
+    });
 });
 
 AFRAME.registerComponent('pseudo-stabilizer', {
