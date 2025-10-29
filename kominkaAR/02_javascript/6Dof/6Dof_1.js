@@ -1,6 +1,6 @@
 const videoPlane = document.getElementById("videoPlane");
 const marker     = document.getElementById("barcodeMarker");
-const camera = document.querySelector('[camera]');
+const camera = document.querySelector("#mainCamera");
 
 // Canvasを作成
 const canvas = document.createElement("canvas");
@@ -20,11 +20,6 @@ let playTimer = null;
 
 const loadingOverlay = document.getElementById("loadingOverlay");
 const progressText   = document.getElementById("progress");
-
-// 🔹 2Dコピー用
-const pseudoEl     = document.getElementById("pseudo2D");
-const pseudoCanvas = document.getElementById("pseudoCanvas");
-const pseudoCtx    = pseudoCanvas.getContext("2d");
 
 // 🔹 全フレームをロード
 function preloadFrames(callback) {
@@ -78,14 +73,6 @@ let lastDistance = 0;
 let pseudoMode = false;
 
 
-window.addEventListener('deviceorientation', (event) => {
-  const alpha = THREE.MathUtils.degToRad(event.alpha || 0); // Z軸
-  const beta  = THREE.MathUtils.degToRad(event.beta || 0);  // X軸
-  const gamma = THREE.MathUtils.degToRad(event.gamma || 0); // Y軸
-  const euler = new THREE.Euler(beta, alpha, -gamma, 'ZXY');
-  gyroQuat.setFromEuler(euler);
-});
-
 // マーカーイベント
 marker.addEventListener("markerFound", () => {
     videoPlane.setAttribute("visible", true);
@@ -98,18 +85,19 @@ marker.addEventListener("markerFound", () => {
     marker.object3D.getWorldPosition(markerLastPos);
     marker.object3D.getWorldQuaternion(markerLastQuat);
 
-    
-    // 距離記録（カメラ位置はジャイロ基準の疑似位置計算に使う）
-    const camPos = new THREE.Vector3();
-    camera.object3D.getWorldPosition(camPos);
-    lastDistance = markerLastPos.distanceTo(camPos);
+    camera.setAttribute('look-controls', {
+      enabled: false,
+      magicWindowTrackingEnabled: false
+    });
 });
 marker.addEventListener("markerLost", () => {
     pseudoMode = true;
     stopPlayback();
     
-    // ロスト時のスマホ角度を保持
-    cameraLastQuat.copy(gyroQuat);
+    camera.setAttribute('look-controls', {
+      enabled: true,
+      magicWindowTrackingEnabled: true
+    });
 });
 
 AFRAME.registerComponent('pseudo-stabilizer', {
@@ -121,50 +109,6 @@ AFRAME.registerComponent('pseudo-stabilizer', {
             videoPlane.object3D.quaternion.copy(markerLastQuat);
         }
         else {
-            // スマホ回転差分
-            const deltaQuat = new THREE.Quaternion();
-            deltaQuat.copy(cameraLastQuat).invert().multiply(gyroQuat);
-
-            // マーカー座標系に変換
-            const markerSpaceQuat = new THREE.Quaternion();
-            markerSpaceQuat.copy(markerLastQuat).invert().multiply(deltaQuat).multiply(markerLastQuat);
-
-            const deltaEuler = new THREE.Euler().setFromQuaternion(markerSpaceQuat, 'ZXY');
-            const maxTilt = Math.PI/4;
-            const tiltX = THREE.MathUtils.clamp(deltaEuler.x, -maxTilt, maxTilt);
-            const tiltY = THREE.MathUtils.clamp(deltaEuler.y, -maxTilt, maxTilt);
-
-            // 移動オフセット
-            const moveScale = lastDistance * 0.5;
-            const offsetLocal = new THREE.Vector3(
-                Math.tan(tiltY) * moveScale,
-                -Math.tan(tiltX) * moveScale,
-                0
-            );
-            const offsetWorld = offsetLocal.clone().applyQuaternion(markerLastQuat);
-
-            const pseudoPos = new THREE.Vector3().copy(markerLastPos).add(offsetWorld);
-
-            videoPlane.object3D.position.copy(pseudoPos);
-            videoPlane.object3D.quaternion.copy(markerLastQuat);
-
-            // -------------------------
-            // 2Dコピー更新
-            // -------------------------
-            pseudoEl.style.display = "block";
-
-            // 3D位置をスクリーン座標に変換
-            const vector = pseudoPos.clone().project(camera.object3D.children[0]);
-            const screenX = (vector.x + 1)/2 * window.innerWidth;
-            const screenY = (-vector.y + 1)/2 * window.innerHeight;
-
-            // 2D canvasにフレーム描画
-            const img = frames[currentFrame];
-            pseudoCtx.clearRect(0, 0, pseudoCanvas.width, pseudoCanvas.height);
-            pseudoCtx.drawImage(img, 0, 0, pseudoCanvas.width, pseudoCanvas.height);
-
-            pseudoEl.style.transform = `translate(${screenX - pseudoCanvas.width/2}px, ${screenY - pseudoCanvas.height/2}px)`;
-
         }
     }
 });

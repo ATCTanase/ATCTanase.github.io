@@ -29,6 +29,7 @@
 
     <a-marker type="pattern" value="5" id="barcodeMarker" url="../../04_image/patt/AR1.patt"
       smooth="true" smoothCount="100" smoothTolerance="10" smoothThreshold="5">
+
     </a-marker>
       <a-plane 
         id="videoPlane" 
@@ -39,12 +40,11 @@
         visible="false"
         material="shader: flat; side: double; transparent: true; alphaTest:0.01;">
       </a-plane>
-    <a-entity camera></a-entity>
-  </a-scene>
 
-  <div id="pseudo2D" style="position:absolute; width:200px; height:200px; pointer-events:none; display:none;">
-    <canvas id="pseudoCanvas" width="200" height="200"></canvas>
-  </div>
+        <a-camera position="0 0 0" id="mainCamera"
+            look-controls="enabled: false; magicWindowTrackingEnabled: false; touchEnabled: false">
+        </a-camera>
+  </a-scene>
 
   <dialog id="kariModalDialog" class="dialog">
     <div id="arrangementChange" style="overflow: visible; height: 250px;">
