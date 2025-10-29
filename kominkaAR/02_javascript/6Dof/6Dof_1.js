@@ -88,9 +88,7 @@ marker.addEventListener("markerFound", () => {
     
     // 初期化
     pseudoMode = false;
-    velocity.set(0, 0, 0);
-    positionOffset.set(0, 0, 0);
-
+    
     // 記録
     marker.object3D.getWorldPosition(markerLastPos);
     marker.object3D.getWorldQuaternion(markerLastQuat);
@@ -120,11 +118,6 @@ AFRAME.registerComponent('pseudo-stabilizer', {
         else {
             // ロスト中：スマホ回転差分で擬似補正
             const deltaQuat = gyroQuat.clone().multiply(cameraLastQuat.clone().invert());
-
-            // マーカー最後の方向ベクトル（カメラ基準）
-            const camPos = new THREE.Vector3();
-            camera.object3D.getWorldPosition(camPos);
-            const dir = markerLastPos.clone().sub(camPos).normalize();
 
             // 回転差分を適用
             const newDir = dir.clone().applyQuaternion(deltaQuat);
