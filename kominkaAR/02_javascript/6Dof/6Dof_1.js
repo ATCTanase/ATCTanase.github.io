@@ -120,24 +120,22 @@ AFRAME.registerComponent('pseudo-stabilizer', {
             const lastEuler = new THREE.Euler().setFromQuaternion(cameraLastQuat, 'YXZ');
             const currentEuler = new THREE.Euler().setFromQuaternion(gyroQuat, 'YXZ');
 
+            lastEuler.z = 0;
+            currentEuler.z = 0;
+
             // 回転差分
             const deltaYaw = currentEuler.y - lastEuler.y;   // 左右
             const deltaPitch = currentEuler.x - lastEuler.x; // 前後
 
             // マーカー最後の距離
-            const d = lastDistance * 0.1;
-            // Yawだけの回転Quaternionを作成
-            const yawQuat = new THREE.Quaternion();
-            yawQuat.setFromAxisAngle(new THREE.Vector3(0,1,0), deltaYaw);
+            const d = lastDistance * 0.5;
+            
+            // マーカーからカメラへの方向ベクトル（XZ平面で正規化）
+            const dir = new THREE.Vector3(markerLastPos.x, 0, markerLastPos.z).normalize();
 
-            // Pitchだけの回転Quaternionを作成
-            const pitchQuat = new THREE.Quaternion();
-            pitchQuat.setFromAxisAngle(new THREE.Vector3(1,0,0), deltaPitch);
-
-            // マーカーからカメラへのロスト時の方向ベクトル
-            const dir = new THREE.Vector3().subVectors(markerLastPos, new THREE.Vector3(0,0,0)).normalize();
-
-            // Yaw/Pitchを順番に適用して回転方向を計算
+            // Yaw/Pitchを順番に適用
+            const yawQuat   = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), deltaYaw);
+            const pitchQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0), deltaPitch);
             const rotatedDir = dir.clone().applyQuaternion(yawQuat).applyQuaternion(pitchQuat);
 
             // 疑似位置
