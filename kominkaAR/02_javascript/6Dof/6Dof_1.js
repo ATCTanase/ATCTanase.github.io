@@ -116,28 +116,38 @@ AFRAME.registerComponent('pseudo-stabilizer', {
             videoPlane.object3D.quaternion.copy(markerLastQuat);
         }
         else {
-                        // ジャイロ角度から疑似的な回転差を計算
-            const deltaQuat = new THREE.Quaternion();
-            deltaQuat.copy(cameraLastQuat).invert().multiply(gyroQuat);
-            
-            // スマホの傾きを取得（ZXYがデバイスと整合性が高い）
-            const deltaEuler = new THREE.Euler().setFromQuaternion(deltaQuat, 'ZXY');
-            
-            console.log(deltaEuler);
+      // === スマホ回転の差分を求める ===
+      const deltaQuat = new THREE.Quaternion();
+      deltaQuat.copy(cameraLastQuat).invert().multiply(gyroQuat);
 
-            // マーカー最後の位置からの移動量を設定（スケールで調整）
-            const moveScale = lastDistance * 0.5; // 適当にスケール調整
-            const offsetX = Math.tan(deltaEuler.y) * moveScale;  // 左右傾き（Y軸）
-            const offsetY = Math.tan(deltaEuler.x) * moveScale;  // 前後傾き（X軸）
-            const pseudoPos = new THREE.Vector3(
-                markerLastPos.x + offsetX,
-                markerLastPos.y + offsetY,
-                markerLastPos.z
-            );
+      // === deltaQuatをmarker座標系に変換 ===
+      // （これで「マーカーから見たスマホの傾き差」になる）
+      const markerSpaceQuat = new THREE.Quaternion();
+      markerSpaceQuat.copy(markerLastQuat).invert().multiply(deltaQuat).multiply(markerLastQuat);
 
-            // 動かす
-            videoPlane.object3D.position.copy(pseudoPos);
-            videoPlane.object3D.quaternion.copy(markerLastQuat);
+      // === オイラー角に変換 ===
+      const deltaEuler = new THREE.Euler().setFromQuaternion(markerSpaceQuat, 'ZXY');
+
+      // --- 傾き量 ---
+      const tiltX = THREE.MathUtils.clamp(deltaEuler.x, -Math.PI / 4, Math.PI / 4);
+      const tiltY = THREE.MathUtils.clamp(deltaEuler.y, -Math.PI / 4, Math.PI / 4);
+
+      // --- オフセット計算 ---
+      const distance = lastDistance || 1.0;
+      const moveScale = distance * 0.5; // 感度
+      const offsetLocal = new THREE.Vector3(
+        Math.tan(tiltY) * moveScale,  // 左右
+        -Math.tan(tiltX) * moveScale, // 上下
+        0
+      );
+
+      // === マーカーの向き基準でワールド変換 ===
+      const offsetWorld = offsetLocal.clone().applyQuaternion(markerLastQuat);
+
+      const pseudoPos = new THREE.Vector3().copy(markerLastPos).add(offsetWorld);
+
+      videoPlane.object3D.position.copy(pseudoPos);
+      videoPlane.object3D.quaternion.copy(markerLastQuat);
         }
     }
 });
