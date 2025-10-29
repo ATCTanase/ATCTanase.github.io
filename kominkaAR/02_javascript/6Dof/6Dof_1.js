@@ -118,7 +118,7 @@ AFRAME.registerComponent('pseudo-stabilizer', {
         else {
                         // ジャイロ角度から疑似的な回転差を計算
             const deltaQuat = new THREE.Quaternion();
-            deltaQuat.copy(cameraLastQuat).inverse().multiply(gyroQuat);
+            deltaQuat.copy(cameraLastQuat).invert().multiply(gyroQuat);
 
             // deltaQuat をオイラー角に変換して X/Y 軸の傾きを取得
             const deltaEuler = new THREE.Euler().setFromQuaternion(deltaQuat, 'YXZ');
