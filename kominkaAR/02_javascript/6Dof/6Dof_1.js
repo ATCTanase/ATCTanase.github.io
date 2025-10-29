@@ -88,7 +88,7 @@ marker.addEventListener("markerFound", () => {
     
     // 初期化
     pseudoMode = false;
-    
+
     // 記録
     marker.object3D.getWorldPosition(markerLastPos);
     marker.object3D.getWorldQuaternion(markerLastQuat);
@@ -120,10 +120,10 @@ AFRAME.registerComponent('pseudo-stabilizer', {
             const deltaQuat = gyroQuat.clone().multiply(cameraLastQuat.clone().invert());
 
             // 回転差分を適用
-            const newDir = dir.clone().applyQuaternion(deltaQuat);
+            const dir  = markerLastPos.clone().applyQuaternion(deltaQuat);
 
             // 最後の距離を維持
-            const pseudoPos = camPos.clone().add(newDir.multiplyScalar(lastDistance));
+            const pseudoPos = camPos.clone().add(dir .multiplyScalar(lastDistance));
 
             videoPlane.object3D.position.copy(pseudoPos);
             videoPlane.object3D.quaternion.copy(markerLastQuat);
