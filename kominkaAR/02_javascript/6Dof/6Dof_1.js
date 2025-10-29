@@ -101,6 +101,8 @@ window.addEventListener("devicemotion", (event) => {
 
 // マーカーイベント
 marker.addEventListener("markerFound", () => {
+    
+    marker.object3D.add(videoPlane.object3D);
     videoPlane.setAttribute("visible", true);
     startPlayback();
     
