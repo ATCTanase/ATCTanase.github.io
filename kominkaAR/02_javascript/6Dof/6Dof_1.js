@@ -67,38 +67,19 @@ function stopPlayback() {
 
 let markerLastPos = new THREE.Vector3();
 let markerLastQuat = new THREE.Quaternion();
-
-let velocity = new THREE.Vector3();
-let positionOffset = new THREE.Vector3();
-
-let cameraQuat = new THREE.Quaternion();
-let lastTime = null;
+let cameraLastQuat = new THREE.Quaternion(); // ロスト時のスマホ角度保持
+let gyroQuat = new THREE.Quaternion();       // 現在のスマホ角度
+let lastDistance = 0;
 let pseudoMode = false;
 
-// --- デバイス傾き保存用 ---
-let tilt = { alpha: 0, beta: 0, gamma: 0 };
 
-// 加速度センサーから擬似移動を更新
-window.addEventListener("devicemotion", (event) => {
-  if (!lastTime) return;
-  const dt = (performance.now() - lastTime) / 1000;
-
-  // 加速度値（重力を除いた値が理想）
-  const acc = new THREE.Vector3(
-    event.acceleration.x || 0,
-    event.acceleration.y || 0,
-    event.acceleration.z || 0
-  );
-
-  // スマホの姿勢に基づき、加速度をワールド空間へ変換
-  const accWorld = acc.clone().applyQuaternion(cameraQuat);
-
-  // 積分で速度・位置オフセットを更新（疑似的な移動）
-  velocity.add(accWorld.clone().multiplyScalar(dt));
-  positionOffset.add(velocity.clone().multiplyScalar(dt));
+window.addEventListener('deviceorientation', (event) => {
+  const alpha = THREE.MathUtils.degToRad(event.alpha || 0); // Z軸
+  const beta  = THREE.MathUtils.degToRad(event.beta || 0);  // X軸
+  const gamma = THREE.MathUtils.degToRad(event.gamma || 0); // Y軸
+  const euler = new THREE.Euler(beta, alpha, -gamma, 'ZXY');
+  gyroQuat.setFromEuler(euler);
 });
-
-
 
 // マーカーイベント
 marker.addEventListener("markerFound", () => {
@@ -114,41 +95,46 @@ marker.addEventListener("markerFound", () => {
     marker.object3D.getWorldPosition(markerLastPos);
     marker.object3D.getWorldQuaternion(markerLastQuat);
 
-    lastTime = performance.now();
+    
+    // 距離記録（カメラ位置はジャイロ基準の疑似位置計算に使う）
+    const camPos = new THREE.Vector3();
+    camera.object3D.getWorldPosition(camPos);
+    lastDistance = markerLastPos.distanceTo(camPos);
 });
 marker.addEventListener("markerLost", () => {
     pseudoMode = true;
-
     stopPlayback();
+    
+    // ロスト時のスマホ角度を保持
+    cameraLastQuat.copy(gyroQuat);
 });
 
 AFRAME.registerComponent('pseudo-stabilizer', {
     tick: function () {
         if (!pseudoMode) {
-            const markerPos = new THREE.Vector3();
-            const markerQuat = new THREE.Quaternion();
-            marker.object3D.getWorldPosition(markerPos);
-            marker.object3D.getWorldQuaternion(markerQuat);
-
-            videoPlane.object3D.position.copy(markerPos);
-            videoPlane.object3D.quaternion.copy(markerQuat);
-
-            markerLastPos.copy(markerPos);
-            markerLastQuat.copy(markerQuat);
+            marker.object3D.getWorldPosition(markerLastPos);
+            marker.object3D.getWorldQuaternion(markerLastQuat);
+            videoPlane.object3D.position.copy(markerLastPos);
+            videoPlane.object3D.quaternion.copy(markerLastQuat);
         }
-        else{
-            camera.object3D.getWorldQuaternion(cameraQuat);
+        else {
+            // ロスト中：スマホ回転差分で擬似補正
+            const deltaQuat = gyroQuat.clone().multiply(cameraLastQuat.clone().invert());
 
-            // 疑似固定位置：マーカーがあった位置 - スマホ移動分
-            const pseudoPos = markerLastPos.clone().sub(
-            positionOffset.clone().applyQuaternion(cameraQuat)
-            );
+            // マーカー最後の方向ベクトル（カメラ基準）
+            const camPos = new THREE.Vector3();
+            camera.object3D.getWorldPosition(camPos);
+            const dir = markerLastPos.clone().sub(camPos).normalize();
+
+            // 回転差分を適用
+            const newDir = dir.clone().applyQuaternion(deltaQuat);
+
+            // 最後の距離を維持
+            const pseudoPos = camPos.clone().add(newDir.multiplyScalar(lastDistance));
 
             videoPlane.object3D.position.copy(pseudoPos);
             videoPlane.object3D.quaternion.copy(markerLastQuat);
-
         }
-        lastTime = performance.now();
     }
 });
 
