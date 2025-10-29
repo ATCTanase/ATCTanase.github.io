@@ -136,7 +136,6 @@ AFRAME.registerComponent('pseudo-stabilizer', {
             );
 
             // 動かす
-            const pseudoPos = new THREE.Vector3().copy(markerLastPos).add(offset);
             videoPlane.object3D.position.copy(pseudoPos);
             videoPlane.object3D.quaternion.copy(markerLastQuat);
         }
