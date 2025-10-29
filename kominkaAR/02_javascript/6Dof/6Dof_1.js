@@ -122,6 +122,7 @@ AFRAME.registerComponent('pseudo-stabilizer', {
                 if (camQuat.equals(new THREE.Quaternion())) return;
 
                 const cam = camera.object3D;
+                const obj = videoPlane.object3D;
                 const offset = markerLastPos.clone().sub(cam.position);
                 offset.applyQuaternion(camQuat);
 
