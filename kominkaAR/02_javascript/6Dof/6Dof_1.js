@@ -64,10 +64,9 @@ function stopPlayback() {
         playTimer = null;
     }
 }
-let isMarkerAttached = false;
+
 let markerLastPos = new THREE.Vector3();
 let markerLastQuat = new THREE.Quaternion();
-let cameraLastQuat = new THREE.Quaternion();
 
 let velocity = new THREE.Vector3();
 let positionOffset = new THREE.Vector3();
@@ -76,6 +75,8 @@ let cameraQuat = new THREE.Quaternion();
 let lastTime = null;
 let pseudoMode = false;
 
+// --- デバイス傾き保存用 ---
+let tilt = { alpha: 0, beta: 0, gamma: 0 };
 
 // 加速度センサーから擬似移動を更新
 window.addEventListener("devicemotion", (event) => {
@@ -101,13 +102,10 @@ window.addEventListener("devicemotion", (event) => {
 
 // マーカーイベント
 marker.addEventListener("markerFound", () => {
-    
-    marker.object3D.add(videoPlane.object3D);
     videoPlane.setAttribute("visible", true);
     startPlayback();
     
     // 初期化
-    isMarkerAttached = true;
     pseudoMode = false;
     velocity.set(0, 0, 0);
     positionOffset.set(0, 0, 0);
@@ -115,40 +113,43 @@ marker.addEventListener("markerFound", () => {
     // 記録
     marker.object3D.getWorldPosition(markerLastPos);
     marker.object3D.getWorldQuaternion(markerLastQuat);
-    camera.object3D.getWorldQuaternion(cameraLastQuat);
 
     lastTime = performance.now();
 });
 marker.addEventListener("markerLost", () => {
-    
-     // マーカーから切り離してシーン直下に戻す
-    marker.sceneEl.object3D.add(videoPlane.object3D);
-    marker.object3D.getWorldPosition(markerLastPos);
-    marker.object3D.getWorldQuaternion(markerLastQuat);
-    camera.object3D.getWorldQuaternion(cameraLastQuat);
-
-    isMarkerAttached = false;
     pseudoMode = true;
 
     stopPlayback();
 });
 
 AFRAME.registerComponent('pseudo-stabilizer', {
-  tick: function () {
-    if (!pseudoMode) return;
+    tick: function () {
+        if (!pseudoMode) {
+            const markerPos = new THREE.Vector3();
+            const markerQuat = new THREE.Quaternion();
+            marker.object3D.getWorldPosition(markerPos);
+            marker.object3D.getWorldQuaternion(markerQuat);
 
-    camera.object3D.getWorldQuaternion(cameraQuat);
+            videoPlane.object3D.position.copy(markerPos);
+            videoPlane.object3D.quaternion.copy(markerQuat);
 
-    // 疑似固定位置：マーカーがあった位置 - スマホ移動分
-    const pseudoPos = markerLastPos.clone().sub(
-      positionOffset.clone().applyQuaternion(cameraQuat)
-    );
+            markerLastPos.copy(markerPos);
+            markerLastQuat.copy(markerQuat);
+        }
+        else{
+            camera.object3D.getWorldQuaternion(cameraQuat);
 
-    videoPlane.object3D.position.copy(pseudoPos);
-    videoPlane.object3D.quaternion.copy(markerLastQuat);
+            // 疑似固定位置：マーカーがあった位置 - スマホ移動分
+            const pseudoPos = markerLastPos.clone().sub(
+            positionOffset.clone().applyQuaternion(cameraQuat)
+            );
 
-    lastTime = performance.now();
-  }
+            videoPlane.object3D.position.copy(pseudoPos);
+            videoPlane.object3D.quaternion.copy(markerLastQuat);
+
+        }
+        lastTime = performance.now();
+    }
 });
 
 document.querySelector('a-scene').setAttribute('pseudo-stabilizer', '');
