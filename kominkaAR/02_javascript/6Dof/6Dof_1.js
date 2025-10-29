@@ -71,7 +71,7 @@ let cameraLastQuat = new THREE.Quaternion(); // ロスト時のスマホ角度�
 let gyroQuat = new THREE.Quaternion();       // 現在のスマホ角度
 let lastDistance = 0;
 let pseudoMode = false;
-
+let appliedOnce = false;
 let lastCamPos = new THREE.Vector3();
 let lastCamQuat = new THREE.Quaternion();
 // マーカーイベント
@@ -102,7 +102,7 @@ marker.addEventListener("markerLost", () => {
       enabled: true,
       magicWindowTrackingEnabled: true
     });
-
+    appliedOnce = false;
 });
 
 AFRAME.registerComponent('pseudo-stabilizer', {
@@ -114,17 +114,26 @@ AFRAME.registerComponent('pseudo-stabilizer', {
             videoPlane.object3D.quaternion.copy(markerLastQuat);
         }
         else {
+            // マーカー消失後、初回のみ
+            if (!appliedOnce) {
+                const camQuat = camera.object3D.quaternion;
 
-        const cam = camera.object3D;
+                // カメラ回転が初期値ならスルー
+                if (camQuat.equals(new THREE.Quaternion())) return;
 
-        const offset = markerLastPos.clone().sub(cam.position);
-        offset.applyQuaternion(cam.quaternion);
-        videoPlane.object3D.position.copy(cam.position.clone().add(offset));
-        videoPlane.object3D.quaternion.copy(markerLastQuat);
+                const cam = camera.object3D;
+                const offset = markerLastPos.clone().sub(cam.position);
+                offset.applyQuaternion(camQuat);
 
-        console.log("markerLost: videoPlane position", videoPlane.object3D.position);
-        console.log("markerLost: videoPlane quaternion", videoPlane.object3D.quaternion);
-        console.log("markerLost: camera quaternion", camera.object3D.quaternion);
+                obj.position.copy(cam.position.clone().add(offset));
+                obj.quaternion.copy(markerLastQuat);
+
+                console.log("markerLost initial position", obj.position);
+                console.log("markerLost initial quaternion", obj.quaternion);
+                console.log("camera quaternion", camQuat);
+
+                appliedOnce = true; // 初回適用済み
+            }
         }
     }
 });
