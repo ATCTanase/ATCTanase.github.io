@@ -118,12 +118,11 @@ AFRAME.registerComponent('pseudo-stabilizer', {
         else {
             // ロスト中：スマホ回転差分で擬似補正
             const deltaQuat = gyroQuat.clone().multiply(cameraLastQuat.clone().invert());
-
+            const dir = markerLastPos.clone().normalize(); 
             // 回転差分を適用
-            const dir  = markerLastPos.clone().applyQuaternion(deltaQuat);
-
+            const newDir = dir.clone().applyQuaternion(deltaQuat);
             // 最後の距離を維持
-            const pseudoPos = camPos.clone().add(dir.multiplyScalar(lastDistance));
+            const pseudoPos = newDir.clone().multiplyScalar(lastDistance);
 
             videoPlane.object3D.position.copy(pseudoPos);
             videoPlane.object3D.quaternion.copy(markerLastQuat);
