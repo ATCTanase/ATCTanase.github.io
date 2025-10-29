@@ -72,7 +72,8 @@ let gyroQuat = new THREE.Quaternion();       // 現在のスマホ角度
 let lastDistance = 0;
 let pseudoMode = false;
 
-
+let lastCamPos = new THREE.Vector3();
+let lastCamQuat = new THREE.Quaternion();
 // マーカーイベント
 marker.addEventListener("markerFound", () => {
     videoPlane.setAttribute("visible", true);
@@ -84,24 +85,29 @@ marker.addEventListener("markerFound", () => {
     // 記録
     marker.object3D.getWorldPosition(markerLastPos);
     marker.object3D.getWorldQuaternion(markerLastQuat);
-
+    
     camera.setAttribute('look-controls', {
       enabled: false,
       magicWindowTrackingEnabled: false
     });
-    
-    console.log("markerFound",markerLastPos);
 });
 marker.addEventListener("markerLost", () => {
     pseudoMode = true;
     stopPlayback();
-    
-    marker.object3D.getWorldPosition(markerLastPos);
-    console.log("markerLost",markerLastPos);
+
+    // カメラのワールド座標・回転を保存
+    camera.object3D.getWorldPosition(lastCamPos);
+    camera.object3D.getWorldQuaternion(lastCamQuat);
     camera.setAttribute('look-controls', {
       enabled: true,
       magicWindowTrackingEnabled: true
     });
+
+    // 保存したカメラ位置・回転を復元
+    camera.object3D.position.copy(lastCamPos);
+    camera.object3D.quaternion.copy(lastCamQuat);
+    console.log("markerLost:lastCamPos",lastCamPos);
+    console.log("markerLost:lastCamQuat",lastCamQuat);
 });
 
 AFRAME.registerComponent('pseudo-stabilizer', {
