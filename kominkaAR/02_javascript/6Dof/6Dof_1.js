@@ -127,12 +127,10 @@ AFRAME.registerComponent('pseudo-stabilizer', {
                 offset.applyQuaternion(camQuat);
 
                 obj.position.copy(cam.position.clone().add(offset));
-                obj.quaternion.copy(markerLastQuat);
-
-                console.log("markerLost initial position", obj.position);
-                console.log("markerLost initial quaternion", obj.quaternion);
-                console.log("camera quaternion", camQuat);
-
+                
+                const worldQuat = camQuat.clone().multiply(markerLastQuat);
+                obj.quaternion.copy(worldQuat);
+                
                 appliedOnce = true; // 初回適用済み
             }
         }
