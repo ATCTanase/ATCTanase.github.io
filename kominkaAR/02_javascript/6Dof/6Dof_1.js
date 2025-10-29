@@ -85,17 +85,19 @@ marker.addEventListener("markerFound", () => {
     marker.object3D.getWorldPosition(markerLastPos);
     marker.object3D.getWorldQuaternion(markerLastQuat);
 
-    const currentQuat = camera.object3D.quaternion.clone();
     camera.setAttribute('look-controls', {
       enabled: false,
       magicWindowTrackingEnabled: false
     });
-    camera.object3D.quaternion.copy(currentQuat);
+    
+    console.log("markerFound",markerLastPos);
 });
 marker.addEventListener("markerLost", () => {
     pseudoMode = true;
     stopPlayback();
     
+    marker.object3D.getWorldPosition(markerLastPos);
+    console.log("markerLost",markerLastPos);
     camera.setAttribute('look-controls', {
       enabled: true,
       magicWindowTrackingEnabled: true
