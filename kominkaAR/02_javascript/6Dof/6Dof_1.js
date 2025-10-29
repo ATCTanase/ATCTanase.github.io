@@ -85,10 +85,12 @@ marker.addEventListener("markerFound", () => {
     marker.object3D.getWorldPosition(markerLastPos);
     marker.object3D.getWorldQuaternion(markerLastQuat);
 
+    const currentQuat = camera.object3D.quaternion.clone();
     camera.setAttribute('look-controls', {
       enabled: false,
       magicWindowTrackingEnabled: false
     });
+    camera.object3D.quaternion.copy(currentQuat);
 });
 marker.addEventListener("markerLost", () => {
     pseudoMode = true;
