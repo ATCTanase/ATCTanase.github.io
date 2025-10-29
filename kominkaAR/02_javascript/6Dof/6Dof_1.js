@@ -123,7 +123,7 @@ AFRAME.registerComponent('pseudo-stabilizer', {
             const dir  = markerLastPos.clone().applyQuaternion(deltaQuat);
 
             // 最後の距離を維持
-            const pseudoPos = camPos.clone().add(dir .multiplyScalar(lastDistance));
+            const pseudoPos = camPos.clone().add(dir.multiplyScalar(lastDistance));
 
             videoPlane.object3D.position.copy(pseudoPos);
             videoPlane.object3D.quaternion.copy(markerLastQuat);
