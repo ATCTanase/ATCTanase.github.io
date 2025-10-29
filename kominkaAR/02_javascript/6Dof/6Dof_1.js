@@ -115,13 +115,12 @@ AFRAME.registerComponent('pseudo-stabilizer', {
         }
         else {
 
-        const cam = this.data.camera.object3D;
-        const obj = this.data.target.object3D;
+        const cam = camera.object3D;
 
         const offset = markerLastPos.clone().sub(cam.position);
         offset.applyQuaternion(cam.quaternion);
-        obj.position.copy(cam.position.clone().add(offset));
-        obj.quaternion.copy(markerLastQuat);
+        videoPlane.object3D.position.copy(cam.position.clone().add(offset));
+        videoPlane.object3D.quaternion.copy(markerLastQuat);
 
         console.log("markerLost: videoPlane position", videoPlane.object3D.position);
         console.log("markerLost: videoPlane quaternion", videoPlane.object3D.quaternion);
