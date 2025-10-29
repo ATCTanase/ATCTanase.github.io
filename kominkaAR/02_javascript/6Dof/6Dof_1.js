@@ -74,6 +74,8 @@ let positionOffset = new THREE.Vector3();
 
 let cameraQuat = new THREE.Quaternion();
 let lastTime = null;
+let pseudoMode = false;
+
 
 // 加速度センサーから擬似移動を更新
 window.addEventListener("devicemotion", (event) => {
