@@ -119,20 +119,20 @@ AFRAME.registerComponent('pseudo-stabilizer', {
                         // ジャイロ角度から疑似的な回転差を計算
             const deltaQuat = new THREE.Quaternion();
             deltaQuat.copy(cameraLastQuat).invert().multiply(gyroQuat);
-
-            // deltaQuat をオイラー角に変換して X/Y 軸の傾きを取得
-            const deltaEuler = new THREE.Euler().setFromQuaternion(deltaQuat, 'YXZ');
+            
+            // スマホの傾きを取得（ZXYがデバイスと整合性が高い）
+            const deltaEuler = new THREE.Euler().setFromQuaternion(deltaQuat, 'ZXY');
             
             console.log(deltaEuler);
 
             // マーカー最後の位置からの移動量を設定（スケールで調整）
             const moveScale = lastDistance * 0.5; // 適当にスケール調整
-            const offsetX = Math.tan(deltaEuler.y)* moveScale; // 左右
-            const offsetY = Math.tan(deltaEuler.x)* moveScale; 
-            const offset = new THREE.Vector3(
-                offsetY,  // 左右
-                -offsetX, // 上下
-                0 // 奥行は変えない
+            const offsetX = Math.tan(deltaEuler.y) * moveScale;  // 左右傾き（Y軸）
+            const offsetY = Math.tan(deltaEuler.x) * moveScale;  // 前後傾き（X軸）
+            const pseudoPos = new THREE.Vector3(
+                markerLastPos.x + offsetX,
+                markerLastPos.y + offsetY,
+                markerLastPos.z
             );
 
             // 動かす
