@@ -116,15 +116,28 @@ AFRAME.registerComponent('pseudo-stabilizer', {
             videoPlane.object3D.quaternion.copy(markerLastQuat);
         }
         else {
-            // ロスト中：スマホ回転差分で擬似補正
-            const deltaQuat = gyroQuat.clone().multiply(cameraLastQuat.clone().invert());
-            const dir = markerLastPos.clone().normalize(); 
-            // 回転差分を適用
-            const newDir = dir.clone().applyQuaternion(deltaQuat);
-            // 最後の距離を維持
-            const pseudoPos = newDir.clone().multiplyScalar(lastDistance);
+            // ロスト時の角度
+            const lastEuler = new THREE.Euler().setFromQuaternion(cameraLastQuat, 'YXZ');
+            const currentEuler = new THREE.Euler().setFromQuaternion(gyroQuat, 'YXZ');
 
+            // 回転差分
+            const deltaYaw = currentEuler.y - lastEuler.y;   // 左右
+            const deltaPitch = currentEuler.x - lastEuler.x; // 前後
+
+            // マーカー最後の距離
+            const d = lastDistance;
+
+            // Y軸回転による左右オフセット
+            const offsetX = d * Math.tan(deltaYaw);
+
+            // X軸回転による上下オフセット
+            const offsetY = d * Math.tan(deltaPitch);
+
+            // 疑似位置
+            const pseudoPos = markerLastPos.clone().add(new THREE.Vector3(offsetX, offsetY, 0));
             videoPlane.object3D.position.copy(pseudoPos);
+
+            // 回転はマーカー最後のまま維持
             videoPlane.object3D.quaternion.copy(markerLastQuat);
         }
     }
