@@ -91,23 +91,20 @@ marker.addEventListener("markerFound", () => {
       magicWindowTrackingEnabled: false
     });
     
-    camera.object3D.getWorldQuaternion(lastCamQuat);
+    camera.object3D.getWorldQuaternion(new THREE.Quaternion());
     console.log("markerFound:lastCamQuat",lastCamQuat);
 });
 marker.addEventListener("markerLost", () => {
     pseudoMode = true;
     stopPlayback();
 
-    // カメラのワールド座標・回転を保存
-    camera.object3D.getWorldPosition(lastCamPos);
-    camera.object3D.getWorldQuaternion(lastCamQuat);
     camera.setAttribute('look-controls', {
       enabled: true,
       magicWindowTrackingEnabled: true
     });
 
     // 保存したカメラ位置・回転を復元
-    camera.object3D.quaternion.copy(lastCamQuat);
+    camera.object3D.quaternion.copy(new THREE.Quaternion());
     console.log("markerLost:lastCamQuat",lastCamQuat);
 });
 
