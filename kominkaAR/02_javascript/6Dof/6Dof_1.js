@@ -103,9 +103,22 @@ marker.addEventListener("markerLost", () => {
       magicWindowTrackingEnabled: true
     });
 
-    // 保存したカメラ位置・回転を復元
-    camera.object3D.quaternion.copy(new THREE.Quaternion());
-    console.log("markerLost:lastCamQuat",lastCamQuat);
+    const lastPos = markerLastPos.clone();
+    const lastQuat = markerLastQuat.clone();
+
+
+    // 1フレーム待ってカメラ回転が更新されるのを待つ
+    setTimeout(() => {
+        const offset = lastPos.clone().sub(camera.object3D.position);
+        offset.applyQuaternion(camera.object3D.quaternion);
+
+        videoPlane.object3D.position.copy(camera.object3D.position.clone().add(offset));
+        videoPlane.object3D.quaternion.copy(lastQuat);
+
+        console.log("markerLost: videoPlane position", videoPlane.object3D.position);
+        console.log("markerLost: videoPlane quaternion", videoPlane.object3D.quaternion);
+        console.log("markerLost:lastCamQuat",lastCamQuat);
+    }, 0);
 });
 
 AFRAME.registerComponent('pseudo-stabilizer', {
