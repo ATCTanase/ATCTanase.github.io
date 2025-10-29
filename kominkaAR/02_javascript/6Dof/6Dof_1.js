@@ -122,13 +122,17 @@ AFRAME.registerComponent('pseudo-stabilizer', {
 
             // deltaQuat をオイラー角に変換して X/Y 軸の傾きを取得
             const deltaEuler = new THREE.Euler().setFromQuaternion(deltaQuat, 'YXZ');
+            
+            console.log(deltaEuler);
 
             // マーカー最後の位置からの移動量を設定（スケールで調整）
             const moveScale = lastDistance * 0.5; // 適当にスケール調整
+            const offsetX = Math.tan(deltaEuler.y)* moveScale; // 左右
+            const offsetY = Math.tan(deltaEuler.x)* moveScale; 
             const offset = new THREE.Vector3(
-                deltaEuler.y * moveScale,  // 左右
-                -deltaEuler.x * moveScale, // 上下
-                0                          // 奥行は変えない
+                offsetY,  // 左右
+                -offsetX, // 上下
+                0 // 奥行は変えない
             );
 
             // 動かす
