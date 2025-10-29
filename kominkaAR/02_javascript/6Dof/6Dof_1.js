@@ -91,7 +91,7 @@ marker.addEventListener("markerFound", () => {
       magicWindowTrackingEnabled: false
     });
     
-    camera.object3D.getWorldQuaternion(new THREE.Quaternion());
+    camera.object3D.quaternion.copy(new THREE.Quaternion());
     console.log("markerFound:lastCamQuat",lastCamQuat);
 });
 marker.addEventListener("markerLost", () => {
