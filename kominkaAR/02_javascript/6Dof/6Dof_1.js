@@ -1,5 +1,6 @@
 const videoPlane = document.getElementById("videoPlane");
 const marker     = document.getElementById("barcodeMarker");
+const camera = document.querySelector('[camera]');
 
 // Canvasを作成
 const canvas = document.createElement("canvas");
@@ -63,18 +64,90 @@ function stopPlayback() {
         playTimer = null;
     }
 }
+let isMarkerAttached = false;
+let markerLastPos = new THREE.Vector3();
+let markerLastQuat = new THREE.Quaternion();
+let cameraLastQuat = new THREE.Quaternion();
+
+let velocity = new THREE.Vector3();
+let positionOffset = new THREE.Vector3();
+
+let cameraQuat = new THREE.Quaternion();
+let lastTime = null;
+
+// 加速度センサーから擬似移動を更新
+window.addEventListener("devicemotion", (event) => {
+  if (!lastTime) return;
+  const dt = (performance.now() - lastTime) / 1000;
+
+  // 加速度値（重力を除いた値が理想）
+  const acc = new THREE.Vector3(
+    event.acceleration.x || 0,
+    event.acceleration.y || 0,
+    event.acceleration.z || 0
+  );
+
+  // スマホの姿勢に基づき、加速度をワールド空間へ変換
+  const accWorld = acc.clone().applyQuaternion(cameraQuat);
+
+  // 積分で速度・位置オフセットを更新（疑似的な移動）
+  velocity.add(accWorld.clone().multiplyScalar(dt));
+  positionOffset.add(velocity.clone().multiplyScalar(dt));
+});
+
+
 
 // マーカーイベント
 marker.addEventListener("markerFound", () => {
     videoPlane.setAttribute("visible", true);
-    videoPlane.setAttribute("height", videoPlane.getAttribute("width") * offset);
     startPlayback();
+    
+    // 初期化
+    isMarkerAttached = true;
+    pseudoMode = false;
+    velocity.set(0, 0, 0);
+    positionOffset.set(0, 0, 0);
+
+    // 記録
+    marker.object3D.getWorldPosition(markerLastPos);
+    marker.object3D.getWorldQuaternion(markerLastQuat);
+    camera.object3D.getWorldQuaternion(cameraLastQuat);
+
+    lastTime = performance.now();
 });
 marker.addEventListener("markerLost", () => {
-    videoPlane.setAttribute("visible", false);
+    
+     // マーカーから切り離してシーン直下に戻す
+    marker.sceneEl.object3D.add(videoPlane.object3D);
+    marker.object3D.getWorldPosition(markerLastPos);
+    marker.object3D.getWorldQuaternion(markerLastQuat);
+    camera.object3D.getWorldQuaternion(cameraLastQuat);
+
+    isMarkerAttached = false;
+    pseudoMode = true;
+
     stopPlayback();
 });
 
+AFRAME.registerComponent('pseudo-stabilizer', {
+  tick: function () {
+    if (!pseudoMode) return;
+
+    camera.object3D.getWorldQuaternion(cameraQuat);
+
+    // 疑似固定位置：マーカーがあった位置 - スマホ移動分
+    const pseudoPos = markerLastPos.clone().sub(
+      positionOffset.clone().applyQuaternion(cameraQuat)
+    );
+
+    videoPlane.object3D.position.copy(pseudoPos);
+    videoPlane.object3D.quaternion.copy(markerLastQuat);
+
+    lastTime = performance.now();
+  }
+});
+
+document.querySelector('a-scene').setAttribute('pseudo-stabilizer', '');
 // 🔹 まずフレームを読み込み開始
 preloadFrames(() => {
     console.log("アニメーション準備完了");

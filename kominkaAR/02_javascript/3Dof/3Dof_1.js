@@ -105,9 +105,7 @@ function updateVideoPlane() {
 
   if (!markerInitialPos) {
     markerInitialPos = markerWorldPos.clone();
-
     markerInitialQuat = markerWorldQuat.clone();
-
     cameraInitialQuat = cameraWorldQuat.clone();
   }
 
