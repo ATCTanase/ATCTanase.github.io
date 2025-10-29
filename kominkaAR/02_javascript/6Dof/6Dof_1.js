@@ -134,6 +134,11 @@ AFRAME.registerComponent('pseudo-stabilizer', {
   
             const quatOffset = new THREE.Quaternion().setFromEuler(localRotOffset);
             videoPlane.object3D.quaternion.copy(markerLastQuat.clone().multiply(quatOffset));
+            
+            const markerScale = barcodeMarker.object3D.scale.clone();
+            const offsetScale = new THREE.Vector3(markerWidth, markerHeight, 1);
+            const finalScale = markerScale.multiply(offsetScale);
+            videoPlane.object3D.scale.copy(finalScale);
         }
         else {
             // マーカー消失後、初回のみ
@@ -154,6 +159,11 @@ AFRAME.registerComponent('pseudo-stabilizer', {
 
                 const worldQuat = camQuat.clone().multiply(markerLastQuat.clone().multiply(quatOffset));
                 obj.quaternion.copy(worldQuat);
+
+                const markerScale = barcodeMarker.object3D.scale.clone();
+                const offsetScale = new THREE.Vector3(markerWidth, markerHeight, 1);
+                const finalScale = markerScale.multiply(offsetScale);
+                videoPlane.object3D.scale.copy(finalScale);
 
                 appliedOnce = true; // 初回適用済み
             }
