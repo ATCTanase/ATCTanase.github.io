@@ -103,23 +103,6 @@ marker.addEventListener("markerLost", () => {
       magicWindowTrackingEnabled: true
     });
 
-    const lastPos = markerLastPos.clone();
-    const lastQuat = markerLastQuat.clone();
-
-    // 次フレームでカメラ回転が反映された状態で適用
-    requestAnimationFrame(() => {
-        console.log("markerLost: lastPos", lastPos);
-        console.log("markerLost: lastQuat", lastQuat);
-        const offset = lastPos.clone().sub(camera.object3D.position);
-        offset.applyQuaternion(camera.object3D.quaternion);
-
-        videoPlane.object3D.position.copy(camera.object3D.position.clone().add(offset));
-        videoPlane.object3D.quaternion.copy(lastQuat);
-
-        console.log("markerLost: videoPlane position", videoPlane.object3D.position);
-        console.log("markerLost: videoPlane quaternion", videoPlane.object3D.quaternion);
-        console.log("markerLost: camera quaternion", camera.object3D.quaternion);
-    });
 });
 
 AFRAME.registerComponent('pseudo-stabilizer', {
@@ -131,6 +114,18 @@ AFRAME.registerComponent('pseudo-stabilizer', {
             videoPlane.object3D.quaternion.copy(markerLastQuat);
         }
         else {
+
+        const cam = this.data.camera.object3D;
+        const obj = this.data.target.object3D;
+
+        const offset = markerLastPos.clone().sub(cam.position);
+        offset.applyQuaternion(cam.quaternion);
+        obj.position.copy(cam.position.clone().add(offset));
+        obj.quaternion.copy(markerLastQuat);
+
+        console.log("markerLost: videoPlane position", videoPlane.object3D.position);
+        console.log("markerLost: videoPlane quaternion", videoPlane.object3D.quaternion);
+        console.log("markerLost: camera quaternion", camera.object3D.quaternion);
         }
     }
 });
