@@ -21,6 +21,11 @@ let playTimer = null;
 const loadingOverlay = document.getElementById("loadingOverlay");
 const progressText   = document.getElementById("progress");
 
+// 🔹 2Dコピー用
+const pseudoEl     = document.getElementById("pseudo2D");
+const pseudoCanvas = document.getElementById("pseudoCanvas");
+const pseudoCtx    = pseudoCanvas.getContext("2d");
+
 // 🔹 全フレームをロード
 function preloadFrames(callback) {
     let loaded = 0;
@@ -116,38 +121,50 @@ AFRAME.registerComponent('pseudo-stabilizer', {
             videoPlane.object3D.quaternion.copy(markerLastQuat);
         }
         else {
-      // === スマホ回転の差分を求める ===
-      const deltaQuat = new THREE.Quaternion();
-      deltaQuat.copy(cameraLastQuat).invert().multiply(gyroQuat);
+            // スマホ回転差分
+            const deltaQuat = new THREE.Quaternion();
+            deltaQuat.copy(cameraLastQuat).invert().multiply(gyroQuat);
 
-      // === deltaQuatをmarker座標系に変換 ===
-      // （これで「マーカーから見たスマホの傾き差」になる）
-      const markerSpaceQuat = new THREE.Quaternion();
-      markerSpaceQuat.copy(markerLastQuat).invert().multiply(deltaQuat).multiply(markerLastQuat);
+            // マーカー座標系に変換
+            const markerSpaceQuat = new THREE.Quaternion();
+            markerSpaceQuat.copy(markerLastQuat).invert().multiply(deltaQuat).multiply(markerLastQuat);
 
-      // === オイラー角に変換 ===
-      const deltaEuler = new THREE.Euler().setFromQuaternion(markerSpaceQuat, 'ZXY');
+            const deltaEuler = new THREE.Euler().setFromQuaternion(markerSpaceQuat, 'ZXY');
+            const maxTilt = Math.PI/4;
+            const tiltX = THREE.MathUtils.clamp(deltaEuler.x, -maxTilt, maxTilt);
+            const tiltY = THREE.MathUtils.clamp(deltaEuler.y, -maxTilt, maxTilt);
 
-      // --- 傾き量 ---
-      const tiltX = THREE.MathUtils.clamp(deltaEuler.x, -Math.PI / 4, Math.PI / 4);
-      const tiltY = THREE.MathUtils.clamp(deltaEuler.y, -Math.PI / 4, Math.PI / 4);
+            // 移動オフセット
+            const moveScale = lastDistance * 0.5;
+            const offsetLocal = new THREE.Vector3(
+                Math.tan(tiltY) * moveScale,
+                -Math.tan(tiltX) * moveScale,
+                0
+            );
+            const offsetWorld = offsetLocal.clone().applyQuaternion(markerLastQuat);
 
-      // --- オフセット計算 ---
-      const distance = lastDistance || 1.0;
-      const moveScale = distance * 0.5; // 感度
-      const offsetLocal = new THREE.Vector3(
-        Math.tan(tiltY) * moveScale,  // 左右
-        -Math.tan(tiltX) * moveScale, // 上下
-        0
-      );
+            const pseudoPos = new THREE.Vector3().copy(markerLastPos).add(offsetWorld);
 
-      // === マーカーの向き基準でワールド変換 ===
-      const offsetWorld = offsetLocal.clone().applyQuaternion(markerLastQuat);
+            videoPlane.object3D.position.copy(pseudoPos);
+            videoPlane.object3D.quaternion.copy(markerLastQuat);
 
-      const pseudoPos = new THREE.Vector3().copy(markerLastPos).add(offsetWorld);
+            // -------------------------
+            // 2Dコピー更新
+            // -------------------------
+            pseudoEl.style.display = "block";
 
-      videoPlane.object3D.position.copy(pseudoPos);
-      videoPlane.object3D.quaternion.copy(markerLastQuat);
+            // 3D位置をスクリーン座標に変換
+            const vector = pseudoPos.clone().project(camera.object3D.children[0]);
+            const screenX = (vector.x + 1)/2 * window.innerWidth;
+            const screenY = (-vector.y + 1)/2 * window.innerHeight;
+
+            // 2D canvasにフレーム描画
+            const img = frames[currentFrame];
+            pseudoCtx.clearRect(0, 0, pseudoCanvas.width, pseudoCanvas.height);
+            pseudoCtx.drawImage(img, 0, 0, pseudoCanvas.width, pseudoCanvas.height);
+
+            pseudoEl.style.transform = `translate(${screenX - pseudoCanvas.width/2}px, ${screenY - pseudoCanvas.height/2}px)`;
+
         }
     }
 });
