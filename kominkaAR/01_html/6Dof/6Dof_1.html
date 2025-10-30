@@ -116,6 +116,7 @@
   <script src="../../02_javascript/image-controller.js"></script>
   <script src="../../02_javascript/debugModeSetting_6Dof.js"></script>
   <script>
+    setARContents();
     
     pushBtn("pageBackBtn", "pageBack", "pageBackOn", "../contentsExplanation/contentsExplanationWithAR.html?id=AR1");
 
@@ -133,8 +134,7 @@
         }
       }
     });
-  </script>
-  <script>
+    
     let guidemarkerOnOff = false;
 
     function onOff(){
@@ -148,6 +148,8 @@
         guidemarkerOnOff = true;
       }
     }
+
+    document.cookie = "watchedAR1=AR1; path=/";
   </script>
 </body>
 
