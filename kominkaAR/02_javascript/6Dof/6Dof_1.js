@@ -115,36 +115,38 @@ marker.addEventListener("markerLost", () => {
     });
     appliedOnce = false;
 });
-function parametarCheck()
-{
-    const localPosOffset = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ);
-    
-    if (!localPosOffset.equals(videoPlane.object3D.position))
-    {
-        videoPlane.object3D.position.copy(localPosOffset);
-    }
+const _tempPos = new THREE.Vector3();
+const _tempEuler = new THREE.Euler();
+const _tempQuat = new THREE.Quaternion();
+const _tempScale = new THREE.Vector3();
 
-    const localRotOffset = new THREE.Euler(
-        THREE.MathUtils.degToRad(markerRotationX),
-        THREE.MathUtils.degToRad(markerRotationY),
-        THREE.MathUtils.degToRad(markerRotationZ)
-    );
-    const quatOffset = new THREE.Quaternion().setFromEuler(localRotOffset);
-    
-    if (!quatOffset.equals(videoPlane.object3D.quaternion))
-    {
-        videoPlane.object3D.quaternion.copy(quatOffset);
-    }
-    
-    const markerScale = marker.object3D.scale.clone();
-    const offsetScale = new THREE.Vector3(markerWidth, markerHeight, 1);
-    const finalScale = markerScale.multiply(offsetScale);
+function parametarCheck() {
+  // ---- 位置 ----
+  _tempPos.set(markerPositionX, markerPositionY, markerPositionZ);
+  const objPos = videoPlane.object3D.position;
+  if (!_tempPos.equals(objPos)) objPos.copy(_tempPos);
 
-    if (!finalScale.equals(planeParent.object3D.scale))
-    {
-        planeParent.object3D.scale.copy(finalScale);
-    }
+  // ---- 回転 ----
+  _tempEuler.set(
+    THREE.MathUtils.degToRad(markerRotationX),
+    THREE.MathUtils.degToRad(markerRotationY),
+    THREE.MathUtils.degToRad(markerRotationZ)
+  );
+  _tempQuat.setFromEuler(_tempEuler);
+
+  const objQuat = videoPlane.object3D.quaternion;
+
+  if (Math.abs(_tempQuat.dot(objQuat)) < 0.9999) objQuat.copy(_tempQuat);
+
+  // ---- スケール ----
+  _tempScale.copy(marker.object3D.scale);
+  _tempScale.multiplyScalar(1); // 明示的コピー（軽い）
+  _tempScale.multiply(new THREE.Vector3(markerWidth, markerHeight, 1));
+
+  const parentScale = videoPlane.object3D.scale;
+  if (!_tempScale.equals(parentScale)) parentScale.copy(_tempScale);
 }
+
 AFRAME.registerComponent('pseudo-stabilizer', {
     tick: function () {
       parametarCheck();
