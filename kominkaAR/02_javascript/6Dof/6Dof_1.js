@@ -1,4 +1,5 @@
 const videoPlane = document.getElementById("videoPlane");
+const planeParent = document.getElementById("planeParent");
 const marker     = document.getElementById("barcodeMarker");
 const camera = document.querySelector("#mainCamera");
 
@@ -114,62 +115,65 @@ marker.addEventListener("markerLost", () => {
     });
     appliedOnce = false;
 });
+function parametarCheck()
+{
+    const localPosOffset = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ);
+    
+    if (!localPosOffset.equals(videoPlane.object3D.position))
+    {
+        videoPlane.object3D.position.copy(localPosOffset);
+    }
 
-AFRAME.registerComponent('pseudo-stabilizer', {
-    tick: function () {
-
-        const localPosOffset = new THREE.Vector3(markerPositionX, markerPositionY, markerPositionZ);
-        const localRotOffset = new THREE.Euler(
+    const localRotOffset = new THREE.Euler(
         THREE.MathUtils.degToRad(markerRotationX),
         THREE.MathUtils.degToRad(markerRotationY),
         THREE.MathUtils.degToRad(markerRotationZ)
-        );
+    );
+    const quatOffset = new THREE.Quaternion().setFromEuler(localRotOffset);
+    
+    if (!quatOffset.equals(videoPlane.object3D.quaternion))
+    {
+        videoPlane.object3D.quaternion.copy(quatOffset);
+    }
+    
+    const markerScale = marker.object3D.scale.clone();
+    const offsetScale = new THREE.Vector3(markerWidth, markerHeight, 1);
+    const finalScale = markerScale.multiply(offsetScale);
+
+    if (!finalScale.equals(planeParent.object3D.scale))
+    {
+        planeParent.object3D.scale.copy(finalScale);
+    }
+}
+AFRAME.registerComponent('pseudo-stabilizer', {
+    tick: function () {
+      parametarCheck();
+       
+      if (!pseudoMode) {
+        marker.object3D.getWorldPosition(markerLastPos);
+        marker.object3D.getWorldQuaternion(markerLastQuat);
+
+        // planeParentをマーカー基準で配置
+        planeParent.object3D.position.copy(markerLastPos);
+        planeParent.object3D.quaternion.copy(markerLastQuat);
+      }
+      else if (!appliedOnce) {
+        const cam = camera.object3D;
+        const camQuat = cam.quaternion;
+        if (camQuat.equals(new THREE.Quaternion())) return;
+
+        const camToMarker = new THREE.Vector3().copy(markerLastPos).sub(cam.position);
+        camToMarker.applyQuaternion(camQuat);
+        planeParent.object3D.position.copy(cam.position.clone().add(camToMarker));
         
-        if (!pseudoMode) {
-            marker.object3D.getWorldPosition(markerLastPos);
-            marker.object3D.getWorldQuaternion(markerLastQuat);
-            const offsetWorld = localPosOffset.clone().applyQuaternion(markerLastQuat);
-            videoPlane.object3D.position.copy(markerLastPos.clone().add(offsetWorld));
-
-  
-            const quatOffset = new THREE.Quaternion().setFromEuler(localRotOffset);
-            videoPlane.object3D.quaternion.copy(markerLastQuat.clone().multiply(quatOffset));
-            
-            const markerScale = barcodeMarker.object3D.scale.clone();
-            const offsetScale = new THREE.Vector3(markerWidth, markerHeight, 1);
-            const finalScale = markerScale.multiply(offsetScale);
-            videoPlane.object3D.scale.copy(finalScale);
-        }
-        else {
-            // マーカー消失後、初回のみ
-            if (!appliedOnce) {
-                const cam = camera.object3D;
-                const camQuat = cam.quaternion;
-
-                // カメラ回転が初期値ならスルー
-                if (camQuat.equals(new THREE.Quaternion())) return;
-
-                const obj = videoPlane.object3D;
-                const offsetWorld = localPosOffset.clone().applyQuaternion(markerLastQuat);
-                const finalPos = markerLastPos.clone().add(offsetWorld).sub(cam.position);
-                finalPos.applyQuaternion(camQuat);
-                obj.position.copy(cam.position.clone().add(finalPos));
-                
-                const quatOffset = new THREE.Quaternion().setFromEuler(localRotOffset);
-
-                const worldQuat = camQuat.clone().multiply(markerLastQuat.clone().multiply(quatOffset));
-                obj.quaternion.copy(worldQuat);
-
-                const markerScale = barcodeMarker.object3D.scale.clone();
-                const offsetScale = new THREE.Vector3(markerWidth, markerHeight, 1);
-                const finalScale = markerScale.multiply(offsetScale);
-                videoPlane.object3D.scale.copy(finalScale);
-
-                appliedOnce = true; // 初回適用済み
-            }
-        }
+        const worldQuat = camQuat.clone().multiply(markerLastQuat);
+        planeParent.object3D.quaternion.copy(worldQuat);
+        
+        appliedOnce = true; // 初回適用済み
+      }
     }
 });
+
 
 document.querySelector('a-scene').setAttribute('pseudo-stabilizer', '');
 // 🔹 まずフレームを読み込み開始

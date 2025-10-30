@@ -47,6 +47,8 @@
     <a-marker type="pattern" value="5" id="barcodeMarker" url="../../04_image/patt/AR1.patt"
       smooth="true" smoothCount="100" smoothTolerance="10" smoothThreshold="5">
     </a-marker>
+    
+    <a-entity id="planeParent">
       <a-plane 
         id="videoPlane" 
         position="0 0 0" 
@@ -56,6 +58,7 @@
         visible="false"
         material="shader: flat; side: double; transparent: true; alphaTest:0.01;">
       </a-plane>
+    </a-entity>
 
         <a-camera position="0 0 0" id="mainCamera"
             look-controls="enabled: true; magicWindowTrackingEnabled: true; touchEnabled: false">
