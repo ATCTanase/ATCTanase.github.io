@@ -1,172 +1,174 @@
-<!DOCTYPE html>
-<html>
+const barcodeMarker = document.getElementById("barcodeMarker");
+const videoPlane = document.getElementById("videoPlane");
+const camera = document.querySelector("#mainCamera");
 
-<head>
-    <!-- Google Tag Manager -->
-    <script>
-        (function (w, d, s, l, i) {
-            w[l] = w[l] || []; w[l].push({
-                'gtm.start':
-                    new Date().getTime(), event: 'gtm.js'
-            }); var f = d.getElementsByTagName(s)[0],
-                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-KG9QWC9H');
-    </script>
-    <!-- End Google Tag Manager -->
-    <meta name="robots" content="noindex">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>南部の曲家（岩手県）：AR表示 | 古民家AR</title>
+let markerTimer = null;
+let markerVisible = false;
 
-    <!-- ↓faviconエラー消すための1行 -->
-    <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="../../../css/3Dof.css">
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-</head>
+// Canvas作成
+const canvas = document.createElement("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const ctx = canvas.getContext("2d", { willReadFrequently: true });
+videoPlane.setAttribute("material", "src", canvas);
 
-<body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript>
-        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KG9QWC9H" height="0" width="0"
-            style="display:none;visibility:hidden"></iframe>
-    </noscript>
-    <!-- End Google Tag Manager (noscript) -->
-    <!-- 🔹 ローディング表示 -->
-    <div id="loadingOverlay">
-        <span id="loadingNow">
-            読み込み中...<span id="progress">0%</span>
-        </span>
-    </div>
+// ARアニメ
+const ARImage = "../../../image/ARImage/AR3_南部の曲屋_うまやの馬";
+const frameCount = 1;
+const frameExt = ".png";
+const frames = [];
+let currentFrame = 0;
+const fps = 20;
+let playTimer = null;
 
-    <!-- 🔹 AR読み込み表示 -->
-    <div id="AROverlay">
-        <img id="ARTargetImg" src="../../../image/ARImage/map_img_ar_frame_vertical.png" alt="">
-    </div>
+const loadingOverlay = document.getElementById("loadingOverlay");
+const AROverlay = document.getElementById("AROverlay");
+const progressText = document.getElementById("progress");
 
-    <!-- 戻るボタン -->
-    <div id="pageBackBtnErea">
-        <button type="button" id="pageBackBtn">
-            <img id="pageBack">
-            <img id="pageBackOn">
-        </button>
-    </div>
-    <!-- 古民家ARロゴ -->
-    <div id="kominkaArLogoErea">
-        <img id="kominkaArLogo">
-    </div>
+let offset;
+let markerPositionX = 0;
+let markerPositionY = 3;
+let markerPositionZ = 0;
 
-    <div id="title" style="top:2px; left:2px; position:fixed; font-size: 30px;">3DOF3</div>
+let markerRotationX = 0;
+let markerRotationY = 0;
+let markerRotationZ = 0;
 
-    <a-scene embedded vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true; alpha: true;"
-        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+let markerHeight = 6;
+let markerWidth = 6;
+// フレームロード
+function preloadFrames(callback) {
+  let loaded = 0;
+  for (let i = 0; i <= frameCount; i++) {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    // img.src = `${ARImage}${String(i).padStart(3, "0")}${frameExt}`;
+    img.src = `${ARImage}${frameExt}`;
+    img.onload = () => {
+      loaded++;
+      progressText.textContent = Math.floor((loaded / frameCount) * 100) + "%";
+      if (loaded === frameCount) {
+        loadingOverlay.style.display = "none";
+        callback();
+        offset = img.height / img.width;
+      }
+    };
+    frames.push(img);
+  }
+}
 
-        <a-light type="ambient" color="#ffffff"></a-light>
-        <a-light type="point" intensity="2" position="0 2 2"></a-light>
+// 次フレーム描画
+function drawNextFrame() {
+  const img = frames[currentFrame];
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        <a-marker type="pattern" value="5" id="barcodeMarker" url="../../../image/patt/AR3.patt" size="0.2"
-            marker-tracker></a-marker>
-        <a-plane id="videoPlane" position="0 0 0" rotation="0 0 0" width="1" height="1" visible="false"
-            material="shader: flat; side: double; transparent: true; alphaTest: 0.01;">
-        </a-plane>
+  const mat = videoPlane.getObject3D("mesh")?.material;
+  if (mat?.map) mat.map.needsUpdate = true;
 
-        <a-camera position="0 0 0" id="mainCamera"
-            look-controls="enabled: false; magicWindowTrackingEnabled: false; touchEnabled: false">
-        </a-camera>
-    </a-scene>
-<!-- 
-    <dialog id="kariModalDialog" class="dialog">
-        <div id="arrangementChange" style="overflow: visible; height: 250px;">
-            <div style="border: solid; height: 100%;">
-                位置
-                <ul style="margin: 0;">
-                    <li>赤線</li>
-                    <input id="XDirection" type="text" style="width: 50%; font-size: 150%;">
-                    <li>緑線</li>
-                    <input id="YDirection" type="text" style="width: 50%;font-size: 150%;">
-                    <li>青線</li>
-                    <input id="ZDirection" type="text" style="width: 50%;font-size: 150%;">
-                </ul>
-            </div>
-            <div style="border: solid; height: 100%;">
-                大きさ
-                <ul style="margin: 0;">
-                    <li>縦幅：横幅に応じて決まります</li>
-                    <input id="height" type="text" style="width: 50%; font-size: 150%;" hidden>
-                    <li>横幅</li>
-                    <input id="width" type="text" style="width: 50%; font-size: 150%;">
-                </ul>
-            </div>
-            <div style="border: solid; height: 100%;">
-                回転
-                <ul style="margin: 0;">
-                    <li>X軸回転(縦に回す)</li>
-                    <input id="XRotation" type="text" style="width: 50%; font-size: 150%;">
-                    <li>Y軸回転(横に回す)</li>
-                    <input id="YRotation" type="text" style="width: 50%; font-size: 150%;">
-                    <li>Z軸回転(平面時にプラスの値で時計回り)</li>
-                    <input id="ZRotation" type="text" style="width: 50%; font-size: 150%;">
-                </ul>
-            </div>
-        </div>
+  currentFrame = (currentFrame + 1) % frameCount;
+}
 
-        <button id="kariCloseDialog" onclick="closeDialog()">適用</button>
-    </dialog>
+function startPlayback() {
+  if (!playTimer) playTimer = setInterval(drawNextFrame, 1000 / fps);
+}
 
-    <div id="kariDialogButton">
-        <button id="kariSettingButton" onclick="openDialog()">設定</button>
-    </div>
-    <div id="kariGuidemarkerButton" style="position: fixed; bottom: 60px; right: 10px;">
-        <button onclick="onOff()">マーカーON・OFF</button>
-    </div> -->
+function stopPlayback() {
+  if (playTimer) {
+    clearInterval(playTimer);
+    playTimer = null;
+  }
+}
 
-    <script src="../../../javascript/3Dof/3Dof_3.js"></script>
-    <script src="../../../javascript/common.js"></script>
-    <script src="../../../javascript/data-store.js"></script>
-    <script src="../../../javascript/image-controller.js"></script>
-    <script src="../../../javascript/debugModeSetting_3Dof.js"></script>
-    <script type="module">
-        setARContents();
+function updateVideoPlane() {
+  if (markerVisible) {
+    // --- ワールド座標 ---
+    const markerWorldPos = new THREE.Vector3();
+    barcodeMarker.object3D.updateMatrixWorld(true);
+    barcodeMarker.object3D.getWorldPosition(markerWorldPos);
+    camera.object3D.updateMatrixWorld(true);
+    markerWorldPos.setFromMatrixPosition(barcodeMarker.object3D.matrixWorld);
+    markerWorldPos.applyMatrix4(camera.object3D.matrixWorld);
 
-        // ボタン名、オフ時のボタン名、オン時のボタン名、url
-        pushBtn("pageBackBtn", "pageBack", "pageBackOn", "./index.html?id=AR3");
-    </script>
-    <!-- <script>
-        // A-Frame コンポーネントを定義
-        AFRAME.registerComponent('axes-helper', {
-            schema: { size: { type: 'number', default: 1 } },
-            init: function () {
-                this.helper = new THREE.AxesHelper(this.data.size);
-                this.el.object3D.add(this.helper);
-            },
-            remove: function () {
-                if (this.helper) {
-                    this.el.object3D.remove(this.helper);
-                    this.helper = null;
-                }
-            }
-        });
-    </script>
-    <script>
-        let guidemarkerOnOff = false;
+    // --- ワールド回転 ---
+    const markerLocalQuat = new THREE.Quaternion();
+    const markerWorldQuat = new THREE.Quaternion();
+    barcodeMarker.object3D.getWorldQuaternion(markerLocalQuat);
+    const cameraWorldQuat = new THREE.Quaternion();
+    camera.object3D.getWorldQuaternion(cameraWorldQuat);
+    markerWorldQuat.multiplyQuaternions(cameraWorldQuat, markerLocalQuat);
 
-        function onOff() {
-            if (guidemarkerOnOff) {
-                document.querySelector("#videoPlane").removeAttribute("axes-helper");
+    // 現在のマーカーの「上」方向（ローカルのY軸がワールド空間でどうなっているか）
+    const markerUp = new THREE.Vector3(0, 1, 0).applyQuaternion(markerWorldQuat);
+    // ワールドの「上」方向
+    const worldUp = new THREE.Vector3(0, 1, 0);
+    // マーカーのUpベクトルとワールドのUpベクトルの間の回転軸と角度を計算
+    const correctionQuaternion = new THREE.Quaternion().setFromUnitVectors(markerUp, worldUp);
+    // 元のマーカーの回転に補正回転を適用（ワールド座標系で回転を安定させる）
+    const stableMarkerWorldQuat = correctionQuaternion.multiply(markerWorldQuat);
 
-                guidemarkerOnOff = false;
-            } else {
-                document.querySelector("#videoPlane").setAttribute("axes-helper", "size: 3");
+    // --- 位置補正 ---
 
-                guidemarkerOnOff = true;
-            }
-        }
-    </script> -->
-    <script>
-        document.cookie = "watchedAR3=AR3; path=/";
-    </script>
-</body>
+    const offsetPosition = new THREE.Vector3(
+      Number(markerPositionX),
+      Number(markerPositionY),
+      Number(markerPositionZ)
+    );
+    // マーカーのワールド回転を適用
+    const rotatedOffset = offsetPosition.clone().applyQuaternion(stableMarkerWorldQuat);
+    const finalPos = markerWorldPos.clone().add(rotatedOffset);
 
-</html>
+    // --- 回転補正 ---
+    const offsetEuler = new THREE.Euler(
+      THREE.MathUtils.degToRad(markerRotationX),
+      THREE.MathUtils.degToRad(markerRotationY),
+      THREE.MathUtils.degToRad(markerRotationZ)
+    );
+    const offsetQuat = new THREE.Quaternion().setFromEuler(offsetEuler);
+    const finalQuat = stableMarkerWorldQuat.clone().multiply(offsetQuat);
+
+    // --- スケール補正 ---
+    const markerScale = barcodeMarker.object3D.scale.clone();
+    const offsetScale = new THREE.Vector3(markerWidth, markerHeight, 1);
+    const finalScale = markerScale.multiply(offsetScale);
+
+    // --- 適用 ---
+    videoPlane.object3D.position.copy(finalPos);
+    videoPlane.object3D.quaternion.copy(finalQuat);
+    videoPlane.object3D.scale.copy(finalScale);
+  }
+}
+
+AFRAME.registerComponent("marker-tracker", {
+  tick: function () {
+    updateVideoPlane();
+  }
+});
+
+barcodeMarker.addEventListener("markerFound", () => {
+  if (!markerVisible) {
+    markerVisible = true;
+    startPlayback();
+    videoPlane.setAttribute('visible', 'true');
+    AROverlay.style.display = "none";
+
+    camera.setAttribute('look-controls', {
+      enabled: true,
+      magicWindowTrackingEnabled: true
+    });
+  }
+});
+
+
+barcodeMarker.addEventListener("markerLost", () => {
+  markerVisible = false;
+  if (markerTimer) {
+    clearInterval(markerTimer);
+    markerTimer = null;
+  }
+});
+
+// 初期ロード
+preloadFrames(() => {
+  console.log("アニメーション準備完了");
+});
