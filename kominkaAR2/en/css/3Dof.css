@@ -1,0 +1,140 @@
+/* モバイルビュー対応：安全な領域の考慮（iOS Safariなど） */
+@supports(padding: max(0px)) {
+    body {
+        padding-top:    env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left:   env(safe-area-inset-left);
+        padding-right:  env(safe-area-inset-right);
+    }
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    width: 100%;
+}
+
+#kariCloseDialog{
+    bottom: 10px;
+    position: absolute;
+    right: 10px;
+}
+
+#kariDebugTitleComment {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+}
+
+#kariDialogButton{
+    bottom: 20px;
+    height: auto;
+    position: fixed;
+    right: 10px;
+    width: auto; 
+    z-index: 9999; 
+}
+
+#kariModalDialog{
+    height: auto;
+    overflow: scroll;
+    position: fixed;
+    top: 15px;
+    width: 90%; 
+    z-index: 9999;
+}
+
+#loadingOverlay{
+    align-items: center;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    display: flex;
+    font-size: 24px;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+}
+
+#loadingNow {
+    bottom: -35%;
+    left: 0;
+    position: relative;
+}
+
+#AROverlay{
+    align-items: center;
+    color: white;
+    display: flex;
+    font-size: 24px;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9998;
+}
+#ARTargetImg{
+    width: 100%;
+}
+
+#CountOverlay{
+    align-items: center;
+    color: white;
+    display: flex;
+    font-size: 40px;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+}
+
+#pageBackBtnErea{
+    height: auto;
+    left: 93%;
+    position: absolute;
+    top: 1%;
+    width: 6%;
+    z-index: 9999;
+}
+#pageBackBtn{
+    background: none;
+    border: none;
+    padding: 0;
+}
+#pageBack,
+#pageBackOn{
+    /* style.cssで設定しているものと同じ */
+    display: block;
+    pointer-events: none;
+    width: 100%;
+}
+
+#screenContents {
+    background-color: blueviolet;
+    height: 100%;
+    width: 100%;
+}
+
+#kominkaArLogoErea {
+    height: auto;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 10%;
+}
+#kominkaArLogo {
+    /* style.cssで設定しているものと同じ */
+    display: block;
+    pointer-events: none;
+    width: 100%;
+}

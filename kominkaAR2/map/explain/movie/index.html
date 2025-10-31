@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || []; w[l].push({
+          'gtm.start':
+            new Date().getTime(), event: 'gtm.js'
+        }); var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+            'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-KG9QWC9H');
+    </script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title id="title"></title>
+
+    <!-- ↓faviconエラー消すための1行 -->
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="../../../css/explain.css">
+    <link rel="stylesheet" href="../../../css/style.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  </head>
+
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KG9QWC9H" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div id="mainContents">
+      <div id="contentsExplanation">
+        <!-- TOPボタン -->
+        <div id="topPageBackBtnErea" style="right: 15%;">
+          <button type="button" id="topPageBackBtn">
+            <img id="topPageBack">
+            <img id="topPageBackOn">
+          </button>
+        </div>
+        <!-- 戻るボタン -->
+        <div id="pageBackBtnErea">
+          <button type="button" id="pageBackBtn">
+            <img id="pageBack">
+            <img id="pageBackOn">
+          </button>
+        </div>
+
+        <!-- 古民家ARロゴ -->
+        <div id="kominkaArLogoErea">
+          <img id="kominkaArLogo">
+        </div>
+
+        <div id="backgroundHiddenErea">
+          <img id="explanationBackgroud">
+        </div>
+
+        <div id="contentsHeightLimitErea">
+          <div id="contentsExplanationErea">
+            <!-- 説明 -->
+            <div id="explanationErea"></div>
+
+            <!-- 画像フリック -->
+            <div id="imageFlickErea">
+              <div id="explanationImagesErea">
+                <div id="flickImage1" style="display: block;">
+                  <img id="explainImage1">
+                </div>
+                <div id="flickImage2" style="display: none;">
+                  <img id="explainImage2">
+                </div>
+                <div id="flickImage3" style="display: none;">
+                  <img id="explainImage3">
+                </div>
+              </div>
+              <div id="imageChoiceIconErea">
+                <div id="flickImageLamp1">
+                  <img id="indicatorOff1">
+                  <img id="indicatorOn1">
+                </div>
+                <div id="flickImageLamp2">
+                  <img id="indicatorOff2">
+                  <img id="indicatorOn2">
+                </div>
+                <div id="flickImageLamp3">
+                  <img id="indicatorOff3">
+                  <img id="indicatorOn3">
+                </div>
+              </div>
+            </div>
+
+            <div id="watchContents">
+              <!-- 映像を見るボタン -->
+              <div id="watchMovieLongButtonErea">
+                <button type="button" id="watchMovieLongBtn" onclick="watchMovieLongDialog()">
+                  <img id="watchMovieLongOn">
+                  <img id="watchMovieLongOff">
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 映像を見るボタン押下後エリア -->
+        <div id="watchMovie">
+          <img id="movieBackgroud">
+          <div id="iframeErea"></div>
+        </div>
+        <!-- 戻るボタン -->
+        <div id="watchMovieBackButtonErea">
+          <button type="button" id="watchMovieBackBtn" onclick="watchMovieLongClose()">
+            <img id="watchMovieBackOn">
+            <img id="watchMovieBackOff">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 画面を縦向きにしてください -->
+    <div id="msgContents">
+      <img id="msgRotationImg">
+    </div>
+
+    <script src="../../../javascript/common.js"></script>
+    <script src="../../../javascript/data-store.js"></script>
+    <script src="../../../javascript/image-controller.js"></script>
+    <script src="../../../javascript/explain/toggle-visibility-in-button-press.js"></script> <!-- 動画の読み込みがあるので先頭に記載する -->
+    <script src="../../../javascript/explain/explanation-image-flick-change.js"></script>
+    <script src="../../../javascript/explain/identification-no-ar.js"></script>
+    <script type="module">
+      setContentsExplanation();
+
+      // ボタン名、オフ時のボタン名、オン時のボタン名、url
+      pushBtn("topPageBackBtn",     "topPageBack",      "topPageBackOn",     "../../../");
+      pushBtn("pageBackBtn",        "pageBack",         "pageBackOn",        "../../");
+      pushBtn("watchMovieBtn",      "watchMovieOn",     "watchMovieOff",     null);
+      pushBtn("watchMovieBackBtn",  "watchMovieBackOn", "watchMovieBackOff", null);
+    </script>
+  </body>
+</html>

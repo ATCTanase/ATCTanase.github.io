@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || []; w[l].push({
+          'gtm.start':
+            new Date().getTime(), event: 'gtm.js'
+        }); var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+            'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-KG9QWC9H');
+    </script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>古民家AR スタンプラリー | 古民家AR</title>
+
+    <!-- ↓faviconエラー消すための1行 -->
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="../css/stamp.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  </head>
+
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KG9QWC9H" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div id="mainContents">
+      <div id="stampRally">
+        <!-- TOPボタン -->
+        <div id="topPageBackBtnErea">
+          <button type="button" id="topPageBackBtn">
+            <img id="topPageBack"   src="../image/common/common_btn_top_off.png">
+            <img id="topPageBackOn" src="../image/common/common_btn_top_press.png">
+          </button>
+        </div>
+
+        <!-- 古民家ARロゴ -->
+        <div id="kominkaArLogoErea">
+          <img id="kominkaArLogo">
+        </div>
+
+        <!-- <img id="stampRallyBackgroud"> -->
+        <div id="backgroundHiddenErea">
+          <img id="stampRallyBackgroud">
+        </div>
+
+        <div id="stampRallyErea">
+          <!-- スタンプラリー マップを見ながら～ -->
+          <div id="stampRallyExplanationErea">
+            <img id="stampRallyExplanation">
+          </div>
+
+          <!-- スタンプ一覧 -->
+          <div id="stampRallyResultErea">
+            <img id="dummyImgStampRally" src="../image/stamp/stamp_img_bg_dummy.png">
+
+            <div id="stampRallyResult1">
+              <img id="nagayamonOfKawatihuseStamp"> <!-- 河内布施の長屋門 -->
+              <img id="nagayamonOfKawatihuseStampOn">
+            </div>
+            <div id="stampRallyResult2">
+              <img id="komeguraOfDozimaStamp"> <!-- 堂島の米蔵 -->
+              <img id="komeguraOfDozimaStampOn">
+            </div>
+            <div id="stampRallyResult3">
+              <img id="minkaOfHidanSirakawaStamp"> <!-- 飛騨白川の民家 -->
+              <img id="minkaOfHidanSirakawaStampOn">
+            </div>
+            <div id="stampRallyResult4">
+              <img id="minkaOfHyugaSibaStamp"> <!-- 日向椎葉の民家 -->
+              <img id="minkaOfHyugaSibaStampOn">
+            </div>
+            <div id="stampRallyResult5">
+              <img id="minkaOfSettunoseStamp"> <!-- 摂津能勢の民家 -->
+              <img id="minkaOfSettunoseStampOn"> 
+            </div>
+            <div id="stampRallyResult6">
+              <img id="takakuraOfAmamiosimaStamp"> <!-- 庵美大島の高倉 -->
+              <img id="takakuraOfAmamiosimaStampOn">
+            </div>
+            <div id="stampRallyResult7">
+              <img id="minkaOfSinanoAkiyamaStamp"> <!-- 信濃秋山の民家 -->
+              <img id="minkaOfSinanoAkiyamaStampOn">
+            </div>
+            <div id="stampRallyResult8">
+              <img id="minkaOfYamatoTotugawaStamp"> <!-- 大和十津川の民家 -->
+              <img id="minkaOfYamatoTotugawaStampOn">
+            </div>
+            <div id="stampRallyResult9">
+              <img id="nosonKabukiButaiOfSyodosimaStamp"> <!-- 小豆島の農村歌舞伎舞台 -->
+              <img id="nosonKabukiButaiOfSyodosimaStampOn">
+            </div>
+            <div id="stampRallyResult10">
+              <img id="magariyaOfNanbuStamp"> <!-- 南部の曲家 -->
+              <img id="magariyaOfNanbuStampOn">
+            </div>
+            <div id="stampRallyResult11">
+              <img id="minkaOfEtizenSurugaStamp"> <!-- 越前敦賀の民家 -->
+              <img id="minkaOfEtizenSurugaStampOn">
+            </div>
+            <div id="stampRallyResult12">
+              <img id="tyasituOfKitakawautiStamp"> <!-- 北河内の茶室 -->
+              <img id="tyasituOfKitakawautiStampOn">
+            </div>
+          </div>
+        </div>
+
+        <!-- 館内マップ -->
+        <div id="stampRallyInHouseMapErea">
+          <div id="stampRallyInHouseMapBtn">
+            <img id="stampRallyInHouseMap">
+            <img id="stampRallyInHouseMapOn">
+          </div>
+        </div>
+      </div>
+
+      <!-- スタンプラリーコンプリートダイアログ -->
+      <div id="stampRallyCompleteDialog">
+        <img id="stampRallyCompleteBackgroud">
+
+        <div id="stampRallyCompleteImgErea">
+          <img id="stampRallyCompleteImgBackgroud">
+
+          <!-- フォトフレームを開くボタン -->
+          <button id="photoFrameErea">
+            <img id="photoFrame">
+            <img id="photoFrameOn">
+          </button>
+
+          <!-- 閉じるボタン -->
+          <button id="stampRallyCompleteClose" onclick="stampRallyCompleteDialogClose()">
+            <img id="stampRallyCompleteDialogClose">
+            <img id="stampRallyCompleteDialogCloseOn">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="msgContents">
+      <img id="msgRotationImg">
+    </div>
+
+    <script src="../javascript/common.js"></script>
+    <script src="../javascript/cookie-check.js"></script>
+    <script src="../javascript/data-store.js"></script>
+    <script src="../javascript/image-controller.js"></script>
+    <script src="../javascript/get-frame-height.js"></script>
+    <script src="../javascript/stamp/change-to-watched-stamp.js"></script>
+    <script src="../javascript/stamp/stamprally-complete-dialog.js"></script>
+    <script type="module">
+      setStampRallyImg();
+
+      // ボタン名、オフ時のボタン名、オン時のボタン名、url
+      pushBtn("photoFrameErea",          "photoFrame",                    "photoFrameOn",                    null);
+      pushBtn("stampRallyCompleteClose", "stampRallyCompleteDialogClose", "stampRallyCompleteDialogCloseOn", null);
+      pushBtn("stampRallyInHouseMapBtn", "stampRallyInHouseMap",          "stampRallyInHouseMapOn",          "../map/");
+      pushBtn("topPageBackBtn",          "topPageBack",                   "topPageBackOn",                   "../");
+    </script>
+    <script>
+      window.addEventListener("load", function () {
+        const stampRallyErea = document.getElementById("stampRallyErea");
+        const remainedWindowInnerHeight = window.innerHeight - stampRallyErea.offsetHeight;
+
+        const stampRallyInHouseMapErea = document.getElementById("stampRallyInHouseMapErea");
+        const stampRallyInHouseMapEreaStyle = window.getComputedStyle(stampRallyInHouseMapErea);
+      });
+    </script>
+    <script>
+      window.addEventListener("load", function () {
+        const backgroundHiddenErea = document.getElementById("backgroundHiddenErea");
+        backgroundHiddenErea.setAttribute("style", "height:" + (window.innerHeight + 40) + "px");
+
+        const stampRallyCompleteBackgroud = document.getElementById("stampRallyCompleteBackgroud");
+        stampRallyCompleteBackgroud.setAttribute("style", "height:" + (window.innerHeight + 40) + "px");
+      });
+    </script>
+  </body>
+</html>

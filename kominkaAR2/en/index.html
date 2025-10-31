@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <!-- Google Tag Manager -->
+  <script>
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || []; w[l].push({
+        'gtm.start':
+          new Date().getTime(), event: 'gtm.js'
+      }); var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-KG9QWC9H');
+  </script>
+  <!-- End Google Tag Manager -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <title>古民家AR</title>
+
+  <!-- ↓faviconエラー消すための1行 -->
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./css/topMenu.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KG9QWC9H" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <div id="mainContents">
+    <div id="menu">
+      <!-- 英語選択ボタン -->
+      <div id="languageBtnErea">
+        <button type="button" id="languageBtn">
+          <img id="englishBtn">
+          <img id="englishBtnOn">
+        </button>
+      </div>
+
+      <img id="menuBackgroud">
+
+      <div id="menuBtnContents">
+        <!-- 館内マップから～ -->
+        <div id="menuExplanationErea">
+          <img id="menuExplanation">
+        </div>
+
+        <div class="menuBtnFlex">
+          <!-- 館内マップ -->
+          <button type="button" id="menuInHouseMapBtn">
+            <img id="menuInHouseMap">
+            <img id="menuInHouseMapOn">
+          </button>
+        </div>
+        <div class="menuBtnFlex">
+          <!-- スタンプラリー -->
+          <button type="button" id="menuStampRallyBtn">
+            <img id="menuStampRally">
+            <img id="menuStampRallyOn">
+          </button>
+          <!-- コンプリート記念フォトフレーム -->
+          <button type="button" id="menuCompletePhotoFrameBtn">
+            <img id="menuCompletePhotoFrameIncomplete">
+            <img id="menuCompletePhotoFrame">
+            <img id="menuCompletePhotoFrameOn">
+          </button>
+        </div>
+        <div class="menuBtnFlex">
+          <!-- このサイトについて -->
+          <button type="button" id="menuAboutThisSiteBtn">
+            <img id="menuAboutThisSite">
+            <img id="menuAboutThisSiteOn">
+          </button>
+          <!-- 日本民家集落博物館公式サイト -->
+          <button type="button" id="menuKominkaOfficialWebsiteBtn">
+            <img id="menuKominkaOfficialWebsite">
+            <img id="menuKominkaOfficialWebsiteOn">
+          </button>
+        </div>
+
+        <!-- 画面は立ち止まって～ -->
+        <div id="menuStopAndLookErea">
+          <img id="menuStopAndLook">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 画面を縦向きにしてください -->
+  <div id="msgContents">
+    <img id="msgRotationImg">
+  </div>
+
+  <script src="./javascript/common.js"></script>
+  <script src="./javascript/cookie-check.js"></script>
+  <script src="./javascript/data-store.js"></script>
+  <script src="./javascript/image-controller.js"></script>
+  <script src="./javascript/topMenu/photo-frame-button-active.js"></script>
+  <script type="module">
+    setLanguageBtn();
+    setMenuImg();
+
+    // ボタン名、オフ時のボタン名、オン時のボタン名、url
+    pushBtn("languageBtn",                   "englishBtn",                 "englishBtnOn",                 "../");
+    pushBtn("menuAboutThisSiteBtn",          "menuAboutThisSite",          "menuAboutThisSiteOn",          "./about/");
+    pushBtn("menuCompletePhotoFrameBtn",     "menuCompletePhotoFrame",     "menuCompletePhotoFrameOn",     false);
+    pushBtn("menuInHouseMapBtn",             "menuInHouseMap",             "menuInHouseMapOn",             "./map/");
+    pushBtn("menuKominkaOfficialWebsiteBtn", "menuKominkaOfficialWebsite", "menuKominkaOfficialWebsiteOn", "officialWebsite");
+    pushBtn("menuStampRallyBtn",             "menuStampRally",             "menuStampRallyOn",             "./stamp/");
+  </script>
+</body>
+
+</html>

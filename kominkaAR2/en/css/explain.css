@@ -1,0 +1,179 @@
+/* html,
+body {
+    overflow: hidden;
+} */
+
+body {
+    font-family: "Noto Sans JP", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+/* .noto-sans-jp-<uniquifier> {
+  font-family: "Noto Sans JP", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+} */
+
+#ARExperienceErea{
+    height: auto;
+    position: absolute;
+}
+
+#ARInvoke{
+    bottom: 5%;
+    height: auto;
+    left: 5%;
+    position: absolute;
+    width: 90%;
+}
+
+#ARInvokeExplanationText{
+    font-size: 13.5px;
+    text-align: center;
+    margin: 0;
+}
+
+#ARInvokeExplanationTextErea{
+    height: auto;
+    left: 5%;
+    position: absolute;
+    top: 73%;
+    width: 90%;
+}
+
+#backgroundHiddenErea{
+    overflow: hidden;
+    position: absolute;
+    width: 100%;
+}
+
+#contentsExplanation{
+    background-color: rgb(153, 217, 165);
+    height: 100%;
+    margin: 0 auto;
+    position: relative;
+    width: 100%;
+}
+
+#contentsHeightLimitErea{
+    position: relative; 
+    padding-bottom: 0%; 
+    padding-left: 7%; 
+    padding-right: 7%; 
+    padding-top: 60%;
+}
+
+#explanationBackgroud1,
+#explanationBackgroud2,
+#explanationBackgroud3,
+#explanationBackgroud4,
+#explanationBackgroud5,
+#explanationBackgroud6,
+#explanationBackgroud7,
+#explanationBackgroud8,
+#explanationBackgroud9,
+#explanationBackgroud10,
+#explanationBackgroud11,
+#explanationBackgroud12{
+    position: absolute;
+    top: 0;
+}
+
+#explanationErea{
+    align-items: center;
+    display: flex;
+    font-size: 14px;
+    height: auto;
+    justify-content: center;
+    width: 100%;
+}
+
+#explainImage1,
+#explainImage2,
+#explainImage3 {
+    border-radius: 15px;
+}
+
+#flickImageLamp1,
+#flickImageLamp2,
+#flickImageLamp3{
+    width: 25%; 
+    height: 50%; 
+    margin-top: 1%;
+}
+
+#howToClose{
+    height: auto;
+    position: absolute;
+    right: -5%;
+    top: -3%;
+    width: 15%;
+}
+
+#howToExperienceIt{
+    display: none;
+    height: 100%;
+    left: 0; 
+    position: absolute; 
+    top: 0; 
+    width: 100%;
+    z-index: 5;
+}
+
+#howToImageErea{
+    height: auto;
+    left: 5%;
+    position: absolute;
+    top: 7%;
+    width: 90%;
+}
+
+#iframeErea{
+    height: auto;
+    left: 0;
+    position: absolute;
+    top: 17%;
+    width: 100%;
+}
+
+#imageChoiceIconErea{
+    display: flex;
+    justify-content: space-evenly;
+    padding-left: 25%;
+    padding-top: 1%;
+    width: 50%;
+}
+
+#imageFlickErea{
+    height: auto;
+    /* padding-top: 3%; */
+    width: 100%;
+}
+
+#watchARButtonErea{
+    padding-right: 3%;
+}
+
+#watchContents{
+    display: flex;
+    padding-top: 3%;
+    width: 100%;
+}
+
+#watchMovie{
+    display: none;
+    height: auto; 
+    margin-top: -10px;
+    position: relative; 
+    width: 100%;
+}
+
+#watchMovieBackButtonErea{
+    display: none;
+    padding-left:  35%;
+    padding-right: 35%;
+    padding-top: 3%;
+    position: relative; 
+}

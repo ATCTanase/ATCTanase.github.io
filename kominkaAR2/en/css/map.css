@@ -1,0 +1,212 @@
+/*＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+ * 館内マップ画面
+ *＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
+/* html,
+body {
+    overflow: hidden;
+} */
+
+#backgroundHiddenErea{
+    overflow: hidden;
+    position: absolute;
+    width: 100%;
+}
+
+#dummyImgMap {
+    left: 0;
+    opacity: 0; /* ダミー画像が見えないように透明化 */
+    position: absolute;
+    top: 0;
+}
+
+#inHouseMap {
+    background-color: rgb(153, 217, 165);
+    height: 100%;
+    margin: 0 auto;
+    position: relative;
+    width: 100%;
+}
+
+#inHouseMapBackgroud {
+    position: absolute;
+    top: 0;
+    z-index: 3; /*地図より上に表示するため*/
+}
+
+#inHouseMapContents {
+    padding-bottom: 0%;
+    padding-left: 3%;
+    padding-right: 3%;
+    padding-top: 3%;
+    position: relative;
+    z-index: 3; /*地図より上に表示するため*/
+}
+
+#inHouseMapDirectionErea {
+    position: absolute;
+    right: 22%;
+    width: 15%;
+}
+
+#inHouseMapDisplayErea {
+    padding-left: 3%;
+    padding-right: 3%;
+}
+
+#inHouseMapExplanationErea{
+    padding-left: 5%;
+    width: 90%;
+}
+
+#inHouseMapScaleUpDownButton{
+    text-align: center;
+}
+
+#inHouseMapScaleUpDownGrid{
+    bottom: 0;
+    display: grid;
+    position: absolute;
+    right: 0;
+}
+
+#inHouseMapSwipeErea{
+    position: relative;
+}
+
+#inHouseMapSwipeEreaOuteside{
+    /* 
+      ・inHouseMapImgを大きくするとARボタンの位置を計算する必要がある
+      ・inHouseMapSwipeEreaを大きくすると、要素がただ大きくなるだけでスクロールできない
+      ・よってinHouseMapSwipeEreaを囲むdivを作成し、その中でinHouseMapSwipeEreaのスケールを拡縮する
+     */
+    overflow: scroll !important;
+    padding-top: 1%;                                                              
+    width: 100%;
+}
+
+#kominkaArLogoErea {
+    z-index: 4 !important; /* backgroundより上に表示するため */
+}
+
+#mapCurrentLocationErea {
+    display: none;
+    position: absolute;
+    width: 5%;
+    z-index: 2; /* 家マークより上に、backgroundより下に表示するため */
+}
+
+#scaleUpButton{
+    width: 75%;
+}
+
+#scaleDownButton{
+    width: 75%;
+}
+
+#topPageBackBtnErea {
+    z-index: 4 !important; /* backgroundより上に表示するため */
+}
+
+
+
+#inHouseMapScaleUpDownErea{ /* 拡縮ボタン */
+    position: absolute;
+    right: 4%;
+    width: 15%;
+}
+
+#arExplanationButton1{ /* 河内布施の長屋門 */
+    height: auto;
+    top: 78%;
+    position: absolute;
+    left: 12%;
+    width: 15% !important;
+}
+
+#arExplanationButton2{ /* 堂島の米蔵 */
+    height: auto;
+    top: 76%;
+    position: absolute;
+    left: 26%;
+    width: 18% !important;
+}
+
+#arExplanationButton3{ /* 飛騨白川の民家 */
+    height: auto;
+    top: 66%;
+    position: absolute;
+    left: 46%;
+    width: 15% !important;
+}
+
+#arExplanationButton4{ /* 日向椎葉の民家 */
+    height: auto;
+    top: 54%;
+    position: absolute;
+    left: 22%;
+    width: 15% !important;
+}
+
+#arExplanationButton5{ /* 摂津能勢の民家 */
+    height: auto;
+    top: 50%;
+    position: absolute;
+    left: 45%;
+    width: 15% !important;
+}
+
+#arExplanationButton6{ /* 庵美大島の高倉 */
+    height: auto;
+    top: 44%;
+    position: absolute;
+    left: 36%;
+    width: 15% !important;
+}
+
+#arExplanationButton7{ /* 信濃秋山の民家 */
+    height: auto;
+    top: 38.5%;
+    position: absolute;
+    left: 21%;
+    width: 15% !important;
+}
+
+#arExplanationButton8{ /* 大和十津川の民家 */
+    height: auto;
+    top: 19%;
+    position: absolute;
+    left: 36%;
+    width: 15% !important;
+}
+
+#arExplanationButton9{ /* 小豆島の農村歌舞伎舞台 */
+    height: auto;
+    top: 20%;
+    position: absolute;
+    left: 50%;
+    width: 22% !important;
+}
+
+#arExplanationButton10{ /* 南部の曲家 */
+    height: auto;
+    top: 18%;
+    position: absolute;
+    left: 72%;
+    width: 15% !important;
+}
+
+#arExplanationButton11{ /* 越前敦賀の民家 */
+    height: auto;
+    top: 12%;
+    position: absolute;
+    left: 49%;
+    width: 15% !important;
+}
+
+#arExplanationButton12{ /* 北河内の茶室 */
+    height: auto;
+    top: 9%;
+    position: absolute;
+    left: 63%;
+    width: 15% !important;
+}

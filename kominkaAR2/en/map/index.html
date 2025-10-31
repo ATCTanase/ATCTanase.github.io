@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || []; w[l].push({
+          'gtm.start':
+            new Date().getTime(), event: 'gtm.js'
+        }); var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+            'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-KG9QWC9H');
+    </script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>館内マップ | 古民家AR</title>
+
+    <!-- ↓faviconエラー消すための1行 -->
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="../css/map.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  </head>
+
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KG9QWC9H" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div id="mainContents">
+      <div id="inHouseMap">
+        <!-- TOPボタン -->
+        <div id="topPageBackBtnErea">
+          <button type="button" id="topPageBackBtn">
+            <img id="topPageBack"   src="../image/common/common_btn_top_off.png">
+            <img id="topPageBackOn" src="../image/common/common_btn_top_press.png">
+          </button>
+        </div>
+
+        <!-- 古民家ARロゴ -->
+        <div id="kominkaArLogoErea">
+          <img id="kominkaArLogo">
+        </div>
+
+        <!-- <img id="inHouseMapBackgroud"> -->
+        <div id="backgroundHiddenErea">
+          <img id="inHouseMapBackgroud">
+        </div>
+
+        <div id="inHouseMapContents">
+          <!-- 館内マップ 古民家に着いたら～ -->
+          <div id="inHouseMapExplanationErea">
+            <img id="inHouseMapExplanation">
+          </div>
+        </div> 
+
+        <!-- 地図スワイプ -->
+        <div id="inHouseMapDisplayErea">
+          <!-- 地図の高さを疑似的に取得するためにダミーの背景画像を用意する -->
+          <img id="dummyImgMap" src="../image/map/map_img_bg_1_dummy.png">
+          <canvas id="myCanvas" style="position: relative; touch-action: none;"></canvas>
+
+          <!-- 拡縮ボタン -->
+          <div id="inHouseMapScaleUpDownErea">
+            <img id="inHouseMapScaleUpDownImg">
+
+            <div id="inHouseMapScaleUpDownGrid">
+              <div id="inHouseMapScaleUpDownButton">
+                <button id="scaleUpButton" onclick="scaleUp()">
+                  <img id="scaleUpBtn">
+                  <img id="scaleUpBtnOn">
+                </button>
+              </div>
+              <div id="inHouseMapScaleUpDownButton">
+                <button id="scaleDownButton" onclick="scaleDown()">
+                  <img id="scaleDownBtn">
+                  <img id="scaleDownBtnOn">
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- 方角 -->
+          <div id="inHouseMapDirectionErea">
+            <img id="inHouseMapDirection">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 画面を縦向きにしてください -->
+    <div id="msgContents">
+      <img id="msgRotationImg">
+    </div>
+
+    <script src="../javascript/common.js"></script>
+    <script src="../javascript/data-store.js"></script>
+    <script src="../javascript/image-controller.js"></script>
+    <script src="../javascript/get-frame-height.js"></script>
+    <script src="../javascript/map/display-current-location-above-map.js"></script>
+    <script src="../javascript/map/drawCanvas.js"></script>
+    <script src="../javascript/map/house-hit-judgement.js"></script>
+    <script src="../javascript/map/map-pinch-and-drag.js"></script>
+    <script src="../javascript/map/map-scale-up-down.js"></script>
+    <script>
+      setInHouseMapImg();
+
+      // ボタン名、オフ時のボタン名、オン時のボタン名、url
+      pushBtn("topPageBackBtn", "topPageBack", "topPageBackOn", "../");
+    </script>
+    <script>
+      window.addEventListener("load", function () {
+        const backgroundHiddenErea = document.getElementById("backgroundHiddenErea");
+        backgroundHiddenErea.setAttribute("style", "height:" + (window.innerHeight + 30) + "px");
+      });
+    </script>
+  </body>
+</html>

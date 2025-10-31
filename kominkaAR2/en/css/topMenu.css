@@ -1,0 +1,57 @@
+/*＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+ * メニュー画面
+ *＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
+/* html,
+body {
+  overflow: hidden;
+} */
+
+#menu {
+  /* background-color: rgb(153, 217, 165); */
+  height: 100%;
+  margin: 0 auto;
+  position: relative;
+  width: 100%;
+}
+
+#menuBackgroud {
+  position: absolute;
+  top: 0;
+}
+
+#menuBtnContents {
+  position: relative;
+  padding-bottom: 0%;
+  padding-left: 3%;
+  padding-right: 3%;
+  padding-top: 71%;
+  /* padding-bottom: 0%;
+  padding-left: 9%;
+  padding-right: 9%;
+  padding-top: 72%; */
+  z-index: 1;
+}
+
+.menuBtnFlex {
+  display: flex;
+  margin-bottom: 2%;
+}
+
+.menuBtnFlex button {
+  margin-right: 2%;
+}
+
+.menuBtnFlex button:last-of-type {
+  margin-right: 0;
+}
+
+#menuExplanationErea{
+  padding-bottom: 3%;
+  padding-left: 10%;
+  width: 80%;
+}
+
+#menuStopAndLookErea{
+  padding-left: 10%;
+  width: 80%;
+}

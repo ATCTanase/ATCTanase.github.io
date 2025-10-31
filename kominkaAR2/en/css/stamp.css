@@ -1,0 +1,260 @@
+/*＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+ * スタンプラリー画面
+ *＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
+/* html,
+body {
+  overflow: hidden;
+} */
+
+#backgroundHiddenErea{
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+}
+
+#dummyImgStampRally {
+  left: 0;
+  opacity: 0; /* ダミー画像が見えないように透明化 */
+  position: absolute;
+  top: 0;
+}
+
+#stampRally {
+  height: 100%;
+  margin: 0 auto;
+  position: relative;
+  width: 100%;
+}
+
+#stampRallyBackgroud {
+  position: absolute;
+  top: 0;
+}
+
+#stampRallyErea {
+  position: relative;
+  padding-bottom: 0%;
+  padding-left: 10%;
+  padding-right: 10%;
+  padding-top: 7%;
+}
+
+#stampRallyExplanationErea {
+}
+
+#stampRallyInHouseMapErea {
+  padding-left: 10%;
+  padding-right: 10%;
+  padding-top: 1%;
+  position: relative;
+}
+
+#stampRallyResultErea {
+  width: 100%;
+}
+
+
+
+#photoFrameErea {
+  bottom: 5%;
+  height: auto;
+  position: absolute;
+  left: 3.5%;
+  width: 90%;
+}
+
+#stampRallyCompleteBackgroud {
+  /* height: 100%; */
+}
+
+#stampRallyCompleteClose {
+  bottom: -15%;
+  height: auto;
+  position: absolute;
+  left: 40%;
+  width: 15%;
+}
+
+#stampRallyCompleteDialog {
+  display: none;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;  
+  width: 100%; 
+  z-index: 5;
+}
+
+#stampRallyCompleteImgErea {
+  height: auto;
+  left: 10%;
+  position: absolute;
+  top: 20%;
+  width: 80%;
+}
+
+
+
+#stampRallyResult1 { /* 河内布施の長屋門 */
+  height: auto;
+  left: 12.5%;
+  position: absolute;
+  top: 83%;
+  width: 30% !important;
+}
+
+#stampRallyResult2 { /* 堂島の米蔵 */
+  height: auto;
+  left: 48%;
+  position: absolute;
+  top: 80.5%;
+  width: 25% !important;
+}
+
+#stampRallyResult3 { /* 飛騨白川の民家 */
+  height: auto;
+  left: 65%;
+  position: absolute;
+  top: 67%;
+  width: 27% !important;
+}
+
+#stampRallyResult4 { /* 日向椎葉の民家 */
+  height: auto;
+  left: 7%;
+  position: absolute;
+  top: 71%;
+  width: 38% !important;
+}
+
+#stampRallyResult5 { /* 摂津能勢の民家 */
+  height: auto;
+  left: 65%;
+  position: absolute;
+  top: 50%;
+  width: 25% !important;
+}
+
+#stampRallyResult6 { /* 庵美大島の高倉 */
+  height: auto;
+  left: 38%;
+  position: absolute;
+  top: 48.5%;
+  width: 24% !important;
+}
+
+#stampRallyResult7 { /* 信濃秋山の民家 */
+  height: auto;
+  left: 3%;
+  position: absolute;
+  top: 55%;
+  width: 30% !important;
+}
+
+#stampRallyResult8 { /* 大和十津川の民家 */
+  height: auto;
+  left: 3%;
+  position: absolute;
+  top: 38.5%;
+  width: 33% !important;
+}
+
+#stampRallyResult9 { /* 小豆島の農村歌舞伎舞台 */
+  height: auto;
+  left: 38%;
+  position: absolute;
+  top: 32%;
+  width: 21% !important;
+}
+
+#stampRallyResult10 { /* 南部の曲家 */
+  height: auto;
+  left: 66%;
+  position: absolute;
+  top: 23.5%;
+  width: 31% !important;
+}
+
+#stampRallyResult11 { /* 越前敦賀の民家 */
+  height: auto;
+  left: 15%;
+  position: absolute;
+  top: 25%;
+  width: 21% !important;
+}
+
+#stampRallyResult12 { /* 北河内の茶室 */
+  height: auto;
+  left: 39%;
+  position: absolute;
+  top: 18.5%;
+  width: 23% !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+img#stampRallyBackground {
+  position: absolute;
+  top: 0;
+}
+
+#stampRallyStampContents .stampRallyStamp {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 15%;
+}
+
+/* スタンプラリー完了エリア */
+#stampRallyCompleteContents {
+  position: relative;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 2;
+  display: none;
+}
+
+img#stampRallyCompleteBackground {
+  position: absolute;
+  top: 0;
+}
+
+.stampRallyCompleteBtnContents {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+/* スタンプラリー完了画面閉じるボタン */
+#closeCompleteBtn {
+  width: 15%;
+  margin-top: 5%;
+}
+
+/* アンケートに答えるボタン */
+#moveEnqueteBtn {
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  width: 85%;
+  transform: translate(-50%, -50%);
+}
+
+#stampRally #backBtn {
+  position: relative;
+  float: right;
+  margin-top: 165%;
+}
