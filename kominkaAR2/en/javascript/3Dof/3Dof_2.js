@@ -550,15 +550,15 @@ $(window).on("orientationchange", function (event) {
   debugScreenFlexGrid(getAngle());
 });
 
-const arrangementChange = document.getElementById("arrangementChange");
+//const arrangementChange = document.getElementById("arrangementChange");
 function debugScreenFlexGrid(angle) {
     if (angle == 0) {
-        const arrangementChange = document.getElementById("arrangementChange");
+        //const arrangementChange = document.getElementById("arrangementChange");
         const kominkaArLogoErea = document.getElementById("kominkaArLogoErea");
         const pageBackBtnErea = document.getElementById("pageBackBtnErea");
         const ARTargetImg = document.getElementById("ARTargetImg");
 
-        arrangementChange.setAttribute("style", "display: grid; height: 530px;");
+        //arrangementChange.setAttribute("style", "display: grid; height: 530px;");
         kominkaArLogoErea.setAttribute("style", "width: 20%;");
         pageBackBtnErea.setAttribute("style", "left: 87%; width: 12%;");
         ARTargetImg.setAttribute("src", "../../../image/ARImage/map_img_ar_frame_vertical.png");
@@ -567,12 +567,12 @@ function debugScreenFlexGrid(angle) {
     }
 
     if (angle == 90) {
-        const arrangementChange = document.getElementById("arrangementChange");
+        //const arrangementChange = document.getElementById("arrangementChange");
         const kominkaArLogoErea = document.getElementById("kominkaArLogoErea");
         const pageBackBtnErea = document.getElementById("pageBackBtnErea");
         const ARTargetImg = document.getElementById("ARTargetImg");
 
-        arrangementChange.setAttribute("style", "display: flex; height: 250px;");
+        //arrangementChange.setAttribute("style", "display: flex; height: 250px;");
         kominkaArLogoErea.setAttribute("style", "width: 10%;");
         pageBackBtnErea.setAttribute("style", "width: 6%;");
         ARTargetImg.setAttribute("src", "../../../image/ARImage/map_img_ar_frame.png");
@@ -580,12 +580,12 @@ function debugScreenFlexGrid(angle) {
         ARTargetImg.setAttribute("height", "100%");
     }
     if (angle == 270) {
-        const arrangementChange = document.getElementById("arrangementChange");
+        //const arrangementChange = document.getElementById("arrangementChange");
         const kominkaArLogoErea = document.getElementById("kominkaArLogoErea");
         const pageBackBtnErea = document.getElementById("pageBackBtnErea");
         const ARTargetImg = document.getElementById("ARTargetImg");
 
-        arrangementChange.setAttribute("style", "display: flex; height: 250px;");
+        //arrangementChange.setAttribute("style", "display: flex; height: 250px;");
         kominkaArLogoErea.setAttribute("style", "width: 10%;");
         pageBackBtnErea.setAttribute("style", "width: 6%;");
         ARTargetImg.setAttribute("src", "../../../image/ARImage/map_img_ar_frame.png");
