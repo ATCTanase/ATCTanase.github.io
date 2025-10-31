@@ -106,7 +106,12 @@ marker.addEventListener("markerFound", () => {
     });
     
     camera.object3D.quaternion.copy(new THREE.Quaternion());
+
+    // planeParentをマーカー基準で配置
+    planeParent.object3D.position.copy(markerLastPos);
+    planeParent.object3D.quaternion.copy(markerLastQuat);
 });
+
 marker.addEventListener("markerLost", () => {
     pseudoMode = true;
     camera.setAttribute('look-controls', {
