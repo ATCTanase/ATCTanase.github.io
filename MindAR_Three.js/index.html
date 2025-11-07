@@ -2,18 +2,20 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>MindAR Standing Image Example</title>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.4/dist/mindar-image-three.prod.js"></script>
+  <title>MindAR Standing Image Example (ESM)</title>
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
   </style>
 </head>
 <body>
-<script>
+
+<script type="module">
+  import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.module.js";
+  import { MindARThree } from "https://cdn.jsdelivr.net/npm/mind-ar@1.2.4/dist/mindar-image-three.module.js";
+
   // MindAR初期化
-  const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+  const mindarThree = new MindARThree({
     container: document.body,
     imageTargetSrc: './targets.mind',
   });
@@ -23,7 +25,7 @@
   // 設定部分
   // ==============================
   const folderPath = './AR1/';
-  const frameBaseName = 'kominka_AR1';
+  const frameBaseName = 'kominka_AR1_';
   const frameExt = '.png';
   const frameCount = 48;
   const frameRate = 6;
@@ -47,12 +49,8 @@
   const plane = new THREE.Mesh(geometry, material);
 
   // ✅ 平面を「垂直に立てる」
-  // MindARのマーカー面はXY平面にあるので、
-  // 垂直にしたい場合はX軸に -90° 回転
   plane.rotation.x = -Math.PI / 2;
-
-  // ✅ 少し浮かせて「マーカーの上に立つ」ように
-  plane.position.y = 0.5; // マーカーから上方向に0.5単位浮かせる
+  plane.position.y = 0.5;
 
   // Anchorに追加
   const anchor = mindarThree.addAnchor(0);
@@ -82,10 +80,7 @@
   let isMarkerVisible = false;
   let lastMatrix = new THREE.Matrix4();
 
-  anchor.onTargetFound = () => {
-    isMarkerVisible = true;
-  };
-
+  anchor.onTargetFound = () => { isMarkerVisible = true; };
   anchor.onTargetLost = () => {
     isMarkerVisible = false;
     lastMatrix.copy(anchor.group.matrixWorld);
@@ -98,11 +93,9 @@
     animateFrames(time);
 
     if (!isMarkerVisible) {
-      // マーカー見失い → 固定
       plane.matrixAutoUpdate = false;
       plane.matrix.copy(lastMatrix);
     } else {
-      // 検出中 → MindAR制御
       plane.matrixAutoUpdate = true;
     }
 
@@ -117,6 +110,8 @@
     renderer.setAnimationLoop(animate);
   };
   start();
+
 </script>
+
 </body>
 </html>
