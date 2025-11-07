@@ -2,29 +2,20 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>AR.js + Three.js + WebXR ハイブリッドAR</title>
+<title>AR.js + WebXR ハイブリッドAR</title>
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    height: 100%;
-    width: 100%;
-    background: black;
-  }
-  canvas {
-    display: block;
-  }
+html, body { margin:0; padding:0; overflow:hidden; width:100%; height:100%; background:black; }
+canvas { display:block; }
 </style>
 </head>
 <body>
 <canvas id="ar-canvas"></canvas>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/aframe/build/ar-threex.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.150.0/examples/jsm/webxr/ARButton.js"></script>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.module.js';
+import { ARButton } from 'https://cdn.jsdelivr.net/npm/three@0.150.0/examples/jsm/webxr/ARButton.js';
+import 'https://cdn.jsdelivr.net/npm/ar.js@3.3.2/aframe/build/ar-threex.js';
 
-<script>
 let scene, camera, renderer;
 let markerRoot, object, fixedObject = null;
 let arSource, arContext;
@@ -33,46 +24,41 @@ init();
 animate();
 
 function init() {
-  // Three.jsシーン
   scene = new THREE.Scene();
 
-  // カメラ
   camera = new THREE.Camera();
   scene.add(camera);
 
-  // レンダラー
   renderer = new THREE.WebGLRenderer({antialias:true, alpha:true, canvas: document.getElementById('ar-canvas')});
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
-  document.body.appendChild(ARButton.createButton(renderer, {requiredFeatures:['hit-test']}));
+  document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures:['hit-test'] }));
 
-  // 光源
   const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
   light.position.set(0.5, 1, 0.25);
   scene.add(light);
 
-  // AR.js ソース（Webカメラ）
+  // AR.js ソース
   arSource = new THREEx.ArToolkitSource({sourceType:'webcam'});
   arSource.init(() => onResize());
   window.addEventListener('resize', () => onResize());
 
   // AR.js コンテキスト
   arContext = new THREEx.ArToolkitContext({
-    cameraParametersUrl: 'https://cdn.jsdelivr.net/npm/ar.js@3.3.2/data/data/camera_para.dat',
-    detectionMode: 'mono'
+    cameraParametersUrl:'https://cdn.jsdelivr.net/npm/ar.js@3.3.2/data/data/camera_para.dat',
+    detectionMode:'mono'
   });
   arContext.init(() => camera.projectionMatrix.copy(arContext.getProjectionMatrix()));
 
   // マーカー
   markerRoot = new THREE.Group();
   scene.add(markerRoot);
-
   new THREEx.ArMarkerControls(arContext, markerRoot, {
-    type: 'pattern',
-    patternUrl: '/pattern-AR1.patt'
+    type:'pattern',
+    patternUrl:'/pattern-AR1.patt'
   });
 
-  // ARオブジェクト作成
+  // ARオブジェクト
   object = new THREE.Mesh(
     new THREE.BoxGeometry(1,1,1),
     new THREE.MeshNormalMaterial()
@@ -90,22 +76,20 @@ function onResize() {
 function animate() {
   requestAnimationFrame(animate);
 
-  // AR.jsの更新
-  if(arSource.ready) {
+  if(arSource.ready){
     arContext.update(arSource.domElement);
   }
 
-  // マーカー追従 or 固定
-  if(markerRoot.visible) {
+  if(markerRoot.visible){
     // マーカー追従中
-    if(fixedObject) {
+    if(fixedObject){
       scene.remove(fixedObject);
       fixedObject = null;
       markerRoot.add(object);
     }
   } else {
     // マーカー消失 → 固定
-    if(fixedObject === null) {
+    if(fixedObject === null){
       fixedObject = object;
       markerRoot.remove(object);
       scene.add(fixedObject);
