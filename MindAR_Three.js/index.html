@@ -9,11 +9,20 @@
   </style>
 </head>
 <body>
-
+    
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+    "mindar-image-three":"https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+  }
+}
+</script>
 <script type="module">
-  import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.module.js";
-  import { MindARThree } from "https://cdn.jsdelivr.net/npm/mind-ar@1.2.4/dist/mindar-image-three.module.js";
-
+  import * as THREE from 'three';
+  import { MindARThree } from 'mindar-image-three';
+  
   // MindAR初期化
   const mindarThree = new MindARThree({
     container: document.body,
