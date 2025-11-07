@@ -14,14 +14,25 @@
     }
 
     /* MindARが生成するvideo要素とcanvasを全画面に */
-    video, canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-    }
+video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 1; /* ← カメラ映像を最前面に */
+}
+
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2; /* ← Three.jsの描画を上に重ねる */
+  background: transparent !important; /* ← 黒塗り防止 */
+}
   </style>
 </head>
 <body>
@@ -74,7 +85,6 @@
   const plane = new THREE.Mesh(geometry, material);
 
   // ✅ 平面を「垂直に立てる」
-  plane.rotation.x = -Math.PI / 2;
   plane.position.y = 0.5;
 
   // Anchorに追加
