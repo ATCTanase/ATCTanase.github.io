@@ -1,151 +1,121 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>MindAR Standing Image Example (ESM)</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    /* MindARが生成するvideo要素とcanvasを全画面に */
-video {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  z-index: 0;
-}
-
-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1;
-  background: transparent !important; /* ← 黒塗り防止 */
-}
-  </style>
+<meta charset="UTF-8">
+<title>AR.js + Three.js + WebXR ハイブリッドAR</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    background: black;
+  }
+  canvas {
+    display: block;
+  }
+</style>
 </head>
 <body>
-    
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
-    "mindar-image-three":"https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
-  }
-}
-</script>
-<script type="module">
-  import * as THREE from 'three';
-  import { MindARThree } from 'mindar-image-three';
+<canvas id="ar-canvas"></canvas>
 
-  // MindAR初期化
-  const mindarThree = new MindARThree({
-    container: document.body,
-    imageTargetSrc: './targets.mind',
-  });
-  const { renderer, scene, camera } = mindarThree;
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/aframe/build/ar-threex.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.0/examples/jsm/webxr/ARButton.js"></script>
 
-  // ==============================
-  // 設定部分
-  // ==============================
-  const folderPath = './AR1/';
-  const frameBaseName = 'kominka_AR1_';
-  const frameExt = '.png';
-  const frameCount = 48;
-  const frameRate = 6;
+<script>
+let scene, camera, renderer;
+let markerRoot, object, fixedObject = null;
+let arSource, arContext;
 
-  // ==============================
-  // 画像読み込み
-  // ==============================
-  const loader = new THREE.TextureLoader();
-  const textures = [];
-  for (let i = 0; i <= frameCount; i++) {
-    textures.push(loader.load(`${folderPath}${frameBaseName}${i}${frameExt}`));
-  }
+init();
+animate();
 
-  // 🎞 平面メッシュを作成
-  const geometry = new THREE.PlaneGeometry(1, 1);
-  const material = new THREE.MeshBasicMaterial({
-    map: textures[0],
-    transparent: true,
-    side: THREE.DoubleSide,
-  });
-  const plane = new THREE.Mesh(geometry, material);
+function init() {
+  // Three.jsシーン
+  scene = new THREE.Scene();
 
-  // ✅ 平面を「垂直に立てる」
-  plane.position.y = 0.5;
+  // カメラ
+  camera = new THREE.Camera();
+  scene.add(camera);
 
-  // Anchorに追加
-  const anchor = mindarThree.addAnchor(0);
-  anchor.group.add(plane);
+  // レンダラー
+  renderer = new THREE.WebGLRenderer({antialias:true, alpha:true, canvas: document.getElementById('ar-canvas')});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.xr.enabled = true;
+  document.body.appendChild(ARButton.createButton(renderer, {requiredFeatures:['hit-test']}));
 
-  // ライト
+  // 光源
   const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+  light.position.set(0.5, 1, 0.25);
   scene.add(light);
 
-  // ==============================
-  // アニメーション設定
-  // ==============================
-  let frameIndex = 0;
-  let lastTime = 0;
-  const animateFrames = (time) => {
-    const delta = time - lastTime;
-    if (delta > 1000 / frameRate) {
-      frameIndex = (frameIndex + 1) % textures.length;
-      material.map = textures[frameIndex];
-      lastTime = time;
+  // AR.js ソース（Webカメラ）
+  arSource = new THREEx.ArToolkitSource({sourceType:'webcam'});
+  arSource.init(() => onResize());
+  window.addEventListener('resize', () => onResize());
+
+  // AR.js コンテキスト
+  arContext = new THREEx.ArToolkitContext({
+    cameraParametersUrl: 'https://cdn.jsdelivr.net/npm/ar.js@3.3.2/data/data/camera_para.dat',
+    detectionMode: 'mono'
+  });
+  arContext.init(() => camera.projectionMatrix.copy(arContext.getProjectionMatrix()));
+
+  // マーカー
+  markerRoot = new THREE.Group();
+  scene.add(markerRoot);
+
+  new THREEx.ArMarkerControls(arContext, markerRoot, {
+    type: 'pattern',
+    patternUrl: '/pattern-AR1.patt'
+  });
+
+  // ARオブジェクト作成
+  object = new THREE.Mesh(
+    new THREE.BoxGeometry(1,1,1),
+    new THREE.MeshNormalMaterial()
+  );
+  object.position.y = 0.5;
+  markerRoot.add(object);
+}
+
+function onResize() {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  if(arSource) arSource.onResizeElement();
+  if(arSource) arSource.copyElementSizeTo(renderer.domElement);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  // AR.jsの更新
+  if(arSource.ready) {
+    arContext.update(arSource.domElement);
+  }
+
+  // マーカー追従 or 固定
+  if(markerRoot.visible) {
+    // マーカー追従中
+    if(fixedObject) {
+      scene.remove(fixedObject);
+      fixedObject = null;
+      markerRoot.add(object);
     }
-  };
-
-  // ==============================
-  // マーカー追従ON/OFF制御
-  // ==============================
-  let isMarkerVisible = false;
-  let lastMatrix = new THREE.Matrix4();
-
-  anchor.onTargetFound = () => { isMarkerVisible = true; };
-  anchor.onTargetLost = () => {
-    isMarkerVisible = false;
-    lastMatrix.copy(anchor.group.matrixWorld);
-  };
-
-  // ==============================
-  // 毎フレーム更新
-  // ==============================
-  const animate = (time) => {
-    animateFrames(time);
-
-    if (!isMarkerVisible) {
-      plane.matrixAutoUpdate = false;
-      plane.matrix.copy(lastMatrix);
-    } else {
-      plane.matrixAutoUpdate = true;
+  } else {
+    // マーカー消失 → 固定
+    if(fixedObject === null) {
+      fixedObject = object;
+      markerRoot.remove(object);
+      scene.add(fixedObject);
+      fixedObject.position.setFromMatrixPosition(object.matrixWorld);
+      fixedObject.quaternion.setFromRotationMatrix(object.matrixWorld);
     }
+  }
 
-    renderer.render(scene, camera);
-  };
-
-  // ==============================
-  // 開始
-  // ==============================
-  const start = async () => {
-    await mindarThree.start();
-    renderer.setAnimationLoop(animate);
-  };
-  start();
-
+  renderer.render(scene, camera);
+}
 </script>
-
 </body>
 </html>
