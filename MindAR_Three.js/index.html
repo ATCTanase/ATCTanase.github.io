@@ -11,11 +11,13 @@
 <body>
 <canvas id="ar-canvas"></canvas>
 
-<!-- Step 1: AR.js を通常スクリプトで動かす -->
+<!-- ✅ 先に three.js と ar-threex を通常スクリプトで読み込む -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/three.js/build/ar-threex.min.js"></script>
+
 <script>
-let detectedMatrix = null;
+/* --- AR.js側：マーカー検出専用 --- */
+window.detectedMatrix = null;
 
 function initMarker() {
   const scene = new THREE.Scene();
@@ -26,11 +28,14 @@ function initMarker() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
+  // ✅ THREEx がここで使える（上で読み込んでいるため）
   const arSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+
   const arContext = new THREEx.ArToolkitContext({
     cameraParametersUrl: 'https://cdn.jsdelivr.net/npm/ar.js@3.3.2/data/data/camera_para.dat',
     detectionMode: 'mono'
   });
+
   arSource.init(() => arContext.init(() => camera.projectionMatrix.copy(arContext.getProjectionMatrix())));
 
   const markerRoot = new THREE.Group();
@@ -46,10 +51,10 @@ function initMarker() {
     if(arSource.ready) arContext.update(arSource.domElement);
     renderer.render(scene, camera);
     if(markerRoot.visible){
-      detectedMatrix = markerRoot.matrixWorld.clone();
-      console.log('✅ マーカー検出', detectedMatrix);
-      // 一度検出したらこのレンダラは停止
-      renderer.domElement.remove();
+      // ✅ マーカー検出時に matrixWorld を保存
+      window.detectedMatrix = markerRoot.matrixWorld.clone();
+      console.log('✅ マーカー検出', window.detectedMatrix);
+      renderer.domElement.remove(); // AR.js 停止
     }
   }
   renderLoop();
@@ -58,39 +63,35 @@ function initMarker() {
 initMarker();
 </script>
 
-<!-- Step 2: WebXR側をモジュールで起動 -->
+<!-- --- WebXR側：モジュールとして起動 --- -->
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.module.js';
 import { ARButton } from 'https://cdn.jsdelivr.net/npm/three@0.150.0/examples/jsm/webxr/ARButton.js';
 
-let scene, camera, renderer, xrRefSpace, cube;
+let scene, camera, renderer, cube;
 
-initXR();
+scene = new THREE.Scene();
+camera = new THREE.PerspectiveCamera();
+scene.add(camera);
 
-async function initXR(){
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera();
-  scene.add(camera);
+renderer = new THREE.WebGLRenderer({antialias:true, alpha:true, canvas:document.getElementById('ar-canvas')});
+renderer.xr.enabled = true;
+document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures:['hit-test'] }));
 
-  renderer = new THREE.WebGLRenderer({antialias:true, alpha:true, canvas:document.getElementById('ar-canvas')});
-  renderer.xr.enabled = true;
-  document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] }));
+const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+scene.add(light);
 
-  const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-  scene.add(light);
+cube = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.1), new THREE.MeshNormalMaterial());
+scene.add(cube);
 
-  cube = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.1), new THREE.MeshNormalMaterial());
-  scene.add(cube);
-
-  renderer.setAnimationLoop(() => {
-    if(window.detectedMatrix){
-      cube.matrixAutoUpdate = false;
-      cube.matrix.copy(window.detectedMatrix);
-      window.detectedMatrix = null;
-    }
-    renderer.render(scene, camera);
-  });
-}
+renderer.setAnimationLoop(() => {
+  if(window.detectedMatrix){
+    cube.matrixAutoUpdate = false;
+    cube.matrix.copy(window.detectedMatrix);
+    window.detectedMatrix = null;
+  }
+  renderer.render(scene, camera);
+});
 </script>
 </body>
 </html>
