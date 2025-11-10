@@ -10,17 +10,14 @@ canvas { display:block; }
 </head>
 <body>
 <canvas id="ar-canvas"></canvas>
-
 <script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/three.js/build/ar-threex.min.js"></script>
-
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.module.js';
-import { ARButton } from 'https://cdn.jsdelivr.net/npm/three@0.150.0/examples/jsm/webxr/ARButton.js';
-
-
-let scene, camera, renderer;
-let markerRoot, object, fixedObject = null;
-let arSource, arContext;
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.0/examples/jsm/webxr/ARButton.js"></script>
+<script>
+  // ここは通常スクリプトとして扱う
+  let scene, camera, renderer;
+  let markerRoot, object, fixedObject = null;
+  let arSource, arContext;
 
 init();
 animate();
