@@ -11,12 +11,11 @@
 <body>
 <canvas id="ar-canvas"></canvas>
 
-<!-- ✅ 先に three.js と ar-threex を通常スクリプトで読み込む -->
+<!-- ✅ 正しい順番とURL -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/three.js/build/ar-threex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/three.js/build/ar-threex.min.js"></script>
 
 <script>
-/* --- AR.js側：マーカー検出専用 --- */
 window.detectedMatrix = null;
 
 function initMarker() {
@@ -28,11 +27,11 @@ function initMarker() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // ✅ THREEx がここで使える（上で読み込んでいるため）
+  // ✅ THREEx がここで定義されている（上記のGitHub経由URLなら動く）
   const arSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
 
   const arContext = new THREEx.ArToolkitContext({
-    cameraParametersUrl: 'https://cdn.jsdelivr.net/npm/ar.js@3.3.2/data/data/camera_para.dat',
+    cameraParametersUrl: 'https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/three.js/data/camera_para.dat',
     detectionMode: 'mono'
   });
 
@@ -43,7 +42,7 @@ function initMarker() {
 
   new THREEx.ArMarkerControls(arContext, markerRoot, {
     type: 'pattern',
-    patternUrl: 'https://cdn.jsdelivr.net/npm/ar.js@3.3.2/data/data/patt.hiro'
+    patternUrl: 'https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/three.js/data/patt.hiro'
   });
 
   function renderLoop(){
@@ -51,10 +50,9 @@ function initMarker() {
     if(arSource.ready) arContext.update(arSource.domElement);
     renderer.render(scene, camera);
     if(markerRoot.visible){
-      // ✅ マーカー検出時に matrixWorld を保存
       window.detectedMatrix = markerRoot.matrixWorld.clone();
-      console.log('✅ マーカー検出', window.detectedMatrix);
-      renderer.domElement.remove(); // AR.js 停止
+      console.log('✅ マーカー検出');
+      renderer.domElement.remove(); // 一旦停止
     }
   }
   renderLoop();
@@ -63,25 +61,22 @@ function initMarker() {
 initMarker();
 </script>
 
-<!-- --- WebXR側：モジュールとして起動 --- -->
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.module.js';
 import { ARButton } from 'https://cdn.jsdelivr.net/npm/three@0.150.0/examples/jsm/webxr/ARButton.js';
 
-let scene, camera, renderer, cube;
-
-scene = new THREE.Scene();
-camera = new THREE.PerspectiveCamera();
+let scene = new THREE.Scene();
+let camera = new THREE.PerspectiveCamera();
 scene.add(camera);
 
-renderer = new THREE.WebGLRenderer({antialias:true, alpha:true, canvas:document.getElementById('ar-canvas')});
+let renderer = new THREE.WebGLRenderer({antialias:true, alpha:true, canvas:document.getElementById('ar-canvas')});
 renderer.xr.enabled = true;
 document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures:['hit-test'] }));
 
 const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
 scene.add(light);
 
-cube = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.1), new THREE.MeshNormalMaterial());
+const cube = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.1), new THREE.MeshNormalMaterial());
 scene.add(cube);
 
 renderer.setAnimationLoop(() => {
